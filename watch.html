@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <!-- ===== SEO / Social (static OG mặc định) ===== -->
+  <meta name="description" content="Khoii – Trang xem phim. Mở nhanh, xem mượt." />
+  <meta name="robots" content="index,follow" />
+
+  <link rel="canonical" href="https://YOUR-DOMAIN.COM/watch.html" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="video.other" />
+  <meta property="og:site_name" content="Khoii" />
+  <meta property="og:title" content="Khoii – Xem phim" />
+  <meta property="og:description" content="Khoii – Trang xem phim. Mở nhanh, xem mượt." />
+  <meta property="og:url" content="https://YOUR-DOMAIN.COM/watch.html" />
+  <meta property="og:image" content="https://YOUR-DOMAIN.COM/og.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Khoii – Xem phim" />
+  <meta name="twitter:description" content="Khoii – Trang xem phim. Mở nhanh, xem mượt." />
+  <meta name="twitter:image" content="https://YOUR-DOMAIN.COM/og.jpg" />
+
+  <link rel="icon" href="/favicon.ico" />
+  <meta name="theme-color" content="#0b1224" />
+  <title>Khoii - Xem phim</title>
+  <style>
+    :root{
+      --bg:#0b1224;
+      --text:#e7edf9;
+      --muted:rgba(231,237,249,.7);
+      --accent:#f2c64f;
+      --line:rgba(255,255,255,.12);
+    }
+    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui}
+    .wrap{max-width:1100px;margin:0 auto;padding:18px}
+    h2{margin:6px 0 14px}
+    .player{
+      position:relative;width:100%;padding-top:56.25%;
+      border-radius:18px;overflow:hidden;
+      border:1px solid var(--line);
+      box-shadow:0 18px 60px rgba(0,0,0,.45);
+      background:#000;
+    }
+    iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px;color:var(--muted)}
+    .pill{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h2 id="title">Đang tải…</h2>
+
+    <div class="player">
+      <iframe id="frame" allow="autoplay; fullscreen"></iframe>
+    </div>
+
+    <div class="row">
+      <span class="pill" id="fileId">ID: —</span>
+      <a id="openDrive" target="_blank" rel="noreferrer">Mở trên Drive</a>
+      <span>•</span>
+      <a href="index.html">← Quay lại</a>
+    </div>
+  </div>
+
+  <script>
+    const DriveTool = (() => {
+      const patterns = [
+        /drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]{10,})/i,
+        /drive\.google\.com\/open\?id=([a-zA-Z0-9_-]{10,})/i,
+        /drive\.google\.com\/uc\?id=([a-zA-Z0-9_-]{10,})/i,
+        /drive\.google\.com\/uc\?export=download&id=([a-zA-Z0-9_-]{10,})/i,
+      ];
+      function extractId(input){
+        const s = String(input || "").trim();
+        if (/^[a-zA-Z0-9_-]{10,}$/.test(s)) return s;
+        try{
+          const u = new URL(s);
+          const qid = u.searchParams.get("id");
+          if(qid && /^[a-zA-Z0-9_-]{10,}$/.test(qid)) return qid;
+        }catch{}
+        for(const re of patterns){
+          const m = s.match(re);
+          if(m && m[1]) return m[1];
+        }
+        return null;
+      }
+      function links(id){
+        return {
+          id,
+          preview: `https://drive.google.com/file/d/${id}/preview`,
+          view: `https://drive.google.com/file/d/${id}/view`,
+        };
+      }
+      function normalize(input){
+        const id = extractId(input);
+        if(!id) return { ok:false, error:"Không tách được ID từ link Drive.", id:null, links:null };
+        return { ok:true, id, links: links(id) };
+      }
+      return { normalize };
+    })();
+
+    const params = new URLSearchParams(location.search);
+    const drive = params.get("drive") || params.get("m") || "";
+    const titleQ = params.get("title") || "Xem phim";
+
+    const titleEl = document.getElementById("title");
+    const frameEl = document.getElementById("frame");
+    const fileIdEl = document.getElementById("fileId");
+    const openDrive = document.getElementById("openDrive");
+
+    const r = DriveTool.normalize(drive);
+
+    if(!r.ok){
+      titleEl.textContent = "Link Drive không hợp lệ";
+      fileIdEl.textContent = "ID: —";
+      frameEl.src = "";
+      openDrive.href = "index.html";
+    }else{
+      titleEl.textContent = titleQ;
+      fileIdEl.textContent = "ID: " + r.id;
+      frameEl.src = r.links.preview;
+      openDrive.href = r.links.view;
+    }
+  </script>
+</body>
+</html>
