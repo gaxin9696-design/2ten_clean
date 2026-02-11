@@ -3,571 +3,475 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Movie / Anime</title>
+  <title>UI Skeleton (Phim style)</title>
   <style>
     :root{
-      --bg:#0b0e14;
-      --card:#111827;
-      --muted:#9ca3af;
-      --line:#1f2937;
-      --accent:#22c55e;
-      --accent2:#60a5fa;
+      --bg0:#0a0b10;
+      --bg1:#0f1320;
+      --panel: rgba(255,255,255,.06);
+      --panel2: rgba(255,255,255,.04);
+      --stroke: rgba(255,255,255,.10);
+      --stroke2: rgba(255,255,255,.16);
+      --text:#e9edf6;
+      --muted:#a6b0c3;
+      --muted2:#7f8aa6;
+      --accent:#f1c55a;      /* vàng như mẫu */
+      --accent2:#60a5fa;     /* xanh nhẹ */
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --shadow2: 0 10px 30px rgba(0,0,0,.35);
+      --r12:12px; --r16:16px; --r20:20px; --r24:24px;
+      --max: 1180px;
     }
+
     *{box-sizing:border-box}
+    html,body{height:100%}
     body{
       margin:0;
+      color:var(--text);
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      background: linear-gradient(180deg, #070a10 0%, #0b0e14 25%, #06080d 100%);
-      color:#e5e7eb;
+      background:
+        radial-gradient(900px 520px at 20% 8%, rgba(96,165,250,.18), transparent 58%),
+        radial-gradient(900px 520px at 78% 12%, rgba(241,197,90,.12), transparent 58%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
     }
     a{color:inherit;text-decoration:none}
-    .wrap{max-width:1100px;margin:0 auto;padding:18px}
-    header{
-      display:flex;align-items:center;justify-content:space-between;gap:12px;
-      padding:10px 0 18px;border-bottom:1px solid var(--line)
+    .wrap{max-width:var(--max);margin:0 auto;padding:18px}
+    @media (max-width:540px){ .wrap{padding:14px} }
+
+    /* ========== TOP BAR ========== */
+    .topbar{
+      position:sticky; top:0; z-index:50;
+      background: linear-gradient(180deg, rgba(10,11,16,.92), rgba(10,11,16,.75));
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,.08);
     }
-    .brand{display:flex;align-items:center;gap:10px}
+    .topbar-inner{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:12px 18px;
+      display:flex; align-items:center; gap:14px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      min-width: 160px;
+    }
     .logo{
-      width:40px;height:40px;border-radius:12px;
-      background: radial-gradient(circle at 30% 30%, rgba(34,197,94,.6), rgba(96,165,250,.35));
-      box-shadow: 0 8px 20px rgba(0,0,0,.35);
+      width:40px;height:40px;border-radius:14px;
+      background:
+        radial-gradient(circle at 30% 25%, rgba(241,197,90,.9), rgba(96,165,250,.35)),
+        rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: var(--shadow2);
     }
-    .brand h1{font-size:18px;margin:0}
-    .nav{display:flex;gap:8px;flex-wrap:wrap}
-    .nav-btn{
-      padding:8px 12px;border:1px solid var(--line);border-radius:999px;
-      background:rgba(255,255,255,.03);cursor:pointer;
-      font-weight:600;font-size:13px;color:#e5e7eb;
+    .brand .t1{font-weight:950; letter-spacing:.2px; line-height:1}
+    .brand .t2{font-size:11px; color:var(--muted2); margin-top:2px}
+
+    .search{
+      flex: 1 1 auto;
+      display:flex; align-items:center; gap:10px;
+      padding:10px 12px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      min-width: 240px;
     }
-    .nav-btn.active{
-      border-color: rgba(34,197,94,.5);
-      box-shadow: 0 0 0 3px rgba(34,197,94,.15) inset;
-    }
-    .searchbar{
-      display:flex;gap:10px;align-items:center;flex-wrap:wrap;
-      padding:18px 0 14px;
-    }
-    .input{
-      flex: 1 1 320px;
-      display:flex;align-items:center;gap:10px;
-      padding:10px 12px;border-radius:14px;
-      background:rgba(255,255,255,.03);border:1px solid var(--line);
-    }
-    .input input{
-      width:100%;border:none;outline:none;background:transparent;color:#e5e7eb;
+    .search .ic{opacity:.8}
+    .search input{
+      width:100%;
+      border:none; outline:none;
+      background:transparent;
+      color:var(--text);
       font-size:14px;
     }
-    .pill{
-      padding:8px 12px;border-radius:999px;border:1px solid var(--line);
-      background:rgba(255,255,255,.03);color:#e5e7eb;
-      font-size:13px;cursor:pointer;font-weight:600;
+    .search:focus-within{
+      border-color: rgba(241,197,90,.45);
+      box-shadow: 0 0 0 4px rgba(241,197,90,.12);
     }
-    .pill:hover{border-color:rgba(255,255,255,.18)}
-    .grid{
-      display:grid;grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap:12px;
-    }
-    @media (max-width: 980px){ .grid{grid-template-columns: repeat(4, 1fr);} }
-    @media (max-width: 760px){ .grid{grid-template-columns: repeat(3, 1fr);} }
-    @media (max-width: 520px){ .grid{grid-template-columns: repeat(2, 1fr);} }
 
-    .card{
-      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
-      border:1px solid var(--line);
-      border-radius:18px;overflow:hidden;
-      box-shadow: 0 10px 28px rgba(0,0,0,.25);
-      display:flex;flex-direction:column;
+    .menu{
+      display:flex; align-items:center; gap:6px;
+      flex: 0 0 auto;
     }
-    .thumb{
-      aspect-ratio: 2/3;
-      width:100%;
-      background: #0f172a;
-      display:flex;align-items:center;justify-content:center;
-      position:relative;
+    .mitem{
+      padding:10px 12px;
+      border-radius: 999px;
+      border:1px solid transparent;
+      color: rgba(233,237,246,.92);
+      font-weight:800;
+      font-size:13px;
+      opacity:.92;
+      cursor:pointer;
+      white-space:nowrap;
     }
-    .thumb img{width:100%;height:100%;object-fit:cover;display:block}
-    .badge{
-      position:absolute;left:10px;top:10px;
-      padding:6px 10px;border-radius:999px;
-      font-size:12px;font-weight:800;
-      background:rgba(0,0,0,.45);backdrop-filter: blur(8px);
-      border:1px solid rgba(255,255,255,.12);
+    .mitem:hover{
+      border-color: rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      opacity:1;
     }
-    .badge.q{left:auto;right:10px}
-    .meta{padding:12px 12px 14px;display:flex;flex-direction:column;gap:6px}
-    .title{
-      font-weight:800;font-size:14px;line-height:1.25;
-      display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
-      min-height: 36px;
+
+    .member{
+      margin-left:6px;
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 12px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      font-weight:900;
+      cursor:pointer;
+      white-space:nowrap;
     }
-    .sub{display:flex;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
-    .chip{
-      padding:4px 8px;border:1px solid var(--line);border-radius:999px;
-      background:rgba(255,255,255,.02);font-weight:700;color:#d1d5db;
+    .member .dot{
+      width:10px;height:10px;border-radius:999px;
+      background: rgba(241,197,90,.9);
+      box-shadow: 0 0 0 3px rgba(241,197,90,.14);
     }
-    .row{display:flex;justify-content:space-between;align-items:center;margin-top:4px}
-    .imdb{font-weight:900;color:#fbbf24}
-    .btn{
-      display:inline-flex;gap:8px;align-items:center;justify-content:center;
-      padding:9px 10px;border-radius:12px;border:1px solid rgba(34,197,94,.35);
-      background:rgba(34,197,94,.10);
-      font-weight:800;font-size:13px;
+    @media (max-width: 980px){
+      .menu{display:none}
+      .brand{min-width:auto}
     }
-    .btn:hover{background:rgba(34,197,94,.16)}
+
+    /* ========== SECTION TITLE ========== */
+    .section-title{
+      display:flex; align-items:center; gap:10px;
+      margin:18px 0 12px;
+      color: rgba(233,237,246,.96);
+      font-weight:950;
+      letter-spacing:.2px;
+      font-size:26px;
+    }
+    .section-title .pill{
+      margin-left:6px;
+      display:inline-flex; align-items:center; justify-content:center;
+      width:34px;height:34px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      font-size:16px;
+      opacity:.9;
+    }
+
+    /* ========== HERO ========== */
     .hero{
-      margin:14px 0 18px;
-      border-radius:22px;
-      border:1px solid rgba(255,255,255,.08);
-      background: radial-gradient(circle at 20% 20%, rgba(96,165,250,.22), transparent 55%),
-                  radial-gradient(circle at 80% 30%, rgba(34,197,94,.18), transparent 55%),
-                  rgba(255,255,255,.02);
+      border-radius: var(--r24);
+      border:1px solid rgba(255,255,255,.10);
+      background:
+        radial-gradient(900px 520px at 22% 20%, rgba(255,255,255,.06), transparent 55%),
+        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      box-shadow: var(--shadow);
       overflow:hidden;
       position:relative;
-      box-shadow: 0 14px 40px rgba(0,0,0,.35);
     }
-    .hero-inner{display:grid;grid-template-columns: 1.1fr .9fr;gap:16px;padding:18px}
-    @media (max-width: 860px){ .hero-inner{grid-template-columns:1fr;} }
-    .hero h2{margin:0;font-size:22px}
-    .hero p{margin:8px 0 0;color:#d1d5db;line-height:1.5}
-    .hero-box{
-      border-radius:18px;border:1px solid rgba(255,255,255,.08);
-      background:rgba(0,0,0,.25);
-      padding:14px;
-      display:flex;flex-direction:column;gap:10px;
+
+    /* fake big image area (placeholder) */
+    .hero-media{
+      position:absolute; inset:0;
+      background:
+        radial-gradient(900px 520px at 70% 50%, rgba(255,255,255,.08), transparent 60%),
+        radial-gradient(600px 400px at 90% 30%, rgba(96,165,250,.12), transparent 55%),
+        radial-gradient(600px 400px at 55% 70%, rgba(241,197,90,.10), transparent 55%),
+        rgba(0,0,0,.22);
+      opacity:.9;
     }
-    .hero-preview{
-      border-radius:16px;overflow:hidden;aspect-ratio: 16/9;
-      background:#0b1222;border:1px solid rgba(255,255,255,.08);
-      display:flex;align-items:center;justify-content:center;
+
+    .hero::after{
+      content:"";
+      position:absolute; inset:0;
+      background: linear-gradient(90deg, rgba(0,0,0,.72) 0%, rgba(0,0,0,.40) 40%, rgba(0,0,0,.18) 70%, rgba(0,0,0,.06) 100%);
+      pointer-events:none;
+    }
+
+    .hero-inner{
+      position:relative;
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:18px;
+      padding:22px;
+      min-height: 360px;
+    }
+    @media (max-width: 900px){
+      .hero-inner{grid-template-columns:1fr; min-height:unset}
+    }
+
+    .hero-left{
+      display:flex; flex-direction:column; gap:12px;
+      padding:10px 6px;
+      max-width: 560px;
+    }
+    .hero-h1{
+      font-size:34px;
+      font-weight:980;
+      letter-spacing:.2px;
+      margin:0;
+      line-height:1.12;
+    }
+    .hero-sub{
+      color: rgba(233,237,246,.85);
+      font-size:14px;
+      margin-top:-4px;
+    }
+
+    .meta-row{
+      display:flex; gap:10px; flex-wrap:wrap;
+      margin-top:6px;
+    }
+    .tag{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:6px 10px;
+      border-radius: 10px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      backdrop-filter: blur(10px);
+      font-weight:900;
+      font-size:12px;
+      color: rgba(233,237,246,.92);
+    }
+    .tag.imdb{
+      border-color: rgba(241,197,90,.35);
+      box-shadow: 0 0 0 3px rgba(241,197,90,.10) inset;
+    }
+
+    .hero-desc{
+      margin:6px 0 0;
+      color: rgba(233,237,246,.84);
+      line-height:1.55;
+      font-size:14px;
+      max-width: 560px;
+    }
+
+    .hero-actions{
+      display:flex; gap:12px; flex-wrap:wrap;
+      margin-top:8px;
+      align-items:center;
+    }
+    .btn-play{
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      height:48px; padding:0 18px;
+      border-radius: 999px;
+      border:1px solid rgba(241,197,90,.35);
+      background: linear-gradient(180deg, rgba(241,197,90,.95), rgba(241,197,90,.72));
+      color:#14161f;
+      font-weight:980;
+      cursor:pointer;
+      box-shadow: 0 16px 40px rgba(241,197,90,.18);
+    }
+    .btn-ghost{
+      display:inline-flex; align-items:center; justify-content:center;
+      height:44px; width:44px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      cursor:pointer;
+      font-weight:950;
+      color: rgba(233,237,246,.92);
+    }
+    .btn-ghost:hover{background: rgba(255,255,255,.10);}
+
+    /* Right side “preview block” (placeholder) */
+    .hero-right{
+      display:flex; align-items:flex-end; justify-content:flex-end;
+      padding:10px 6px;
+    }
+    .preview-box{
+      width:min(420px, 100%);
+      border-radius: var(--r20);
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow2);
+      overflow:hidden;
+    }
+    .preview-media{
+      aspect-ratio: 16/9;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.06), rgba(255,255,255,.03)),
+        rgba(0,0,0,.22);
+      border-bottom:1px solid rgba(255,255,255,.10);
       position:relative;
     }
-    .hero-preview img{width:100%;height:100%;object-fit:cover;display:block}
-    .hero-dots{display:flex;gap:6px;justify-content:center}
-    .dot{
-      width:8px;height:8px;border-radius:999px;
-      background:rgba(255,255,255,.22);
-      border:1px solid rgba(255,255,255,.18);
+    .skeleton{
+      position:absolute; inset:0;
+      background: linear-gradient(90deg,
+        rgba(255,255,255,.02) 0%,
+        rgba(255,255,255,.07) 35%,
+        rgba(255,255,255,.02) 70%);
+      transform: translateX(-40%);
+      animation: shimmer 1.8s infinite;
+      opacity:.55;
     }
-    .dot.on{background:rgba(34,197,94,.75);border-color:rgba(34,197,94,.75)}
-    footer{padding:22px 0 6px;color:var(--muted);font-size:12px;text-align:center}
+    @keyframes shimmer{
+      0%{transform:translateX(-60%)}
+      100%{transform:translateX(60%)}
+    }
+    .preview-info{
+      padding:12px 12px 14px;
+      display:flex; flex-direction:column; gap:8px;
+    }
+    .line{
+      height:10px; border-radius:999px;
+      background: rgba(255,255,255,.08);
+    }
+    .line.w60{width:60%}
+    .line.w80{width:80%}
+    .line.w40{width:40%}
+
+    /* ========== CAROUSEL ========== */
+    .carousel{
+      margin-top:14px;
+      border-radius: var(--r24);
+      border:1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
+      box-shadow: var(--shadow2);
+      overflow:hidden;
+    }
+    .carousel-inner{
+      padding:14px 14px 16px;
+    }
+    .strip{
+      display:flex;
+      gap:10px;
+      overflow:auto;
+      padding-bottom: 4px;
+      scroll-snap-type: x mandatory;
+    }
+    .strip::-webkit-scrollbar{height:10px}
+    .strip::-webkit-scrollbar-thumb{
+      background: rgba(255,255,255,.10);
+      border-radius:999px;
+    }
+    .thumb{
+      scroll-snap-align:start;
+      width:92px; flex: 0 0 92px;
+      aspect-ratio: 2/3;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.12);
+      background:
+        radial-gradient(60px 60px at 30% 20%, rgba(241,197,90,.10), transparent 65%),
+        radial-gradient(60px 60px at 70% 30%, rgba(96,165,250,.10), transparent 65%),
+        rgba(0,0,0,.22);
+      box-shadow: 0 10px 24px rgba(0,0,0,.30);
+      position:relative;
+      overflow:hidden;
+    }
+    .thumb .skeleton{opacity:.45}
+    .thumb:hover{border-color: rgba(255,255,255,.20); transform: translateY(-2px); transition:.15s ease;}
+
+    /* optional: section spacing */
+    .spacer{height:14px}
   </style>
 </head>
+
 <body>
-  <div class="wrap">
-    <header>
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-inner">
       <div class="brand">
         <div class="logo"></div>
         <div>
-          <h1>Movies / Anime Library</h1>
-          <div style="color:var(--muted);font-size:12px;margin-top:2px">Browse • Filter • Watch</div>
+          <div class="t1">PhimApp</div>
+          <div class="t2">Phim Hot Update Nhanh</div>
         </div>
       </div>
-      <nav class="nav">
-        <button class="nav-btn active" data-kind="all">Tất cả</button>
-        <button class="nav-btn" data-kind="movie">Movie</button>
-        <button class="nav-btn" data-kind="anime">Anime</button>
-      </nav>
-    </header>
 
-    <section class="hero" id="hero">
+      <div class="search">
+        <div class="ic">🔎</div>
+        <input placeholder="Tìm kiếm phim, diễn viên..." />
+      </div>
+
+      <div class="menu">
+        <div class="mitem">Thể loại ▾</div>
+        <div class="mitem">Phim Lẻ</div>
+        <div class="mitem">Phim Bộ</div>
+        <div class="mitem">Quốc gia ▾</div>
+      </div>
+
+      <div class="member">
+        <span class="dot"></span>
+        <span>Thành viên</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <!-- TITLE -->
+    <div class="section-title">
+      Kho Tàng Anime Mới Nhất
+      <span class="pill">›</span>
+    </div>
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-media"></div>
+
       <div class="hero-inner">
-        <div>
-          <h2>Gợi ý hôm nay</h2>
-          <p>Chọn thể loại, tìm nhanh theo tên, lọc chất lượng/năm và bấm Watch để xem.</p>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
-            <button class="pill" id="shuffleBtn">🎲 Random</button>
-            <button class="pill" id="clearFilter">🧹 Clear Filter</button>
+        <div class="hero-left">
+          <h1 class="hero-h1">Tên Anime / Phim (Placeholder)</h1>
+          <div class="hero-sub">Tên phụ / English title (placeholder)</div>
+
+          <div class="meta-row">
+            <span class="tag imdb">IMDb 6.8</span>
+            <span class="tag">FHD</span>
+            <span class="tag">2025</span>
+            <span class="tag">Phần 2</span>
+            <span class="tag">Tập 18</span>
+          </div>
+
+          <div class="meta-row" style="margin-top:2px">
+            <span class="tag">Chính Kịch</span>
+            <span class="tag">Hoạt Hình</span>
+            <span class="tag">Tình Cảm</span>
+            <span class="tag">Tâm Lý</span>
+          </div>
+
+          <p class="hero-desc">
+            Đây là phần mô tả nội dung (placeholder). Bạn có thể để dài 2–3 dòng như web mẫu.
+            Khi gắn data thật, chỗ này render description.
+          </p>
+
+          <div class="hero-actions">
+            <button class="btn-play">▶ Xem ngay</button>
+            <button class="btn-ghost">♡</button>
+            <button class="btn-ghost">i</button>
           </div>
         </div>
-        <div class="hero-box">
-          <div class="hero-preview" id="heroPreview">
-            <div style="color:var(--muted);font-weight:800">Đang tải...</div>
+
+        <div class="hero-right">
+          <div class="preview-box">
+            <div class="preview-media">
+              <div class="skeleton"></div>
+            </div>
+            <div class="preview-info">
+              <div class="line w80"></div>
+              <div class="line w60"></div>
+              <div class="line w40"></div>
+            </div>
           </div>
-          <div class="hero-dots" id="heroDots"></div>
         </div>
       </div>
     </section>
 
-    <div class="searchbar">
-      <div class="input">
-        🔎
-        <input id="q" placeholder="Tìm theo tên / year / country..." autocomplete="off" />
+    <!-- CAROUSEL THUMBNAILS (placeholders) -->
+    <section class="carousel">
+      <div class="carousel-inner">
+        <div class="strip">
+          <!-- 14 thumbnails placeholder -->
+          <div class="thumb"><div class="skeleton"></div></div>
+          <div class="thumb"><div class="skeleton"></div></div>
+          <div class="thumb"><div class="skeleton"></div></div>
+          <div class="thumb"><div class="skeleton"></div></div>
+          <div class="thumb"><div class="skeleton"></div></div>
+          <div class="thumb"><div class="skeleton"></div></div>
+          <div class="thumb"><div class="skeleton"></div></div>
+          <div class="thumb"><div class="skeleton"></div></div>
+          <div class="thumb"><div class="skeleton"></div></div>
+          <div class="thumb"><div class="skeleton"></div></div>
+          <div class="thumb"><div class="skeleton"></div></div>
+          <div class="thumb"><div class="skeleton"></div></div>
+          <div class="thumb"><div class="skeleton"></div></div>
+          <div class="thumb"><div class="skeleton"></div></div>
+        </div>
       </div>
-      <select class="pill" id="qualitySel">
-        <option value="">Quality: All</option>
-        <option>HD</option>
-        <option>FHD</option>
-        <option>4K</option>
-      </select>
-      <select class="pill" id="yearSel">
-        <option value="">Year: All</option>
-      </select>
-      <select class="pill" id="countrySel">
-        <option value="">Country: All</option>
-      </select>
-      <select class="pill" id="genreSel">
-        <option value="">Genre: All</option>
-      </select>
-    </div>
+    </section>
 
-    <div class="grid" id="grid"></div>
-
-    <footer>
-      © <span id="yearNow"></span> • Local JSON/Supabase compatible
-    </footer>
+    <div class="spacer"></div>
   </div>
-
-  <script>
-    // ================== CONFIG ==================
-    // Nếu bạn dùng Supabase, điền URL + anon key + tên table.
-    // Nếu không, script sẽ fallback dữ liệu demo hoặc bạn tự nạp JSON.
-    const SUPABASE_URL = "https://nzalaxolteaiafvuceqz.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56YWxheG9sdGVhaWFmdnVjZXF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyOTY2MjAsImV4cCI6MjA4NTg3MjYyMH0.0eIz6cfB4Dr_g5Wja70tZCMvVfUKoI5H4D8MJBP49Bg";
-    const TABLE = "movies";
-
-    const STORAGE_KEY = "movieapp_data_cache_v1";
-
-    // ================== STATE ==================
-    const state = {
-      kind: "all", // all | movie | anime
-      q: "",
-      quality: "",
-      year: "",
-      country: "",
-      genre: "",
-      items: [],
-      heroItems: [],
-      heroIndex: 0,
-      heroTimer: null,
-    };
-
-    const el = {
-      grid: document.getElementById("grid"),
-      q: document.getElementById("q"),
-      qualitySel: document.getElementById("qualitySel"),
-      yearSel: document.getElementById("yearSel"),
-      countrySel: document.getElementById("countrySel"),
-      genreSel: document.getElementById("genreSel"),
-      shuffleBtn: document.getElementById("shuffleBtn"),
-      clearFilter: document.getElementById("clearFilter"),
-      navBtns: [...document.querySelectorAll(".nav .nav-btn")],
-      heroPreview: document.getElementById("heroPreview"),
-      heroDots: document.getElementById("heroDots"),
-      yearNow: document.getElementById("yearNow"),
-    };
-
-    function safeText(s){ return String(s ?? ""); }
-
-    function escapeHtml(s){
-      return safeText(s)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#39;");
-    }
-
-    function pick(obj, keys){
-      const o = {};
-      for(const k of keys) o[k] = obj[k];
-      return o;
-    }
-
-    function normalizeItem(x){
-      // Map dữ liệu nhiều format về 1 format chung
-      return {
-        id: safeText(x.id ?? x.slug ?? crypto.randomUUID()),
-        title: safeText(x.title ?? x.name ?? "Untitled"),
-        kind: safeText(x.kind ?? x.type ?? "movie"),
-        year: safeText(x.year ?? ""),
-        quality: safeText(x.quality ?? x.q ?? ""),
-        imdb: safeText(x.imdb ?? x.rating ?? ""),
-        country: safeText(x.country ?? x.nation ?? ""),
-        genre: safeText(x.genre ?? x.categories ?? ""),
-        poster: safeText(x.poster ?? x.thumb ?? x.image ?? ""),
-        url: safeText(x.url ?? x.link ?? x.watch ?? ""),
-      };
-    }
-
-    async function loadData(){
-      // 1) localStorage cache
-      const old = localStorage.getItem(STORAGE_KEY);
-      if(old){
-        try{
-          const parsed = JSON.parse(old);
-          if(Array.isArray(parsed) && parsed.length){
-            state.items = parsed.map(normalizeItem);
-            return;
-          }
-        }catch{}
-      }
-
-      // 2) Supabase (nếu có)
-      if(SUPABASE_URL && SUPABASE_ANON_KEY){
-        try{
-          // load supabase dynamic
-          const script = document.createElement("script");
-          script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
-          document.head.appendChild(script);
-          await new Promise((res, rej)=>{script.onload=res; script.onerror=rej;});
-
-          const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-          const { data, error } = await supabase.from(TABLE).select("*");
-          if(error) throw error;
-
-          state.items = (data ?? []).map(normalizeItem);
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
-          return;
-        }catch(err){
-          console.warn("Supabase load failed, fallback demo:", err);
-        }
-      }
-
-      // 3) demo fallback
-      const fallback = [
-        {
-          id: "demo1",
-          title: "Demo Movie",
-          kind: "movie",
-          year: "2026",
-          quality: "FHD",
-          imdb: "6.8",
-          country: "VN",
-          genre: "Action",
-          poster: "",
-          url: "watch.html?url=",
-        },
-        {
-          id: "demo2",
-          title: "Demo Anime",
-          kind: "anime",
-          year: "2025",
-          quality: "HD",
-          imdb: "7.4",
-          country: "JP",
-          genre: "Fantasy",
-          poster: "",
-          url: "watch.html?url=",
-        }
-      ];
-      state.items = fallback.map(normalizeItem);
-    }
-
-    function uniqueSorted(list){
-      const set = new Set();
-      list.forEach(v=>{
-        const s = safeText(v).trim();
-        if(s) set.add(s);
-      });
-      return [...set].sort((a,b)=>a.localeCompare(b));
-    }
-
-    function buildFilters(){
-      // years numeric sort desc
-      const years = uniqueSorted(state.items.map(x=>x.year)).sort((a,b)=>{
-        const na=Number(a), nb=Number(b);
-        if(!Number.isNaN(na) && !Number.isNaN(nb)) return nb-na;
-        return b.localeCompare(a);
-      });
-
-      const countries = uniqueSorted(state.items.map(x=>x.country));
-      const genres = uniqueSorted(state.items.map(x=>x.genre));
-
-      // fill selects (keep first option)
-      function fill(sel, arr){
-        const first = sel.options[0];
-        sel.innerHTML = "";
-        sel.appendChild(first);
-        arr.forEach(v=>{
-          const opt=document.createElement("option");
-          opt.value=v; opt.textContent=v;
-          sel.appendChild(opt);
-        });
-      }
-      fill(el.yearSel, years);
-      fill(el.countrySel, countries);
-      fill(el.genreSel, genres);
-    }
-
-    function applyFilters(items){
-      const q = state.q.trim().toLowerCase();
-      return items.filter(x=>{
-        if(state.kind !== "all" && x.kind !== state.kind) return false;
-        if(state.quality && x.quality !== state.quality) return false;
-        if(state.year && x.year !== state.year) return false;
-        if(state.country && x.country !== state.country) return false;
-        if(state.genre && x.genre !== state.genre) return false;
-
-        if(q){
-          const hay = `${x.title} ${x.year} ${x.country} ${x.genre} ${x.quality}`.toLowerCase();
-          if(!hay.includes(q)) return false;
-        }
-        return true;
-      });
-    }
-
-    function cardHtml(x){
-      const poster = x.poster ? `<img src="${escapeHtml(x.poster)}" alt="${escapeHtml(x.title)}">` : `<div style="color:var(--muted);font-weight:900">No Poster</div>`;
-      const badgeKind = x.kind ? `<div class="badge">${escapeHtml(x.kind.toUpperCase())}</div>` : "";
-      const badgeQ = x.quality ? `<div class="badge q">${escapeHtml(x.quality)}</div>` : "";
-      const imdb = x.imdb ? `<div class="imdb">⭐ ${escapeHtml(x.imdb)}</div>` : `<div style="color:var(--muted);font-weight:900">—</div>`;
-      const url = x.url || `watch.html?url=${encodeURIComponent(x.id)}`;
-      return `
-        <article class="card">
-          <div class="thumb">
-            ${poster}
-            ${badgeKind}
-            ${badgeQ}
-          </div>
-          <div class="meta">
-            <div class="title">${escapeHtml(x.title)}</div>
-            <div class="sub">
-              ${x.year ? `<span class="chip">${escapeHtml(x.year)}</span>`:""}
-              ${x.country ? `<span class="chip">${escapeHtml(x.country)}</span>`:""}
-              ${x.genre ? `<span class="chip">${escapeHtml(x.genre)}</span>`:""}
-            </div>
-            <div class="row">
-              ${imdb}
-              <a class="btn" href="${escapeHtml(url)}">▶ Watch</a>
-            </div>
-          </div>
-        </article>
-      `;
-    }
-
-    function render(){
-      const filtered = applyFilters(state.items);
-      el.grid.innerHTML = filtered.map(cardHtml).join("");
-      buildHero(filtered);
-    }
-
-    function buildHero(filtered){
-      // pick up to 5 items for hero
-      const items = (filtered.length ? filtered : state.items).slice(0, 5);
-      state.heroItems = items;
-      state.heroIndex = 0;
-      renderHero();
-      renderHeroDots();
-      resetHeroTimer();
-    }
-
-    function renderHero(){
-      const x = state.heroItems[state.heroIndex];
-      if(!x){
-        el.heroPreview.innerHTML = `<div style="color:var(--muted);font-weight:900">No items</div>`;
-        return;
-      }
-      const poster = x.poster ? `<img src="${escapeHtml(x.poster)}" alt="${escapeHtml(x.title)}">` : `<div style="color:var(--muted);font-weight:900">No Poster</div>`;
-      const url = x.url || `watch.html?url=${encodeURIComponent(x.id)}`;
-      el.heroPreview.innerHTML = `
-        <a href="${escapeHtml(url)}" style="width:100%;height:100%;display:block;position:relative">
-          ${poster}
-          <div style="position:absolute;left:10px;bottom:10px;right:10px;
-            padding:10px 12px;border-radius:14px;background:rgba(0,0,0,.45);
-            border:1px solid rgba(255,255,255,.14);backdrop-filter: blur(10px);">
-            <div style="font-weight:900">${escapeHtml(x.title)}</div>
-            <div style="margin-top:4px;color:#d1d5db;font-size:12px;display:flex;gap:8px;flex-wrap:wrap">
-              ${x.kind ? `<span class="chip">${escapeHtml(x.kind.toUpperCase())}</span>`:""}
-              ${x.year ? `<span class="chip">${escapeHtml(x.year)}</span>`:""}
-              ${x.quality ? `<span class="chip">${escapeHtml(x.quality)}</span>`:""}
-              ${x.country ? `<span class="chip">${escapeHtml(x.country)}</span>`:""}
-            </div>
-          </div>
-        </a>
-      `;
-      updateHeroDots();
-    }
-
-    function renderHeroDots(){
-      el.heroDots.innerHTML = "";
-      for(let i=0;i<state.heroItems.length;i++){
-        const d=document.createElement("div");
-        d.className="dot" + (i===state.heroIndex ? " on":"");
-        d.addEventListener("click", ()=>{ state.heroIndex=i; renderHero(); });
-        el.heroDots.appendChild(d);
-      }
-    }
-
-    function updateHeroDots(){
-      [...el.heroDots.querySelectorAll(".dot")]
-        .forEach((d,i)=>d.classList.toggle("on", i===state.heroIndex));
-    }
-
-    function resetHeroTimer(){
-      if(state.heroTimer) clearInterval(state.heroTimer);
-      state.heroTimer = setInterval(()=>{
-        if(!state.heroItems.length) return;
-        state.heroIndex = (state.heroIndex + 1) % state.heroItems.length;
-        renderHero();
-      }, 3500);
-    }
-
-    function shuffle(){
-      // Fisher-Yates
-      const a = [...state.items];
-      for(let i=a.length-1;i>0;i--){
-        const j = Math.floor(Math.random()*(i+1));
-        [a[i],a[j]]=[a[j],a[i]];
-      }
-      state.items = a;
-      render();
-    }
-
-    function clearFilters(){
-      state.kind="all";
-      state.q="";
-      state.quality="";
-      state.year="";
-      state.country="";
-      state.genre="";
-      el.q.value="";
-      el.qualitySel.value="";
-      el.yearSel.value="";
-      el.countrySel.value="";
-      el.genreSel.value="";
-      el.navBtns.forEach(b=>b.classList.toggle("active", b.dataset.kind==="all"));
-      render();
-    }
-
-    function bind(){
-      el.q.addEventListener("input", ()=>{
-        state.q = el.q.value;
-        render();
-      });
-      el.qualitySel.addEventListener("change", ()=>{
-        state.quality = el.qualitySel.value;
-        render();
-      });
-      el.yearSel.addEventListener("change", ()=>{
-        state.year = el.yearSel.value;
-        render();
-      });
-      el.countrySel.addEventListener("change", ()=>{
-        state.country = el.countrySel.value;
-        render();
-      });
-      el.genreSel.addEventListener("change", ()=>{
-        state.genre = el.genreSel.value;
-        render();
-      });
-      el.shuffleBtn.addEventListener("click", shuffle);
-      el.clearFilter.addEventListener("click", clearFilters);
-      el.navBtns.forEach(btn=>{
-        btn.addEventListener("click", ()=>{
-          state.kind = btn.dataset.kind;
-          el.navBtns.forEach(b=>b.classList.toggle("active", b===btn));
-          render();
-        });
-      });
-    }
-
-    (async function init(){
-      el.yearNow.textContent = String(new Date().getFullYear());
-      await loadData();
-      buildFilters();
-      bind();
-      render();
-    })();
-  </script>
 </body>
 </html>
