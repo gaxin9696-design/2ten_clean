@@ -9,7 +9,6 @@
       --bg:#0b0e14;
       --line:#1f2937;
       --muted:#9ca3af;
-      --accent:#22c55e;
     }
     *{box-sizing:border-box}
     body{
@@ -46,12 +45,13 @@
       font-size:13px;
     }
     button{
-      padding:9px 12px;border-radius:12px;border:1px solid rgba(34,197,94,.35);
-      background:rgba(34,197,94,.10);
+      padding:9px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
       font-weight:800;font-size:13px;color:#e5e7eb;cursor:pointer;
     }
-    button:hover{background:rgba(34,197,94,.16)}
+    button:hover{background:rgba(255,255,255,.10)}
     .muted{color:var(--muted);font-size:12px}
+    code{background:rgba(255,255,255,.06);padding:2px 6px;border-radius:8px}
   </style>
 </head>
 <body>
@@ -59,7 +59,7 @@
     <header>
       <div>
         <h1>Watch</h1>
-        <div class="muted" style="margin-top:2px">Paste a Google Drive link / embed link</div>
+        <div class="muted" style="margin-top:2px">Stream từ Google Drive (preview iframe)</div>
       </div>
       <a class="pill" href="index.html">← Home</a>
     </header>
@@ -67,20 +67,21 @@
     <div class="player">
       <iframe id="frame" allow="autoplay; encrypted-media" allowfullscreen></iframe>
       <div class="bar">
-        <input id="url" placeholder="Dán link Drive: https://drive.google.com/file/d/.../view">
+        <input id="id" placeholder="Drive VIDEO ID hoặc link Drive video (file/d/ID/view)">
         <button id="go">Load</button>
       </div>
     </div>
 
     <p class="muted" style="margin-top:12px">
-      Tip: Link Drive dạng <code>file/d/ID/view</code> sẽ tự chuyển sang <code>.../preview</code>.
+      Dùng link dạng <code>https://drive.google.com/file/d/ID/view</code> hoặc chỉ dán <code>ID</code>.
+      File Drive phải để <b>Anyone with the link can view</b>.
     </p>
   </div>
 
   <script>
     const el = {
       frame: document.getElementById("frame"),
-      url: document.getElementById("url"),
+      id: document.getElementById("id"),
       go: document.getElementById("go"),
     };
 
@@ -90,57 +91,36 @@
     }
 
     function extractDriveId(link){
-      try{
-        const u = new URL(link);
-        const s = u.pathname;
-
-        // /file/d/<ID>/view
-        const m1 = s.match(/\/file\/d\/([^\/]+)/);
-        if(m1) return m1[1];
-
-        // /open?id=<ID>
-        const id = u.searchParams.get("id");
-        if(id) return id;
-
-        // uc?id=<ID>
-        const id2 = u.searchParams.get("id");
-        if(id2) return id2;
-
-        return "";
-      }catch{
-        // maybe plain id
-        return link.trim();
-      }
+      const s = String(link || "").trim();
+      let m = s.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+      if(m) return m[1];
+      m = s.match(/open\?id=([a-zA-Z0-9_-]+)/);
+      if(m) return m[1];
+      m = s.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+      if(m) return m[1];
+      // nếu user dán thẳng ID
+      return s;
     }
 
     function toDrivePreview(linkOrId){
-      const raw = String(linkOrId || "").trim();
-      if(!raw) return "";
-      if(raw.startsWith("http")){
-        const id = extractDriveId(raw);
-        if(id) return `https://drive.google.com/file/d/${id}/preview`;
-        return raw;
-      }
-      // treat as id
-      return `https://drive.google.com/file/d/${raw}/preview`;
+      const id = extractDriveId(linkOrId);
+      if(!id) return "";
+      return `https://drive.google.com/file/d/${encodeURIComponent(id)}/preview`;
     }
 
-    function load(url){
-      el.frame.src = url;
+    function load(linkOrId){
+      const url = toDrivePreview(linkOrId);
+      if(url) el.frame.src = url;
     }
 
-    el.go.addEventListener("click", ()=>{
-      const url = toDrivePreview(el.url.value);
-      if(url) load(url);
-    });
+    el.go.addEventListener("click", ()=> load(el.id.value));
 
-    // auto from query param ?url=
+    // auto từ query: watch.html?id=DRIVEID
     (function init(){
-      const q = getParam("url");
+      const q = getParam("id");
       if(q){
-        el.url.value = q;
-        const url = toDrivePreview(q);
-        if(url) load(url);
+        el.id.value = q;
+        load(q);
       }
     })();
   </script>
