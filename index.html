@@ -678,7 +678,42 @@
 
   </div>
 
-  <script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    // ================== SUPABASE (Public Read) ==================
+    // Điền thông tin của bạn:
+    const SUPABASE_URL = "https://nzalaxolteaiafvuceqz.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56YWxheG9sdGVhaWFmdnVjZXF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyOTY2MjAsImV4cCI6MjA4NTg3MjYyMH0.0eIz6cfB4Dr_g5Wja70tZCMvVfUKoI5H4D8MJBP49Bg";
+    const supabase = window.supabase?.createClient
+      ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+      : null;
+
+    async function dbListMoviesPublic(){
+      if(!supabase) return null;
+      const { data, error } = await supabase
+        .from("movies")
+        .select("id,title,kind,year,quality,desc,driveid,drivelink,posterurl,herourl,updatedat")
+        .order("updatedat", { ascending: false });
+      if(error){
+        console.warn("Supabase load error:", error);
+        return null;
+      }
+      return (data || []).map(row => ({
+        id: row.id,
+        title: row.title,
+        kind: row.kind,
+        year: row.year || "",
+        quality: row.quality || "FHD",
+        desc: row.desc || "",
+        driveId: row.driveid,
+        driveLink: row.drivelink || "",
+        posterUrl: row.posterurl || "",
+        heroUrl: row.herourl || "",
+        updatedAt: Number(row.updatedat || 0)
+      }));
+    }
+
+
     const STORAGE_KEY = "khoii_drive_movies_v1";
     const LEGACY_KEY  = "my_drive_movies_v2";
 
@@ -970,8 +1005,9 @@
         .replaceAll("'","&#039;");
     }
 
-    function loadItems(){
-      const saved = loadMovies();
+    async function loadItems(){
+      const db = await dbListMoviesPublic();
+      const saved = (db && db.length) ? db : loadMovies();
       items = (saved.length ? saved : fallback).map(toIndexItem);
       return items;
     }
@@ -1078,12 +1114,12 @@
 
     el.q.addEventListener("input", applyFilter);
 
-    function refreshHome(){
-      loadItems();
+    async function refreshHome(){
+      await loadItems();
       applyFilter();
     }
 
-    refreshHome();
+    (async () => { await refreshHome(); })();
 
     window.addEventListener("storage", (e) => {
       if(e.key === STORAGE_KEY) refreshHome();
