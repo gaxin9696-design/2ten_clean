@@ -859,6 +859,14 @@
       posterSquares: document.getElementById("posterSquares"),
       heroContent: document.querySelector(".hero-content"),
     };
+    // Fallback nếu ảnh hero lỗi (drive/private/bị chặn hotlink)
+    [el.heroImgA, el.heroImgB].forEach(img=>{
+      if (!img) return;
+      img.addEventListener("error", ()=>{
+        img.src = svgPlaceholder("Image unavailable", 1600, 900);
+      });
+    });
+
 
     let items = [];
     let filtered = [];
