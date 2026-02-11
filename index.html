@@ -22,7 +22,6 @@
       --r12:12px; --r16:16px; --r20:20px; --r24:24px;
       --max: 1180px;
     }
-
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
@@ -38,7 +37,6 @@
     .wrap{max-width:var(--max);margin:0 auto;padding:18px}
     @media (max-width:540px){ .wrap{padding:14px} }
 
-    /* TOPBAR */
     .topbar{
       position:sticky; top:0; z-index:50;
       background: linear-gradient(180deg, rgba(10,11,16,.92), rgba(10,11,16,.75));
@@ -122,7 +120,6 @@
       .brand{min-width:auto}
     }
 
-    /* Dropdown */
     .dropdown{position:relative; display:inline-block;}
     .dd-panel{
       position:absolute;
@@ -150,7 +147,6 @@
     .dd-item:hover{background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.08);}
     .dd-item small{color:var(--muted2); font-weight:900}
 
-    /* TITLE */
     .section-title{
       display:flex; align-items:center; gap:10px;
       margin:18px 0 12px;
@@ -168,7 +164,6 @@
       opacity:.9;
     }
 
-    /* HERO (NO animation, NO poster) */
     .hero{
       border-radius: var(--r24);
       border:1px solid rgba(255,255,255,.10);
@@ -236,7 +231,6 @@
     }
     .btn-ghost:hover{background: rgba(255,255,255,.10);}
 
-    /* Right side: khung placeholder tĩnh */
     .hero-right{display:flex; align-items:flex-end; justify-content:flex-end; padding:10px 6px;}
     .preview-box{
       width:min(420px, 100%);
@@ -261,7 +255,6 @@
     .line.w80{width:80%}
     .line.w40{width:40%}
 
-    /* CAROUSEL */
     .carousel{
       margin-top:14px;
       border-radius: var(--r24);
@@ -319,7 +312,6 @@
       opacity:.95;
     }
 
-    /* Modal */
     .modal-backdrop{
       position:fixed; inset:0;
       background: rgba(0,0,0,.60);
@@ -377,14 +369,13 @@
 </head>
 
 <body>
-  <!-- TOPBAR -->
   <div class="topbar">
     <div class="topbar-inner">
       <div class="brand" id="homeBtn" title="Về trang chủ">
         <div class="logo"></div>
         <div>
           <div class="t1">PhimApp</div>
-          <div class="t2">Khung sườn UI • không ảnh/không animation</div>
+          <div class="t2">Khung sườn UI • load Supabase/localStorage</div>
         </div>
       </div>
 
@@ -419,20 +410,14 @@
       <span class="pill">›</span>
     </div>
 
-    <!-- HERO -->
     <section class="hero">
       <div class="hero-inner">
         <div class="hero-left">
-          <h1 class="hero-h1" id="heroTitle">Tên Anime / Phim (Placeholder)</h1>
-          <div class="hero-sub" id="heroSub">Tên phụ / English title (placeholder)</div>
-
+          <h1 class="hero-h1" id="heroTitle">—</h1>
+          <div class="hero-sub" id="heroSub"></div>
           <div class="meta-row" id="heroMetaTop"></div>
           <div class="meta-row" id="heroMetaTags" style="margin-top:2px"></div>
-
-          <p class="hero-desc" id="heroDesc">
-            Đây là mô tả nội dung (placeholder).
-          </p>
-
+          <p class="hero-desc" id="heroDesc"></p>
           <div class="hero-actions">
             <button class="btn-play" id="playBtn">▶ Xem ngay</button>
             <button class="btn-ghost" id="favBtn" title="Yêu thích">♡</button>
@@ -453,7 +438,6 @@
       </div>
     </section>
 
-    <!-- CAROUSEL -->
     <section class="carousel">
       <div class="carousel-inner">
         <div class="strip" id="strip"></div>
@@ -461,7 +445,6 @@
     </section>
   </div>
 
-  <!-- MODAL -->
   <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true">
       <div class="modal-head">
@@ -472,50 +455,36 @@
     </div>
   </div>
 
-  <div class="toast" id="toast">Saved</div>
+  <div class="toast" id="toast">Loaded</div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    <script>
-  // ================== CONFIG ==================
-  // Nếu bạn dùng Supabase: điền URL + anon key + tên table
-  // Nếu bỏ trống: app sẽ dùng localStorage -> rồi fallback demo.
-  const SUPABASE_URL = "https://nzalaxolteaiafvuceqz.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56YWxheG9sdGVhaWFmdnVjZXF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyOTY2MjAsImV4cCI6MjA4NTg3MjYyMH0.0eIz6cfB4Dr_g5Wja70tZCMvVfUKoI5H4D8MJBP49Bg";
-  const SUPABASE_TABLE = "movies";
+    // ================== CONFIG ==================
+    const SUPABASE_URL = "https://nzalaxolteaiafvuceqz.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56YWxheG9sdGVhaWFmdnVjZXF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyOTY2MjAsImV4cCI6MjA4NTg3MjYyMH0.0eIz6cfB4Dr_g5Wja70tZCMvVfUKoI5H4D8MJBP49Bg";
+    const SUPABASE_TABLE = "movies";
 
-  // cache/local keys
-  const LS_FAV = "phimapp_favs_v1";
-  const LS_CACHE = "movieapp_data_cache_v1";
+    const LS_FAV = "phimapp_favs_v1";
+    const LS_CACHE = "movieapp_data_cache_v1";
 
-    // ========== DATA (placeholder) ==========
-    // Bạn có thể thay bằng data từ localStorage/Supabase sau.
-    const DATA = [
+    // ========== FALLBACK DEMO (nếu Supabase + cache rỗng) ==========
+    const DEMO = [
       { id:"aono2", type:"series", title:"Ao no Orchestra 2nd Season", sub:"Blue Orchestra Season 2", imdb:"6.8", quality:"FHD", year:"2025", part:"Phần 2", ep:"Tập 18",
         tags:["Chính Kịch","Hoạt Hình","Tình Cảm","Tâm Lý"], genre:"Hoạt Hình", country:"JP",
         desc:"Vào mùa thu năm cuối cấp trung học cơ sở... (placeholder mô tả)"},
-      { id:"dandadan", type:"series", title:"Dandadan", sub:"Dandadan (TV)", imdb:"8.1", quality:"FHD", year:"2024", part:"Phần 1", ep:"Tập 12",
-        tags:["Hài","Siêu Nhiên","Hành Động"], genre:"Siêu Nhiên", country:"JP",
-        desc:"Một cặp đôi kỳ lạ lao vào những vụ việc..."},
-      { id:"solo", type:"series", title:"Solo Leveling", sub:"Ore dake Level Up na Ken", imdb:"8.3", quality:"FHD", year:"2024", part:"Phần 1", ep:"Tập 12",
-        tags:["Hành Động","Fantasy"], genre:"Fantasy", country:"KR",
-        desc:"Thế giới nơi thợ săn săn quái..."},
       { id:"movie1", type:"movie", title:"The Demo Movie", sub:"Demo Movie 2026", imdb:"7.0", quality:"4K", year:"2026", part:"", ep:"",
         tags:["Hành Động","Phiêu Lưu"], genre:"Hành Động", country:"US",
         desc:"Phim demo để test UI."},
-      { id:"anime1", type:"series", title:"Anime Placeholder", sub:"Anime Sub Title", imdb:"7.6", quality:"HD", year:"2023", part:"Phần 1", ep:"Tập 24",
-        tags:["Phiêu Lưu","Fantasy"], genre:"Fantasy", country:"VN",
-        desc:"Mô tả placeholder…"}
     ];
-
-    const LS_FAV = "phimapp_favs_v1";
 
     // ========== STATE ==========
     const state = {
+      DATA: [],
       q: "",
       type: "all",       // all | movie | series
       genre: "",
       country: "",
-      activeId: DATA[0]?.id ?? "",
+      activeId: "",
       favs: new Set(),
     };
 
@@ -553,7 +522,6 @@
       toast: document.getElementById("toast"),
     };
 
-    // ========== HELPERS ==========
     function escapeHtml(s){
       return String(s ?? "")
         .replaceAll("&","&amp;")
@@ -570,6 +538,12 @@
       toast._t = setTimeout(()=> el.toast.classList.remove("show"), 1200);
     }
 
+    function unique(list){
+      const s = new Set();
+      list.forEach(v=>{ if(String(v||"").trim()) s.add(String(v).trim()); });
+      return [...s].sort((a,b)=>a.localeCompare(b));
+    }
+
     function loadFavs(){
       try{
         const raw = localStorage.getItem(LS_FAV);
@@ -584,20 +558,86 @@
       localStorage.setItem(LS_FAV, JSON.stringify([...state.favs]));
     }
 
-    function getActive(){
-      return DATA.find(x=>x.id === state.activeId) || DATA[0];
+    // ====== Cache helpers ======
+    function readCache(){
+      const s = localStorage.getItem(LS_CACHE);
+      if(!s) return [];
+      try{
+        const arr = JSON.parse(s);
+        return Array.isArray(arr) ? arr : [];
+      }catch{ return []; }
+    }
+    function writeCache(items){
+      localStorage.setItem(LS_CACHE, JSON.stringify(items));
     }
 
-    function unique(list){
-      const s = new Set();
-      list.forEach(v=>{ if(String(v||"").trim()) s.add(String(v).trim()); });
-      return [...s].sort((a,b)=>a.localeCompare(b));
+    // ====== Map DB row -> UI item ======
+    function mapDbRowToUi(row){
+      // table movies: {id,title,kind,year,quality,imdb,country,genre,poster,url,driveid}
+      const type = (row.kind === "movie") ? "movie" : "series"; // bạn có thể đổi rule nếu muốn
+      return {
+        id: String(row.id ?? ""),
+        type,
+        title: String(row.title ?? ""),
+        sub: "", // chưa có field => để trống
+        imdb: String(row.imdb ?? ""),
+        quality: String(row.quality ?? ""),
+        year: String(row.year ?? ""),
+        part: "",
+        ep: "",
+        tags: row.genre ? [String(row.genre)] : [],
+        genre: String(row.genre ?? ""),
+        country: String(row.country ?? ""),
+        desc: "", // chưa có field => để trống
+        poster: String(row.poster ?? ""),
+        url: String(row.url ?? ""),
+        driveid: String(row.driveid ?? ""),
+      };
+    }
+
+    async function loadFromSupabase(){
+      if(!SUPABASE_URL || !SUPABASE_ANON_KEY) return [];
+      try{
+        const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // cần policy SELECT nếu RLS bật
+        const { data, error } = await sb
+          .from(SUPABASE_TABLE)
+          .select("id,title,kind,year,quality,imdb,country,genre,poster,url,driveid")
+          .order("id", { ascending: false })
+          .limit(200);
+
+        if(error) throw error;
+        return (data || []).map(mapDbRowToUi);
+      }catch(e){
+        console.warn("Supabase load failed:", e?.message || e);
+        return [];
+      }
+    }
+
+    async function bootstrapData(){
+      // 1) thử Supabase
+      const fromDb = await loadFromSupabase();
+      if(fromDb.length){
+        // sync cache để lần sau load nhanh/offline
+        writeCache(fromDb);
+        return { items: fromDb, source: "supabase" };
+      }
+
+      // 2) fallback localStorage
+      const fromCache = readCache();
+      if(fromCache.length){
+        return { items: fromCache, source: "localStorage" };
+      }
+
+      // 3) fallback demo
+      return { items: DEMO, source: "demo" };
     }
 
     // ========== FILTERING ==========
     function filteredItems(){
       const q = state.q.trim().toLowerCase();
-      return DATA.filter(x=>{
+      return state.DATA.filter(x=>{
         if(state.type !== "all" && x.type !== state.type) return false;
         if(state.genre && x.genre !== state.genre) return false;
         if(state.country && x.country !== state.country) return false;
@@ -610,15 +650,26 @@
       });
     }
 
+    function getActive(){
+      return state.DATA.find(x=>x.id === state.activeId) || state.DATA[0];
+    }
+
     // ========== RENDER ==========
     function renderHero(){
       const x = getActive();
-      if(!x) return;
+      if(!x){
+        el.heroTitle.textContent = "Chưa có dữ liệu";
+        el.heroSub.textContent = "";
+        el.heroMetaTop.innerHTML = "";
+        el.heroMetaTags.innerHTML = "";
+        el.heroDesc.textContent = "";
+        el.favBtn.textContent = "♡";
+        return;
+      }
 
       el.heroTitle.textContent = x.title || "—";
       el.heroSub.textContent = x.sub || "";
 
-      // meta top row
       const top = [];
       if(x.imdb) top.push(`<span class="tag imdb">IMDb ${escapeHtml(x.imdb)}</span>`);
       if(x.quality) top.push(`<span class="tag">${escapeHtml(x.quality)}</span>`);
@@ -627,12 +678,9 @@
       if(x.ep) top.push(`<span class="tag">${escapeHtml(x.ep)}</span>`);
       el.heroMetaTop.innerHTML = top.join("");
 
-      // tag row
       el.heroMetaTags.innerHTML = (x.tags || []).map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join("");
-
       el.heroDesc.textContent = x.desc || "";
 
-      // fav button
       el.favBtn.textContent = state.favs.has(x.id) ? "♥" : "♡";
       el.favBtn.title = state.favs.has(x.id) ? "Bỏ yêu thích" : "Yêu thích";
     }
@@ -640,7 +688,6 @@
     function renderStrip(){
       const items = filteredItems();
 
-      // ensure active is visible; if active filtered out, switch to first item
       if(items.length && !items.some(i=>i.id===state.activeId)){
         state.activeId = items[0].id;
       }
@@ -656,9 +703,8 @@
         `;
       }).join("");
 
-      // bind click
       [...el.strip.querySelectorAll(".thumb")].forEach(card=>{
-        card.addEventListener("click", (e)=>{
+        card.addEventListener("click", ()=>{
           const id = card.getAttribute("data-id");
           if(!id) return;
           state.activeId = id;
@@ -669,8 +715,8 @@
     }
 
     function renderDropdowns(){
-      const genres = unique(DATA.map(x=>x.genre));
-      const countries = unique(DATA.map(x=>x.country));
+      const genres = unique(state.DATA.map(x=>x.genre));
+      const countries = unique(state.DATA.map(x=>x.country));
 
       el.ddGenre.innerHTML = [
         `<div class="dd-item" data-v=""><span>Tất cả</span><small>${genres.length}</small></div>`,
@@ -682,7 +728,6 @@
         ...countries.map(c=>`<div class="dd-item" data-v="${escapeHtml(c)}"><span>${escapeHtml(c)}</span></div>`)
       ].join("");
 
-      // click handlers
       [...el.ddGenre.querySelectorAll(".dd-item")].forEach(it=>{
         it.addEventListener("click", ()=>{
           state.genre = it.getAttribute("data-v") || "";
@@ -707,20 +752,16 @@
     }
 
     function syncMenuActive(){
-      // type buttons
       el.btnMovie.classList.toggle("active", state.type==="movie");
       el.btnSeries.classList.toggle("active", state.type==="series");
-
-      // dropdown buttons: active if filter selected
       el.btnGenre.classList.toggle("active", !!state.genre);
       el.btnCountry.classList.toggle("active", !!state.country);
 
-      // show filter state in button text
       el.btnGenre.textContent = state.genre ? `Thể loại: ${state.genre} ▾` : "Thể loại ▾";
       el.btnCountry.textContent = state.country ? `Quốc gia: ${state.country} ▾` : "Quốc gia ▾";
     }
 
-    // ========== DROPDOWN CONTROL ==========
+    // ========== DROPDOWN ==========
     function closeDropdowns(){
       el.ddGenre.classList.remove("open");
       el.ddCountry.classList.remove("open");
@@ -753,18 +794,15 @@
 
     // ========== EVENTS ==========
     function bind(){
-      // search
       el.searchInput.addEventListener("input", ()=>{
         state.q = el.searchInput.value;
         renderStrip();
         renderHero();
       });
 
-      // menu dropdown toggles
       el.btnGenre.addEventListener("click", (e)=>{ e.stopPropagation(); toggleDropdown("genre"); });
       el.btnCountry.addEventListener("click", (e)=>{ e.stopPropagation(); toggleDropdown("country"); });
 
-      // type filter
       el.btnMovie.addEventListener("click", ()=>{
         state.type = (state.type==="movie") ? "all" : "movie";
         toast(state.type==="movie" ? "Filter: Movie" : "Filter: All");
@@ -776,18 +814,16 @@
         renderStrip(); renderHero(); syncMenuActive();
       });
 
-      // click outside to close dropdown
       document.addEventListener("click", ()=> closeDropdowns());
 
-      // play button
       el.playBtn.addEventListener("click", ()=>{
         const x = getActive();
         if(!x) return;
-        // chuyển sang watch.html. Bạn có thể đổi sang link thật: x.url
-        location.href = `watch.html?url=${encodeURIComponent(x.id)}`;
+        // nếu DB có url thì đi theo url, fallback theo id
+        if(x.url) location.href = x.url;
+        else location.href = `watch.html?url=${encodeURIComponent(x.id)}`;
       });
 
-      // fav button
       el.favBtn.addEventListener("click", ()=>{
         const x = getActive();
         if(!x) return;
@@ -803,7 +839,6 @@
         renderStrip();
       });
 
-      // info button
       el.infoBtn.addEventListener("click", ()=>{
         const x = getActive();
         if(!x) return;
@@ -816,26 +851,20 @@
             ${x.country ? `<span class="tag">${escapeHtml(x.country)}</span>`:""}
             <span class="tag">${escapeHtml(x.type)}</span>
           </div>
-          <div style="color:rgba(233, hookup)"></div>
           <div><b>Mô tả:</b><br>${escapeHtml(x.desc || "—")}</div>
           <div style="margin-top:10px;color:rgba(233,237,246,.78)">
             <b>ID:</b> ${escapeHtml(x.id)}
           </div>
-        `.replace("hookup","237,246,.88"); // tránh highlight tự động
+        `;
         openModal(x.title || "Thông tin", html);
       });
 
-      // modal close
       el.modalClose.addEventListener("click", closeModal);
       el.modalBackdrop.addEventListener("click", (e)=>{ if(e.target===el.modalBackdrop) closeModal(); });
       document.addEventListener("keydown", (e)=>{ if(e.key==="Escape") closeModal(); });
 
-      // member -> mở admin
-      el.memberBtn.addEventListener("click", ()=>{
-        location.href = "test.html";
-      });
+      el.memberBtn.addEventListener("click", ()=>{ location.href = "test.html"; });
 
-      // brand -> reset filters
       el.homeBtn.addEventListener("click", ()=>{
         state.q=""; state.type="all"; state.genre=""; state.country="";
         el.searchInput.value="";
@@ -845,8 +874,15 @@
     }
 
     // ========== INIT ==========
-    (function init(){
+    (async function init(){
       loadFavs();
+
+      const boot = await bootstrapData();
+      state.DATA = boot.items;
+      state.activeId = state.DATA[0]?.id || "";
+
+      toast(`Loaded: ${boot.source} (${state.DATA.length})`);
+
       renderDropdowns();
       syncMenuActive();
       bind();
