@@ -1,1311 +1,573 @@
-<!-- =========================
-     FILE: index.html (FULL COPY)
-     UI: giống web mẫu (hero + dots tiny + blur/fade + poster ô vuông)
-========================= -->
-<!doctype html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="Khoii – Xem phim nhanh, giao diện đẹp. Cập nhật phim mới, xem trên mọi thiết bị." />
-  <meta name="robots" content="index,follow" />
-  <meta name="theme-color" content="#0b1224" />
-  <title>Khoii - Home</title>
-
+  <title>Movie / Anime</title>
   <style>
     :root{
-      --bg0:#0b0f17; --bg1:#0b1224;
-      --text:#e7edf9; --muted:rgba(231,237,249,.72);
-      --line:rgba(255,255,255,.10); --line2:rgba(255,255,255,.16);
-      --glass:rgba(18,24,36,.72); --glass2:rgba(18,24,36,.55);
-      --accent:#f2c64f;
-      --radius:22px;
-      --shadow:0 18px 65px rgba(0,0,0,.55);
+      --bg:#0b0e14;
+      --card:#111827;
+      --muted:#9ca3af;
+      --line:#1f2937;
+      --accent:#22c55e;
+      --accent2:#60a5fa;
     }
     *{box-sizing:border-box}
-    html,body{height:100%}
     body{
       margin:0;
-      font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,"Apple Color Emoji","Segoe UI Emoji";
-      color:var(--text);
-      background:
-        radial-gradient(1200px 500px at 20% -10%, rgba(99,102,241,.18), transparent 55%),
-        radial-gradient(900px 420px at 85% 10%, rgba(245,158,11,.10), transparent 55%),
-        linear-gradient(180deg,var(--bg0),var(--bg1));
-      overflow-x:hidden;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background: linear-gradient(180deg, #070a10 0%, #0b0e14 25%, #06080d 100%);
+      color:#e5e7eb;
     }
-
-    /* ===== tiny dots overlay (giống web mẫu) ===== */
-    body::before{
-      content:"";
-      position:fixed; inset:0;
-      pointer-events:none;
-      z-index:0;
-      background-image:
-        radial-gradient(circle, rgba(255,255,255,.22) 1px, transparent 1.2px),
-        radial-gradient(circle, rgba(255,255,255,.14) 1px, transparent 1.25px);
-      background-size:6px 6px, 12px 12px;
-      background-position:0 0, 3px 3px;
-      opacity:.14;
-      mix-blend-mode:overlay;
-      filter:blur(.15px);
+    a{color:inherit;text-decoration:none}
+    .wrap{max-width:1100px;margin:0 auto;padding:18px}
+    header{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      padding:10px 0 18px;border-bottom:1px solid var(--line)
     }
-    .container{
-      position:relative; z-index:1;
-      max-width:1320px;
-      margin:0 auto;
-      padding:18px 22px 40px;
+    .brand{display:flex;align-items:center;gap:10px}
+    .logo{
+      width:40px;height:40px;border-radius:12px;
+      background: radial-gradient(circle at 30% 30%, rgba(34,197,94,.6), rgba(96,165,250,.35));
+      box-shadow: 0 8px 20px rgba(0,0,0,.35);
     }
-
-    /* ===== TOPBAR ===== */
-    .topbar{display:flex;align-items:center;gap:16px}
-    .brand{display:flex;align-items:center;gap:10px;min-width:170px}
-    .brand-logo{
-      width:44px;height:34px;border-radius:10px;
-      display:grid;place-items:center;
-      font-weight:900;letter-spacing:.6px;color:#0b1224;
-      background:
-        radial-gradient(18px 18px at 30% 35%, rgba(255,255,255,.22), transparent 60%),
-        linear-gradient(135deg,#f59e0b,#fb7185);
-      box-shadow:0 10px 25px rgba(245,158,11,.22);
-      position:relative;overflow:hidden;user-select:none;
+    .brand h1{font-size:18px;margin:0}
+    .nav{display:flex;gap:8px;flex-wrap:wrap}
+    .nav-btn{
+      padding:8px 12px;border:1px solid var(--line);border-radius:999px;
+      background:rgba(255,255,255,.03);cursor:pointer;
+      font-weight:600;font-size:13px;color:#e5e7eb;
     }
-    .brand-logo:before{
-      content:"";position:absolute;inset:0;
-      background:conic-gradient(from 220deg, rgba(0,0,0,.35), transparent 40%, rgba(0,0,0,.28));
-      mix-blend-mode:overlay;
+    .nav-btn.active{
+      border-color: rgba(34,197,94,.5);
+      box-shadow: 0 0 0 3px rgba(34,197,94,.15) inset;
     }
-    .brand-logo span{position:relative;z-index:1}
-    .brand-name{font-weight:900;letter-spacing:.3px;font-size:18px;line-height:1.1}
-    .brand-sub{font-size:11px;color:rgba(231,237,249,.55);margin-top:2px}
-
-    .search{
-      flex:1;max-width:620px;
+    .searchbar{
+      display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+      padding:18px 0 14px;
+    }
+    .input{
+      flex: 1 1 320px;
       display:flex;align-items:center;gap:10px;
-      padding:10px 14px;border-radius:12px;
-      background:var(--glass);
-      border:1px solid rgba(255,255,255,.12);
-      box-shadow:0 10px 30px rgba(0,0,0,.30);
-      backdrop-filter:blur(14px);
+      padding:10px 12px;border-radius:14px;
+      background:rgba(255,255,255,.03);border:1px solid var(--line);
     }
-    .search input{
-      width:100%;border:0;outline:0;background:transparent;
-      color:var(--text);font-size:14px;
+    .input input{
+      width:100%;border:none;outline:none;background:transparent;color:#e5e7eb;
+      font-size:14px;
     }
-    .search input::placeholder{color:rgba(231,237,249,.50)}
+    .pill{
+      padding:8px 12px;border-radius:999px;border:1px solid var(--line);
+      background:rgba(255,255,255,.03);color:#e5e7eb;
+      font-size:13px;cursor:pointer;font-weight:600;
+    }
+    .pill:hover{border-color:rgba(255,255,255,.18)}
+    .grid{
+      display:grid;grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap:12px;
+    }
+    @media (max-width: 980px){ .grid{grid-template-columns: repeat(4, 1fr);} }
+    @media (max-width: 760px){ .grid{grid-template-columns: repeat(3, 1fr);} }
+    @media (max-width: 520px){ .grid{grid-template-columns: repeat(2, 1fr);} }
 
-    .nav{display:flex;align-items:center;gap:14px;margin-left:6px}
-    .nav a{
-      color:rgba(231,237,249,.88);
-      text-decoration:none;font-size:14px;
-      display:inline-flex;align-items:center;gap:6px;
-      padding:8px 10px;border-radius:10px;
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:1px solid var(--line);
+      border-radius:18px;overflow:hidden;
+      box-shadow: 0 10px 28px rgba(0,0,0,.25);
+      display:flex;flex-direction:column;
     }
-    .nav a:hover{background:rgba(255,255,255,.06)}
-    .nav a.active{
-      border:1px solid rgba(242,198,79,.35);
-      background:rgba(242,198,79,.10);
-    }
-
-    .member-btn{
-      margin-left:auto;
-      display:inline-flex;align-items:center;gap:10px;
-      padding:10px 14px;border-radius:999px;
-      border:1px solid rgba(255,255,255,.12);
-      background:var(--glass2);
-      color:var(--text);cursor:pointer;
-      backdrop-filter:blur(14px);
-      box-shadow:0 10px 30px rgba(0,0,0,.24);
-    }
-    .member-btn:hover{border-color:var(--line2)}
-
-    /* ===== SECTION TITLE ===== */
-    .section-title{margin-top:18px;display:flex;align-items:center;gap:12px}
-    .section-title h2{margin:0;font-size:30px;letter-spacing:.2px}
-    .circle-action{
-      width:34px;height:34px;border-radius:999px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(18,24,36,.55);
-      display:grid;place-items:center;cursor:pointer;
-      backdrop-filter:blur(12px);
-    }
-    .circle-action:hover{background:rgba(255,255,255,.06)}
-
-    /* ===== Tooltip ===== */
-    .tip{position:relative}
-    .tip::after{
-      content:attr(data-tip);
-      position:absolute;left:50%;
-      transform:translateX(-50%) translateY(6px);
-      bottom:100%;
-      background:rgba(10,14,22,.92);
-      border:1px solid rgba(255,255,255,.14);
-      box-shadow:0 12px 30px rgba(0,0,0,.35);
-      color:rgba(231,237,249,.92);
-      padding:8px 10px;border-radius:10px;
-      font-size:12px;white-space:nowrap;
-      opacity:0;pointer-events:none;
-      transition:opacity .15s ease, transform .15s ease;
-      backdrop-filter:blur(10px);
-      z-index:99;
-    }
-    .tip:hover::after{opacity:1;transform:translateX(-50%) translateY(0)}
-
-    /* ===== HERO ===== */
-    .hero{
-      margin-top:14px;
-      position:relative;overflow:hidden;
-      border-radius:var(--radius);
-      min-height:520px;
-      border:1px solid rgba(255,255,255,.08);
-      box-shadow:var(--shadow);
-      background:#0b0f17;
-      isolation:isolate;
-    }
-    .hero-media{
-      position:absolute;inset:0;left:auto;
-      width:64%;height:100%;
-      object-fit:cover;
-      transform:scale(1.04);
-      filter:saturate(1.05) contrast(1.03) brightness(.96);
-      background:#0b0f17;
-      z-index:0;
-      opacity:0;
-      transition:opacity .35s ease;
-      -webkit-mask-image:linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 18%, rgba(0,0,0,1) 100%);
-      mask-image:linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 18%, rgba(0,0,0,1) 100%);
-      will-change:opacity, filter, transform;
-    }
-    .hero-media.on{opacity:1}
-
-    /* blur->clear khi đổi banner */
-    .hero-media.reveal{animation:heroReveal .55s ease both}
-    @keyframes heroReveal{
-      from{opacity:0;filter:blur(16px) saturate(1.05) contrast(1.03) brightness(.96);transform:scale(1.08)}
-      to{opacity:1;filter:blur(0) saturate(1.05) contrast(1.03) brightness(.96);transform:scale(1.04)}
-    }
-    .hero::before{
-      content:"";
-      position:absolute; inset:0;
-      pointer-events:none;
-      z-index:1;
-
-      /* phân chia vùng tối (trái) -> sáng (phải) + làm mờ giống web mẫu */
-      background:
-        radial-gradient(120% 95% at 18% 45%, rgba(0,0,0,.82) 0%, rgba(0,0,0,.58) 44%, rgba(0,0,0,.22) 72%, rgba(0,0,0,0) 100%),
-        linear-gradient(90deg, rgba(0,0,0,.64) 0%, rgba(0,0,0,.46) 38%, rgba(0,0,0,.16) 68%, rgba(0,0,0,0) 100%);
-
-      /* blur phần background phía sau (ảnh banner) */
-      -webkit-backdrop-filter: blur(18px) saturate(1.08) contrast(1.05);
-      backdrop-filter: blur(18px) saturate(1.08) contrast(1.05);
-
-      /* chỉ làm mờ mạnh bên trái, fade dần sang phải */
-      -webkit-mask-image: linear-gradient(90deg,
-        rgba(0,0,0,1) 0%,
-        rgba(0,0,0,1) 58%,
-        rgba(0,0,0,.45) 78%,
-        rgba(0,0,0,0) 100%);
-      mask-image: linear-gradient(90deg,
-        rgba(0,0,0,1) 0%,
-        rgba(0,0,0,1) 58%,
-        rgba(0,0,0,.45) 78%,
-        rgba(0,0,0,0) 100%);
-    }
-    .hero::after{
-      content:"";
-      position:absolute;inset:0;z-index:2;pointer-events:none;
-
-      /* dotted texture like web mẫu (phủ lên cả vùng ảnh banner, mạnh hơn ở bên trái) */
-      background-image:
-        linear-gradient(90deg, rgba(0,0,0,.48) 0%, rgba(0,0,0,.18) 55%, rgba(0,0,0,0) 100%),
-        radial-gradient(circle, rgba(255,255,255,.22) 1px, transparent 1.6px),
-        radial-gradient(circle, rgba(255,255,255,.14) 1px, transparent 1.6px);
-      background-size:auto, 8px 8px, 16px 16px;
-      background-position:0 0, 0 0, 4px 4px;
-
-      /* để chấm li ti nổi hơn trên ảnh */
-      opacity:.40;
-      mix-blend-mode:overlay;
-
-      /* tập trung nhiều hơn bên trái nhưng vẫn lan sang vùng ảnh */
-      -webkit-mask-image:linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 62%, rgba(0,0,0,.35) 82%, rgba(0,0,0,0) 100%);
-      mask-image:linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 62%, rgba(0,0,0,.35) 82%, rgba(0,0,0,0) 100%);
-    }
-
-
-    .hero-inner{
-      position:relative;z-index:3;
-      padding:34px 36px 165px;
-      display:flex;gap:24px;
-    }
-    .hero-content{
-      width:46%;max-width:580px;min-width:360px;
-      animation:infoReveal .55s ease both;
-      display:flex;
-      flex-direction:column;
-      min-height:360px; /* giữ khu vực info đủ cao để nút không bị dồn lên trên khi thiếu nội dung */
-    }
-    .hero-content.is-switching{animation:infoHide .18s ease both}
-    @keyframes infoHide{
-      from{opacity:1;transform:translateY(0);filter:blur(0)}
-      to{opacity:0;transform:translateY(6px);filter:blur(6px)}
-    }
-    @keyframes infoReveal{
-      from{opacity:0;transform:translateY(10px);filter:blur(10px)}
-      to{opacity:1;transform:translateY(0);filter:blur(0)}
-    }
-
-    .hero-title{margin:0 0 6px;font-size:34px;font-weight:900;letter-spacing:.2px}
-    .hero-subtitle{margin:0 0 14px;color:rgba(231,237,249,.85);font-size:14px}
-    .badges,.genres{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
-    .badge{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:7px 10px;border-radius:10px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(18,24,36,.55);
-      color:rgba(231,237,249,.92);
-      font-size:13px;
-      backdrop-filter:blur(10px);
-    }
-    .badge.imdb{border-color:rgba(242,198,79,.75);background:rgba(242,198,79,.10)}
-    .badge b{font-size:11px;letter-spacing:.6px;opacity:.9}
-    .genre{
-      padding:7px 10px;border-radius:999px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(18,24,36,.45);
-      color:rgba(231,237,249,.88);
-      font-size:13px;
-      backdrop-filter:blur(10px);
-    }
-    .hero-desc{
-      margin:12px 0 16px;
-      color:rgba(231,237,249,.80);
-      font-size:14px;line-height:1.55;
-      max-width:60ch;
-    }
-
-    .actions{display:flex;gap:14px;align-items:center;margin-top:auto;padding-top:14px}
-    .btn-icon{
-      width:56px;height:56px;border-radius:999px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(18,24,36,.50);
-      display:grid;place-items:center;
-      cursor:pointer;
-      backdrop-filter:blur(12px);
-      transition:transform .12s ease,border-color .12s ease,background .12s ease;
-    }
-    .btn-icon:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.20);background:rgba(255,255,255,.07)}
-    .btn-play{
-      background:var(--accent);
-      border-color:rgba(0,0,0,.12);
-      box-shadow:0 16px 40px rgba(242,198,79,.22);
-    }
-    .btn-play:hover{background:#ffd36b}
-    .btn-play svg{fill:#0b1224}
-
-    .hero-ctrl{
-      position:absolute;top:18px;right:18px;
-      z-index:4;display:flex;gap:10px;align-items:center;
-    }
-    .ctrl-btn{
-      width:44px;height:44px;border-radius:999px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(18,24,36,.48);
-      color:var(--text);
-      display:grid;place-items:center;
-      cursor:pointer;
-      backdrop-filter:blur(12px);
-      transition:transform .12s ease,border-color .12s ease,background .12s ease;
-    }
-    .ctrl-btn:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.20);background:rgba(255,255,255,.07)}
-
-    .hero-dots{
-      position:absolute;left:36px;bottom:134px;
-      z-index:4;display:flex;gap:8px;align-items:center;
-    }
-    .dot{
-      width:8px;height:8px;border-radius:999px;
-      background:rgba(255,255,255,.20);
-      border:1px solid rgba(255,255,255,.12);
-      cursor:pointer;
-      transition:transform .12s ease, background .12s ease, border-color .12s ease;
-    }
-    .dot:hover{transform:translateY(-1px)}
-    .dot.on{background:rgba(242,198,79,.85);border-color:rgba(242,198,79,.35)}
-
-    /* ===== THUMB STRIP (dưới hero, giống mẫu) ===== */
-    .thumb-row{
-      position:absolute;left:22px;right:22px;bottom:16px;
-      z-index:4;border-radius:16px;
-      padding:12px 12px 14px;
-      background:rgba(10,14,22,.58);
-      border:1px solid rgba(255,255,255,.10);
-      backdrop-filter:blur(10px);
-      overflow:hidden;
-    }
-    .thumbs{
-      position:relative;z-index:2;
-      display:flex;gap:12px;
-      overflow-x:auto;
-      padding:2px 2px 4px;
-      scroll-snap-type:x mandatory;
-      -webkit-overflow-scrolling:touch;
-    }
-    .thumbs::-webkit-scrollbar{height:10px}
-    .thumbs::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:999px}
-
     .thumb{
-      scroll-snap-align:start;
-      width:70px;height:100px;border-radius:14px;
-      border:1px solid rgba(255,255,255,.16);
-      overflow:hidden;background:rgba(255,255,255,.05);
-      cursor:pointer;flex:0 0 auto;padding:0;
-      box-shadow:0 12px 30px rgba(0,0,0,.30);
-      transition:transform .14s ease,border-color .14s ease,box-shadow .14s ease;
+      aspect-ratio: 2/3;
+      width:100%;
+      background: #0f172a;
+      display:flex;align-items:center;justify-content:center;
       position:relative;
     }
     .thumb img{width:100%;height:100%;object-fit:cover;display:block}
-    .thumb:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.28)}
-    .thumb.active{
-      transform:translateY(-5px);
-      border-color:rgba(242,198,79,.85);
-      box-shadow:0 18px 40px rgba(242,198,79,.10), 0 18px 45px rgba(0,0,0,.38);
-    }
-    .thumb.placeholder{border-color:rgba(255,255,255,.10);box-shadow:none;cursor:default}
-
-    .thumb::after{
-      content:"";
-      position:absolute;inset:0;pointer-events:none;z-index:2;
-      border-radius:inherit;
-      background-image:radial-gradient(circle, rgba(255,255,255,.22) 1px, transparent 1.8px);
-      background-size:9px 9px;
-      opacity:0;
-      transition:opacity .18s ease;
-      -webkit-mask-image:radial-gradient(70% 70% at 30% 35%, #000 0%, #000 55%, transparent 100%);
-      mask-image:radial-gradient(70% 70% at 30% 35%, #000 0%, #000 55%, transparent 100%);
-    }
-    .thumb:hover::after, .thumb.active::after{opacity:.24}
-    .thumb.placeholder::after{display:none}
-    /* ===== Card rows ===== */
-    .rows{margin-top:18px;display:grid;gap:16px}
-    .row-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
-    .row-head h3{margin:0;font-size:18px;letter-spacing:.2px}
-    .row-head a{
-      color:rgba(231,237,249,.8);text-decoration:none;font-size:13px;
+    .badge{
+      position:absolute;left:10px;top:10px;
       padding:6px 10px;border-radius:999px;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(18,24,36,.35);
-    }
-    .row-head a:hover{border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.06)}
-    .cards{
-      display:flex;gap:14px;
-      overflow-x:auto;
-      padding:6px 2px 10px;
-      scroll-snap-type:x mandatory;
-      -webkit-overflow-scrolling:touch;
-    }
-    .cards::-webkit-scrollbar{height:10px}
-    .cards::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:999px}
-    .card{
-      scroll-snap-align:start;
-      width:170px;flex:0 0 auto;
-      border-radius:16px;
+      font-size:12px;font-weight:800;
+      background:rgba(0,0,0,.45);backdrop-filter: blur(8px);
       border:1px solid rgba(255,255,255,.12);
-      background:rgba(18,24,36,.40);
+    }
+    .badge.q{left:auto;right:10px}
+    .meta{padding:12px 12px 14px;display:flex;flex-direction:column;gap:6px}
+    .title{
+      font-weight:800;font-size:14px;line-height:1.25;
+      display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+      min-height: 36px;
+    }
+    .sub{display:flex;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+    .chip{
+      padding:4px 8px;border:1px solid var(--line);border-radius:999px;
+      background:rgba(255,255,255,.02);font-weight:700;color:#d1d5db;
+    }
+    .row{display:flex;justify-content:space-between;align-items:center;margin-top:4px}
+    .imdb{font-weight:900;color:#fbbf24}
+    .btn{
+      display:inline-flex;gap:8px;align-items:center;justify-content:center;
+      padding:9px 10px;border-radius:12px;border:1px solid rgba(34,197,94,.35);
+      background:rgba(34,197,94,.10);
+      font-weight:800;font-size:13px;
+    }
+    .btn:hover{background:rgba(34,197,94,.16)}
+    .hero{
+      margin:14px 0 18px;
+      border-radius:22px;
+      border:1px solid rgba(255,255,255,.08);
+      background: radial-gradient(circle at 20% 20%, rgba(96,165,250,.22), transparent 55%),
+                  radial-gradient(circle at 80% 30%, rgba(34,197,94,.18), transparent 55%),
+                  rgba(255,255,255,.02);
       overflow:hidden;
-      box-shadow:0 18px 50px rgba(0,0,0,.35);
-      cursor:pointer;
-      transition:transform .14s ease,border-color .14s ease;
+      position:relative;
+      box-shadow: 0 14px 40px rgba(0,0,0,.35);
+    }
+    .hero-inner{display:grid;grid-template-columns: 1.1fr .9fr;gap:16px;padding:18px}
+    @media (max-width: 860px){ .hero-inner{grid-template-columns:1fr;} }
+    .hero h2{margin:0;font-size:22px}
+    .hero p{margin:8px 0 0;color:#d1d5db;line-height:1.5}
+    .hero-box{
+      border-radius:18px;border:1px solid rgba(255,255,255,.08);
+      background:rgba(0,0,0,.25);
+      padding:14px;
+      display:flex;flex-direction:column;gap:10px;
+    }
+    .hero-preview{
+      border-radius:16px;overflow:hidden;aspect-ratio: 16/9;
+      background:#0b1222;border:1px solid rgba(255,255,255,.08);
+      display:flex;align-items:center;justify-content:center;
       position:relative;
     }
-    .card:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.22)}
-    .card .img{height:240px;background:#000;border-bottom:1px solid rgba(255,255,255,.10)}
-    .card img{width:100%;height:100%;object-fit:cover;display:block}
-    .card .meta{padding:10px 10px 12px}
-    .card .meta b{display:block;font-size:13px;line-height:1.25}
-    .card .meta small{display:block;margin-top:6px;color:rgba(231,237,249,.65)}
-    .tag{
-      position:absolute;top:10px;left:10px;
-      padding:6px 8px;border-radius:999px;
-      font-size:11px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(10,14,22,.65);
-      backdrop-filter:blur(10px);
-      z-index:3;
+    .hero-preview img{width:100%;height:100%;object-fit:cover;display:block}
+    .hero-dots{display:flex;gap:6px;justify-content:center}
+    .dot{
+      width:8px;height:8px;border-radius:999px;
+      background:rgba(255,255,255,.22);
+      border:1px solid rgba(255,255,255,.18);
     }
-    .card::after{
-      content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
-      background-image:radial-gradient(circle, rgba(255,255,255,.10) 1px, transparent 1.35px);
-      background-size:8px 8px;
-      opacity:.18;mix-blend-mode:overlay;z-index:2;
-    }
-
-    /* ===== Filter panel ===== */
-    .filter-panel{
-      margin-top:14px;border-radius:16px;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(10,14,22,.58);
-      backdrop-filter:blur(10px);
-      box-shadow:0 18px 50px rgba(0,0,0,.35);
-      padding:12px 12px 10px;
-    }
-    .filter-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
-    .filter-close{
-      width:38px;height:38px;border-radius:12px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(18,24,36,.45);
-      color:rgba(231,237,249,.92);
-      cursor:pointer;
-    }
-    .filter-close:hover{background:rgba(255,255,255,.06)}
-    .filter-chips{display:flex;flex-wrap:wrap;gap:10px}
-    .chip{
-      padding:8px 12px;border-radius:999px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(18,24,36,.45);
-      color:rgba(231,237,249,.88);
-      cursor:pointer;font-size:13px;
-    }
-    .chip:hover{background:rgba(255,255,255,.06)}
-    .chip.on{border-color:rgba(242,198,79,.65);background:rgba(242,198,79,.12)}
-    .filter-actions{margin-top:10px;display:flex;justify-content:flex-end}
-    .filter-clear{
-      padding:9px 12px;border-radius:12px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(18,24,36,.45);
-      color:rgba(231,237,249,.92);
-      cursor:pointer;
-    }
-    .filter-clear:hover{background:rgba(255,255,255,.06)}
-
-    /* ===== RESPONSIVE ===== */
-    @media (max-width:980px){
-      .nav{display:none}
-      .hero-inner{padding:28px 22px 180px}
-      .hero-content{width:60%;min-width:auto}
-      .hero-media{width:60%}
-      .hero-dots{left:22px}
-    }
-    @media (max-width:760px){
-      .brand-sub{display:none}
-      .member-btn span{display:none}
-      .section-title h2{font-size:22px}
-      .hero{min-height:600px}
-      .hero-media{width:100%;height:52%;top:0;left:0;right:0}
-      .hero::before{
-        background:linear-gradient(180deg,
-          rgba(10,14,22,.12) 0%,
-          rgba(10,14,22,.72) 45%,
-          rgba(10,14,22,.94) 100%);
-      }
-      .hero::after{
-        -webkit-mask-image:linear-gradient(180deg,#000 0 86%,transparent 100%);
-        mask-image:linear-gradient(180deg,#000 0 86%,transparent 100%);
-      }
-      .hero-inner{flex-direction:column;padding:240px 16px 205px}
-      .hero-content{width:100%;max-width:none}
-      .hero-title{font-size:26px}
-      .thumb-row{left:12px;right:12px}
-      .hero-dots{left:16px;bottom:144px}
-      .hero-ctrl{right:12px;top:12px}
-      .card{width:160px}
-      .card .img{height:220px}
-    }
-  
-    /* === FIX: hạ vị trí cụm nút trong hero (Play / Fav / Info) === */
-    @media (max-width:980px){
-      .hero-content{min-height:unset;}
-      .actions{margin-top:16px;}
-    }
-
-
-
-/* ===== Hero posters (giống web mẫu) ===== */
-.hero-posters{
-  position:absolute;
-  left:26px; right:26px;
-  bottom:76px; /* nằm trên thumbs strip */
-  z-index:4;
-  pointer-events:auto;
-}
-.hero-posters-wrap{
-  display:flex;
-  gap:10px;
-  align-items:flex-end;
-  overflow:auto hidden;
-  padding:10px 6px;
-  scrollbar-width:none;
-}
-.hero-posters-wrap::-webkit-scrollbar{ height:0; width:0; }
-.hero-poster{
-  width:64px; height:64px;
-  border-radius:14px;
-  background:rgba(255,255,255,.06);
-  border:1px solid rgba(255,255,255,.10);
-  overflow:hidden;
-  display:grid;
-  place-items:center;
-  flex:0 0 auto;
-  cursor:pointer;
-  position:relative;
-  transition:transform .15s ease, border-color .15s ease, box-shadow .15s ease;
-  backdrop-filter: blur(6px);
-}
-.hero-poster img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  transform:scale(1.05);
-}
-.hero-poster:hover{ transform: translateY(-2px); border-color: rgba(255,255,255,.22); }
-.hero-poster.on{
-  border-color: rgba(255,214,102,.65);
-  box-shadow: 0 10px 24px rgba(0,0,0,.28), 0 0 0 1px rgba(255,214,102,.22) inset;
-}
-@media (max-width: 820px){
-  .hero-posters{ bottom:66px; left:16px; right:16px; }
-  .hero-poster{ width:56px; height:56px; border-radius:12px; }
-}
-@media (max-width: 560px){
-  .hero-posters{ display:none; } /* mobile nhỏ thì ẩn cho gọn */
-}
-</style>
+    .dot.on{background:rgba(34,197,94,.75);border-color:rgba(34,197,94,.75)}
+    footer{padding:22px 0 6px;color:var(--muted);font-size:12px;text-align:center}
+  </style>
 </head>
-
 <body>
-  <div class="container">
-    <header class="topbar">
-      <div class="brand" style="cursor:pointer" onclick="location.href='index.html'">
-        <div class="brand-logo" aria-hidden="true"><span>K</span></div>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo"></div>
         <div>
-          <div class="brand-name">Khoii</div>
-          <div class="brand-sub">Kho phim cập nhật nhanh</div>
+          <h1>Movies / Anime Library</h1>
+          <div style="color:var(--muted);font-size:12px;margin-top:2px">Browse • Filter • Watch</div>
         </div>
       </div>
-
-      <div class="search">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M10.5 19a8.5 8.5 0 1 1 0-17 8.5 8.5 0 0 1 0 17Z" stroke="rgba(231,237,249,.85)" stroke-width="2" />
-          <path d="M16.8 16.8 21 21" stroke="rgba(231,237,249,.85)" stroke-width="2" stroke-linecap="round" />
-        </svg>
-        <input id="q" placeholder="Tìm kiếm phim, diễn viên" />
-      </div>
-
-      <nav class="nav" aria-label="Main navigation">
-        <a href="#" class="nav-btn" data-action="genres">Thể loại</a>
-        <a href="#" class="nav-btn" data-action="kind" data-kind="movie">Phim Lẻ</a>
-        <a href="#" class="nav-btn" data-action="kind" data-kind="series">Phim Bộ</a>
-        <a href="#" class="nav-btn" data-action="countries">Quốc gia</a>
+      <nav class="nav">
+        <button class="nav-btn active" data-kind="all">Tất cả</button>
+        <button class="nav-btn" data-kind="movie">Movie</button>
+        <button class="nav-btn" data-kind="anime">Anime</button>
       </nav>
-
-      <button class="member-btn" onclick="location.href='test.html'">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M12 12a4.5 4.5 0 1 0-4.5-4.5A4.5 4.5 0 0 0 12 12Z" stroke="rgba(231,237,249,.9)" stroke-width="2" />
-          <path d="M20 21a8 8 0 1 0-16 0" stroke="rgba(231,237,249,.9)" stroke-width="2" stroke-linecap="round" />
-        </svg>
-        <span>Admin</span>
-      </button>
     </header>
 
-    <!-- Filter panel -->
-    <section id="filterPanel" class="filter-panel" aria-label="Bộ lọc" hidden>
-      <div class="filter-head">
-        <b id="filterTitle">Bộ lọc</b>
-        <button id="closeFilter" class="filter-close" type="button" aria-label="Đóng">✕</button>
-      </div>
-      <div id="filterChips" class="filter-chips"></div>
-      <div class="filter-actions">
-        <button id="clearFilter" class="filter-clear" type="button">Xoá lọc</button>
-      </div>
-    </section>
-
-    <div class="section-title">
-      <h2>Kho Tàng Anime Mới Nhất</h2>
-      <button class="circle-action" id="btnMore" title="Xem thêm">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M10 7l5 5-5 5" stroke="rgba(231,237,249,.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-      </button>
-    </div>
-
-    <section class="hero" aria-label="Hero">
-      <img id="heroImgA" class="hero-media on" alt="" />
-      <img id="heroImgB" class="hero-media" alt="" />
-
-      <div class="hero-ctrl">
-        <button class="ctrl-btn tip" data-tip="Trước" id="prevBtn" aria-label="Prev">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <path d="M15 6l-6 6 6 6" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </button>
-        <button class="ctrl-btn tip" data-tip="Sau" id="nextBtn" aria-label="Next">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <path d="M9 6l6 6-6 6" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </button>
-      </div>
-
+    <section class="hero" id="hero">
       <div class="hero-inner">
-        <div class="hero-content">
-          <h1 id="heroTitle" class="hero-title"></h1>
-          <p id="heroSubtitle" class="hero-subtitle"></p>
-
-          <div id="heroBadges" class="badges"></div>
-          <div id="heroGenres" class="genres"></div>
-
-          <p id="heroDesc" class="hero-desc"></p>
-
-          <div class="actions">
-            <button class="btn-icon btn-play tip" data-tip="Phát" id="btnPlay" title="Phát">
-              <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M8 5v14l12-7-12-7Z"></path>
-              </svg>
-            </button>
-
-            <button class="btn-icon tip" data-tip="Yêu thích" id="btnFav" title="Yêu thích">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M12 21s-7-4.6-9.4-8.7C.8 9 .9 6.5 2.7 4.9 4.5 3.3 7.2 3.6 9 5.4L12 8.4l3-3c1.8-1.8 4.5-2.1 6.3-.5 1.8 1.6 1.9 4.1.1 7.4C19 16.4 12 21 12 21Z"
-                  stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linejoin="round" />
-              </svg>
-            </button>
-
-            <button class="btn-icon tip" data-tip="Thông tin" id="btnInfo" title="Thông tin">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Z" stroke="rgba(231,237,249,.92)" stroke-width="2" />
-                <path d="M12 10v7" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round" />
-                <path d="M12 7h.01" stroke="rgba(231,237,249,.92)" stroke-width="3" stroke-linecap="round" />
-              </svg>
-            </button>
+        <div>
+          <h2>Gợi ý hôm nay</h2>
+          <p>Chọn thể loại, tìm nhanh theo tên, lọc chất lượng/năm và bấm Watch để xem.</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+            <button class="pill" id="shuffleBtn">🎲 Random</button>
+            <button class="pill" id="clearFilter">🧹 Clear Filter</button>
           </div>
         </div>
-      </div>
-
-      <div id="heroDots" class="hero-dots" aria-label="Hero dots"></div>
-
-      <div class="hero-posters" aria-label="Poster trong banner">
-        <div id="heroPosters" class="hero-posters-wrap"></div>
-      </div>
-
-
-      <div class="thumb-row">
-        <div id="thumbs" class="thumbs" aria-label="Danh sách phim"></div>
+        <div class="hero-box">
+          <div class="hero-preview" id="heroPreview">
+            <div style="color:var(--muted);font-weight:800">Đang tải...</div>
+          </div>
+          <div class="hero-dots" id="heroDots"></div>
+        </div>
       </div>
     </section>
 
-    <!-- Ô vuông poster dưới banner -->
-
-    <div class="rows" id="rows" aria-label="Danh sách phim bên dưới">
-      <div class="row-head">
-        <h3>Đề xuất hôm nay</h3>
-        <a href="list.html?tab=suggest">Xem tất cả</a>
+    <div class="searchbar">
+      <div class="input">
+        🔎
+        <input id="q" placeholder="Tìm theo tên / year / country..." autocomplete="off" />
       </div>
-      <div id="rowSuggest" class="cards"></div>
-
-      <div class="row-head">
-        <h3>Phim mới cập nhật</h3>
-        <a href="list.html?tab=new">Xem tất cả</a>
-      </div>
-      <div id="rowNew" class="cards"></div>
-
-      <div class="row-head">
-        <h3>Anime nổi bật</h3>
-        <a href="list.html?tab=anime">Xem tất cả</a>
-      </div>
-      <div id="rowAnime" class="cards"></div>
+      <select class="pill" id="qualitySel">
+        <option value="">Quality: All</option>
+        <option>HD</option>
+        <option>FHD</option>
+        <option>4K</option>
+      </select>
+      <select class="pill" id="yearSel">
+        <option value="">Year: All</option>
+      </select>
+      <select class="pill" id="countrySel">
+        <option value="">Country: All</option>
+      </select>
+      <select class="pill" id="genreSel">
+        <option value="">Genre: All</option>
+      </select>
     </div>
+
+    <div class="grid" id="grid"></div>
+
+    <footer>
+      © <span id="yearNow"></span> • Local JSON/Supabase compatible
+    </footer>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // ================== SUPABASE (Public Read) ==================
+    // ================== CONFIG ==================
+    // Nếu bạn dùng Supabase, điền URL + anon key + tên table.
+    // Nếu không, script sẽ fallback dữ liệu demo hoặc bạn tự nạp JSON.
     const SUPABASE_URL = "https://nzalaxolteaiafvuceqz.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56YWxheG9sdGVhaWFmdnVjZXF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyOTY2MjAsImV4cCI6MjA4NTg3MjYyMH0.0eIz6cfB4Dr_g5Wja70tZCMvVfUKoI5H4D8MJBP49Bg";
+    const TABLE = "movies";
 
-    const supabase = window.supabase?.createClient
-      ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-      : null;
+    const STORAGE_KEY = "movieapp_data_cache_v1";
 
-    async function dbListMoviesPublic() {
-      if (!supabase) return null;
-      const { data, error } = await supabase
-        .from("movies")
-        .select("id,title,kind,year,quality,desc,driveid,drivelink,posterurl,herourl,updatedat,genres,country,imdb")
-        .order("updatedat", { ascending: false });
-
-      if (error) {
-        console.warn("Supabase load error:", error);
-        return null;
-      }
-
-      return (data || []).map(row => ({
-        id: row.id,
-        title: row.title,
-        kind: row.kind,
-        year: row.year || "",
-        quality: row.quality || "FHD",
-        desc: row.desc || "",
-        imdb: row.imdb || "",
-        driveId: row.driveid,
-        driveLink: row.drivelink || "",
-        posterUrl: row.posterurl || "",
-        heroUrl: row.herourl || "",
-        genres: Array.isArray(row.genres) ? row.genres : [],
-        country: row.country || "",
-        updatedAt: Number(row.updatedat || 0)
-      }));
-    }
-
-    // ================== LOCAL FALLBACK ==================
-    const STORAGE_KEY = "khoii_drive_movies_v1";
-    const LEGACY_KEY = "my_drive_movies_v2";
-
-    function svgPlaceholder(title = "Khoii", w = 1200, h = 700) {
-      const safe = String(title).replace(/[<>&"]/g, "");
-      const svg =
-`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
-  <defs>
-    <linearGradient id="g" x1="0" x2="1">
-      <stop offset="0" stop-color="#0b0f17"/>
-      <stop offset="1" stop-color="#141a2a"/>
-    </linearGradient>
-    <radialGradient id="r" cx="30%" cy="25%" r="70%">
-      <stop offset="0" stop-color="rgba(242,198,79,.28)"/>
-      <stop offset="1" stop-color="rgba(0,0,0,0)"/>
-    </radialGradient>
-  </defs>
-  <rect width="100%" height="100%" fill="url(#g)"/>
-  <rect width="100%" height="100%" fill="url(#r)"/>
-  <text x="6%" y="50%" fill="rgba(231,237,249,.92)" font-family="system-ui,Segoe UI,Roboto" font-size="56" font-weight="800">${safe}</text>
-  <text x="6%" y="62%" fill="rgba(231,237,249,.55)" font-family="system-ui,Segoe UI,Roboto" font-size="22">Demo (offline safe)</text>
-</svg>`;
-      return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
-    }
-
-    const DriveTool = (() => {
-      const patterns = [
-        /drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]{10,})/i,
-        /drive\.google\.com\/open\?id=([a-zA-Z0-9_-]{10,})/i,
-        /drive\.google\.com\/uc\?id=([a-zA-Z0-9_-]{10,})/i,
-        /drive\.google\.com\/uc\?export=download&id=([a-zA-Z0-9_-]{10,})/i,
-      ];
-      function extractId(input) {
-        const s = String(input || "").trim();
-        if (/^[a-zA-Z0-9_-]{10,}$/.test(s)) return s;
-        try {
-          const u = new URL(s);
-          const qid = u.searchParams.get("id");
-          if (qid && /^[a-zA-Z0-9_-]{10,}$/.test(qid)) return qid;
-        } catch {}
-        for (const re of patterns) {
-          const m = s.match(re);
-          if (m && m[1]) return m[1];
-        }
-        return null;
-      }
-      function thumb(id, w = 800) { return `https://drive.google.com/thumbnail?id=${id}&sz=w${w}`; }
-      return { extractId, thumb };
-    })();
-
-    function loadMovies() {
-      try {
-        let raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) {
-          const old = localStorage.getItem(LEGACY_KEY);
-          if (old) {
-            localStorage.setItem(STORAGE_KEY, old);
-            raw = old;
-          }
-        }
-        const arr = raw ? JSON.parse(raw) : [];
-        return Array.isArray(arr) ? arr : [];
-      } catch { return []; }
-    }
-
-    const fallback = [
-      {
-        id: "demo1",
-        title: "Demo Movie",
-        kind: "anime",
-        year: "2026",
-        quality: "FHD",
-        imdb: "6.8",
-        desc: "Chưa có phim? Vào Admin để thêm phim Drive thật.",
-        driveId: "YOUR_DRIVE_ID_HERE",
-        posterUrl: svgPlaceholder("Khoii • Poster Demo", 500, 750),
-        heroUrl: svgPlaceholder("Khoii • Hero Demo", 1600, 900),
-        genres: ["Action", "Fantasy"],
-        country: "Japan",
-        updatedAt: Date.now()
-      }
-    ];
-
-    function toIndexItem(m) {
-      const driveId = m.driveId || DriveTool.extractId(m.driveLink) || "";
-      const poster = m.posterUrl || (driveId ? DriveTool.thumb(driveId, 600) : "");
-      const hero = m.heroUrl || (driveId ? DriveTool.thumb(driveId, 1400) : poster);
-
-      const kindLabel =
-        m.kind === "movie" ? "Phim Lẻ" :
-        m.kind === "series" ? "Phim Bộ" : "Anime";
-
-      return {
-        id: m.id || ("m_" + Math.random().toString(16).slice(2)),
-        title: m.title || "Không tên",
-        subtitle: kindLabel,
-        imdb: m.imdb || "",
-        quality: m.quality || "FHD",
-        year: m.year || "—",
-        season: kindLabel,
-        episode: "Full",
-        genres: Array.isArray(m.genres) ? m.genres : [],
-        country: m.country || "",
-        desc: m.desc || "",
-        driveId,
-        hero: hero || svgPlaceholder("Khoii Hero", 1600, 900),
-        poster: poster || svgPlaceholder("Khoii Poster", 500, 750),
-        kind: m.kind || "anime",
-        updatedAt: Number(m.updatedAt || 0)
-      };
-    }
-
-    const el = {
-      heroImgA: document.getElementById("heroImgA"),
-      heroImgB: document.getElementById("heroImgB"),
-      heroTitle: document.getElementById("heroTitle"),
-      heroSubtitle: document.getElementById("heroSubtitle"),
-      heroBadges: document.getElementById("heroBadges"),
-      heroGenres: document.getElementById("heroGenres"),
-      heroDesc: document.getElementById("heroDesc"),
-      thumbs: document.getElementById("thumbs"),
-      heroDots: document.getElementById("heroDots"),
-      heroPosters: document.getElementById("heroPosters"),
-      prevBtn: document.getElementById("prevBtn"),
-      nextBtn: document.getElementById("nextBtn"),
-      btnPlay: document.getElementById("btnPlay"),
-      btnFav: document.getElementById("btnFav"),
-      btnInfo: document.getElementById("btnInfo"),
-      q: document.getElementById("q"),
-      rowSuggest: document.getElementById("rowSuggest"),
-      rowNew: document.getElementById("rowNew"),
-      rowAnime: document.getElementById("rowAnime"),
-      btnMore: document.getElementById("btnMore"),
-      heroContent: document.querySelector(".hero-content"),
+    // ================== STATE ==================
+    const state = {
+      kind: "all", // all | movie | anime
+      q: "",
+      quality: "",
+      year: "",
+      country: "",
+      genre: "",
+      items: [],
+      heroItems: [],
+      heroIndex: 0,
+      heroTimer: null,
     };
 
-    let items = [];
-    let filtered = [];
-    let activeIndex = 0;
-    let usingA = true;
-    let autoTimer = null;
-
-    // ===== FILTER STATE =====
-    const filterState = { kind:null, genre:null, country:null };
-
-    // Filter panel UI
-    const fp = {
-      panel: document.getElementById("filterPanel"),
-      title: document.getElementById("filterTitle"),
-      chips: document.getElementById("filterChips"),
-      close: document.getElementById("closeFilter"),
-      clear: document.getElementById("clearFilter"),
+    const el = {
+      grid: document.getElementById("grid"),
+      q: document.getElementById("q"),
+      qualitySel: document.getElementById("qualitySel"),
+      yearSel: document.getElementById("yearSel"),
+      countrySel: document.getElementById("countrySel"),
+      genreSel: document.getElementById("genreSel"),
+      shuffleBtn: document.getElementById("shuffleBtn"),
+      clearFilter: document.getElementById("clearFilter"),
       navBtns: [...document.querySelectorAll(".nav .nav-btn")],
+      heroPreview: document.getElementById("heroPreview"),
+      heroDots: document.getElementById("heroDots"),
+      yearNow: document.getElementById("yearNow"),
     };
 
     function safeText(s){ return String(s ?? ""); }
+
     function escapeHtml(s){
-      return String(s ?? "")
+      return safeText(s)
         .replaceAll("&","&amp;")
         .replaceAll("<","&lt;")
         .replaceAll(">","&gt;")
         .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
+        .replaceAll("'","&#39;");
     }
 
-    function badgeHTML(item){
-      const imdbPart = item.imdb ? `<span class="badge imdb"><b>IMDb</b> ${safeText(item.imdb)}</span>` : "";
-      const countryPart = item.country ? `<span class="badge">${escapeHtml(item.country)}</span>` : "";
+    function pick(obj, keys){
+      const o = {};
+      for(const k of keys) o[k] = obj[k];
+      return o;
+    }
+
+    function normalizeItem(x){
+      // Map dữ liệu nhiều format về 1 format chung
+      return {
+        id: safeText(x.id ?? x.slug ?? crypto.randomUUID()),
+        title: safeText(x.title ?? x.name ?? "Untitled"),
+        kind: safeText(x.kind ?? x.type ?? "movie"),
+        year: safeText(x.year ?? ""),
+        quality: safeText(x.quality ?? x.q ?? ""),
+        imdb: safeText(x.imdb ?? x.rating ?? ""),
+        country: safeText(x.country ?? x.nation ?? ""),
+        genre: safeText(x.genre ?? x.categories ?? ""),
+        poster: safeText(x.poster ?? x.thumb ?? x.image ?? ""),
+        url: safeText(x.url ?? x.link ?? x.watch ?? ""),
+      };
+    }
+
+    async function loadData(){
+      // 1) localStorage cache
+      const old = localStorage.getItem(STORAGE_KEY);
+      if(old){
+        try{
+          const parsed = JSON.parse(old);
+          if(Array.isArray(parsed) && parsed.length){
+            state.items = parsed.map(normalizeItem);
+            return;
+          }
+        }catch{}
+      }
+
+      // 2) Supabase (nếu có)
+      if(SUPABASE_URL && SUPABASE_ANON_KEY){
+        try{
+          // load supabase dynamic
+          const script = document.createElement("script");
+          script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+          document.head.appendChild(script);
+          await new Promise((res, rej)=>{script.onload=res; script.onerror=rej;});
+
+          const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+          const { data, error } = await supabase.from(TABLE).select("*");
+          if(error) throw error;
+
+          state.items = (data ?? []).map(normalizeItem);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
+          return;
+        }catch(err){
+          console.warn("Supabase load failed, fallback demo:", err);
+        }
+      }
+
+      // 3) demo fallback
+      const fallback = [
+        {
+          id: "demo1",
+          title: "Demo Movie",
+          kind: "movie",
+          year: "2026",
+          quality: "FHD",
+          imdb: "6.8",
+          country: "VN",
+          genre: "Action",
+          poster: "",
+          url: "watch.html?url=",
+        },
+        {
+          id: "demo2",
+          title: "Demo Anime",
+          kind: "anime",
+          year: "2025",
+          quality: "HD",
+          imdb: "7.4",
+          country: "JP",
+          genre: "Fantasy",
+          poster: "",
+          url: "watch.html?url=",
+        }
+      ];
+      state.items = fallback.map(normalizeItem);
+    }
+
+    function uniqueSorted(list){
+      const set = new Set();
+      list.forEach(v=>{
+        const s = safeText(v).trim();
+        if(s) set.add(s);
+      });
+      return [...set].sort((a,b)=>a.localeCompare(b));
+    }
+
+    function buildFilters(){
+      // years numeric sort desc
+      const years = uniqueSorted(state.items.map(x=>x.year)).sort((a,b)=>{
+        const na=Number(a), nb=Number(b);
+        if(!Number.isNaN(na) && !Number.isNaN(nb)) return nb-na;
+        return b.localeCompare(a);
+      });
+
+      const countries = uniqueSorted(state.items.map(x=>x.country));
+      const genres = uniqueSorted(state.items.map(x=>x.genre));
+
+      // fill selects (keep first option)
+      function fill(sel, arr){
+        const first = sel.options[0];
+        sel.innerHTML = "";
+        sel.appendChild(first);
+        arr.forEach(v=>{
+          const opt=document.createElement("option");
+          opt.value=v; opt.textContent=v;
+          sel.appendChild(opt);
+        });
+      }
+      fill(el.yearSel, years);
+      fill(el.countrySel, countries);
+      fill(el.genreSel, genres);
+    }
+
+    function applyFilters(items){
+      const q = state.q.trim().toLowerCase();
+      return items.filter(x=>{
+        if(state.kind !== "all" && x.kind !== state.kind) return false;
+        if(state.quality && x.quality !== state.quality) return false;
+        if(state.year && x.year !== state.year) return false;
+        if(state.country && x.country !== state.country) return false;
+        if(state.genre && x.genre !== state.genre) return false;
+
+        if(q){
+          const hay = `${x.title} ${x.year} ${x.country} ${x.genre} ${x.quality}`.toLowerCase();
+          if(!hay.includes(q)) return false;
+        }
+        return true;
+      });
+    }
+
+    function cardHtml(x){
+      const poster = x.poster ? `<img src="${escapeHtml(x.poster)}" alt="${escapeHtml(x.title)}">` : `<div style="color:var(--muted);font-weight:900">No Poster</div>`;
+      const badgeKind = x.kind ? `<div class="badge">${escapeHtml(x.kind.toUpperCase())}</div>` : "";
+      const badgeQ = x.quality ? `<div class="badge q">${escapeHtml(x.quality)}</div>` : "";
+      const imdb = x.imdb ? `<div class="imdb">⭐ ${escapeHtml(x.imdb)}</div>` : `<div style="color:var(--muted);font-weight:900">—</div>`;
+      const url = x.url || `watch.html?url=${encodeURIComponent(x.id)}`;
       return `
-        ${imdbPart}
-        <span class="badge">${escapeHtml(item.quality)}</span>
-        <span class="badge">${escapeHtml(item.year)}</span>
-        ${countryPart}
-        <span class="badge">${escapeHtml(item.season)}</span>
-        <span class="badge">${escapeHtml(item.episode)}</span>
+        <article class="card">
+          <div class="thumb">
+            ${poster}
+            ${badgeKind}
+            ${badgeQ}
+          </div>
+          <div class="meta">
+            <div class="title">${escapeHtml(x.title)}</div>
+            <div class="sub">
+              ${x.year ? `<span class="chip">${escapeHtml(x.year)}</span>`:""}
+              ${x.country ? `<span class="chip">${escapeHtml(x.country)}</span>`:""}
+              ${x.genre ? `<span class="chip">${escapeHtml(x.genre)}</span>`:""}
+            </div>
+            <div class="row">
+              ${imdb}
+              <a class="btn" href="${escapeHtml(url)}">▶ Watch</a>
+            </div>
+          </div>
+        </article>
       `;
     }
-    function genresHTML(item){
-      const arr = Array.isArray(item.genres) ? item.genres : [];
-      return arr.slice(0,8).map(g => `<span class="genre">${escapeHtml(g)}</span>`).join("");
+
+    function render(){
+      const filtered = applyFilters(state.items);
+      el.grid.innerHTML = filtered.map(cardHtml).join("");
+      buildHero(filtered);
     }
 
-    function setImgWithFallback(imgEl, url, fallbackUrl){
-      imgEl.onerror = () => { imgEl.onerror = null; imgEl.src = fallbackUrl; };
-      imgEl.src = url || fallbackUrl;
+    function buildHero(filtered){
+      // pick up to 5 items for hero
+      const items = (filtered.length ? filtered : state.items).slice(0, 5);
+      state.heroItems = items;
+      state.heroIndex = 0;
+      renderHero();
+      renderHeroDots();
+      resetHeroTimer();
     }
 
-    // ===== blur/fade transition banner =====
-    function setHeroImage(url){
-      const nextEl = usingA ? el.heroImgB : el.heroImgA;
-      const curEl  = usingA ? el.heroImgA : el.heroImgB;
-
-      el.heroContent?.classList.add("is-switching");
-
-      setImgWithFallback(nextEl, url, svgPlaceholder("Khoii Hero", 1600, 900));
-
-      // restart reveal anim
-      nextEl.classList.remove("reveal");
-      void nextEl.offsetWidth;
-      nextEl.classList.add("reveal");
-
-      nextEl.classList.add("on");
-      curEl.classList.remove("on");
-      usingA = !usingA;
-
-      setTimeout(() => el.heroContent?.classList.remove("is-switching"), 120);
+    function renderHero(){
+      const x = state.heroItems[state.heroIndex];
+      if(!x){
+        el.heroPreview.innerHTML = `<div style="color:var(--muted);font-weight:900">No items</div>`;
+        return;
+      }
+      const poster = x.poster ? `<img src="${escapeHtml(x.poster)}" alt="${escapeHtml(x.title)}">` : `<div style="color:var(--muted);font-weight:900">No Poster</div>`;
+      const url = x.url || `watch.html?url=${encodeURIComponent(x.id)}`;
+      el.heroPreview.innerHTML = `
+        <a href="${escapeHtml(url)}" style="width:100%;height:100%;display:block;position:relative">
+          ${poster}
+          <div style="position:absolute;left:10px;bottom:10px;right:10px;
+            padding:10px 12px;border-radius:14px;background:rgba(0,0,0,.45);
+            border:1px solid rgba(255,255,255,.14);backdrop-filter: blur(10px);">
+            <div style="font-weight:900">${escapeHtml(x.title)}</div>
+            <div style="margin-top:4px;color:#d1d5db;font-size:12px;display:flex;gap:8px;flex-wrap:wrap">
+              ${x.kind ? `<span class="chip">${escapeHtml(x.kind.toUpperCase())}</span>`:""}
+              ${x.year ? `<span class="chip">${escapeHtml(x.year)}</span>`:""}
+              ${x.quality ? `<span class="chip">${escapeHtml(x.quality)}</span>`:""}
+              ${x.country ? `<span class="chip">${escapeHtml(x.country)}</span>`:""}
+            </div>
+          </div>
+        </a>
+      `;
+      updateHeroDots();
     }
 
     function renderHeroDots(){
       el.heroDots.innerHTML = "";
-      const n = Math.min(filtered.length, 8);
-      for (let i=0;i<n;i++){
-        const d = document.createElement("div");
-        d.className = "dot" + (i===activeIndex ? " on" : "");
-        d.title = "Slide " + (i+1);
-        d.addEventListener("click", () => setActive(i, true));
+      for(let i=0;i<state.heroItems.length;i++){
+        const d=document.createElement("div");
+        d.className="dot" + (i===state.heroIndex ? " on":"");
+        d.addEventListener("click", ()=>{ state.heroIndex=i; renderHero(); });
         el.heroDots.appendChild(d);
       }
     }
+
     function updateHeroDots(){
-      [...el.heroDots.querySelectorAll(".dot")].forEach((d,i)=>d.classList.toggle("on", i===activeIndex));
+      [...el.heroDots.querySelectorAll(".dot")]
+        .forEach((d,i)=>d.classList.toggle("on", i===state.heroIndex));
     }
 
-    function setActive(index, userAction=false){
-      activeIndex = index;
-      const item = filtered[index];
-      if (!item) return;
+    function resetHeroTimer(){
+      if(state.heroTimer) clearInterval(state.heroTimer);
+      state.heroTimer = setInterval(()=>{
+        if(!state.heroItems.length) return;
+        state.heroIndex = (state.heroIndex + 1) % state.heroItems.length;
+        renderHero();
+      }, 3500);
+    }
 
-      setHeroImage(item.hero);
+    function shuffle(){
+      // Fisher-Yates
+      const a = [...state.items];
+      for(let i=a.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [a[i],a[j]]=[a[j],a[i]];
+      }
+      state.items = a;
+      render();
+    }
 
-      el.heroTitle.textContent = item.title;
-      el.heroSubtitle.textContent = item.subtitle || "";
-      el.heroBadges.innerHTML = badgeHTML(item);
-      el.heroGenres.innerHTML = genresHTML(item);
-      el.heroDesc.textContent = item.desc || "—";
+    function clearFilters(){
+      state.kind="all";
+      state.q="";
+      state.quality="";
+      state.year="";
+      state.country="";
+      state.genre="";
+      el.q.value="";
+      el.qualitySel.value="";
+      el.yearSel.value="";
+      el.countrySel.value="";
+      el.genreSel.value="";
+      el.navBtns.forEach(b=>b.classList.toggle("active", b.dataset.kind==="all"));
+      render();
+    }
 
-      [...el.thumbs.querySelectorAll(".thumb")].forEach((t,i)=>{
-        t.classList.toggle("active", i===index && !t.classList.contains("placeholder"));
+    function bind(){
+      el.q.addEventListener("input", ()=>{
+        state.q = el.q.value;
+        render();
       });
-
-      const btn = el.thumbs.querySelectorAll(".thumb")[index];
-      if (btn?.scrollIntoView){
-        btn.scrollIntoView({ behavior: userAction ? "smooth" : "auto", inline: "center", block: "nearest" });
-      }
-
-      updateHeroDots();
-      updateHeroPosters();
-      if (userAction) restartAuto();
-    }
-
-    
-    function renderHeroPosters(list){
-      if (!el.heroPosters) return;
-      el.heroPosters.innerHTML = "";
-      const n = Math.min(list.length, 14);
-      for (let i=0;i<n;i++){
-        const item = list[i];
-        const b = document.createElement("button");
-        b.type = "button";
-        b.className = "hero-poster" + (i===activeIndex ? " on" : "");
-        b.title = item.title;
-        const img = document.createElement("img");
-        img.alt = item.title;
-        img.loading = "lazy";
-        img.onerror = () => { img.onerror = null; img.src = svgPlaceholder("Khoii Poster", 500, 750); };
-        img.src = item.poster || svgPlaceholder("Khoii Poster", 500, 750);
-        b.appendChild(img);
-        b.addEventListener("click", ()=>setActive(i,true));
-        el.heroPosters.appendChild(b);
-      }
-    }
-    function updateHeroPosters(){
-      if (!el.heroPosters) return;
-      [...el.heroPosters.querySelectorAll(".hero-poster")].forEach((p,i)=>p.classList.toggle("on", i===activeIndex));
-      const btn = el.heroPosters.querySelectorAll(".hero-poster")[activeIndex];
-      if (btn?.scrollIntoView){
-        btn.scrollIntoView({ behavior:"smooth", inline:"center", block:"nearest" });
-      }
-    }
-
-function renderThumbs(list){
-      el.thumbs.innerHTML = "";
-      list.forEach((item,index)=>{
-        const btn = document.createElement("button");
-        btn.className = "thumb tip";
-        btn.type = "button";
-        btn.title = item.title;
-        btn.dataset.tip = item.title;
-
-        const img = document.createElement("img");
-        img.alt = item.title;
-        img.loading = "lazy";
-        img.onerror = () => { img.onerror = null; img.src = svgPlaceholder("Khoii Poster", 500, 750); };
-        img.src = item.poster || svgPlaceholder("Khoii Poster", 500, 750);
-
-        btn.appendChild(img);
-        btn.addEventListener("click", ()=>setActive(index,true));
-        el.thumbs.appendChild(btn);
+      el.qualitySel.addEventListener("change", ()=>{
+        state.quality = el.qualitySel.value;
+        render();
       });
-
-      const total = 14;
-      for (let i=list.length;i<total;i++){
-        const ph = document.createElement("div");
-        ph.className = "thumb placeholder";
-        el.thumbs.appendChild(ph);
-      }
-    }
-
-    function renderCards(container, list, tagText){
-      container.innerHTML = "";
-      list.forEach((item)=>{
-        const c = document.createElement("div");
-        c.className = "card tip";
-        c.dataset.tip = item.title;
-        c.innerHTML = `
-          <div class="tag">${escapeHtml(tagText)}</div>
-          <div class="img"><img alt="" loading="lazy"></div>
-          <div class="meta">
-            <b>${escapeHtml(item.title)}</b>
-            <small>${escapeHtml(item.subtitle)} • ${escapeHtml(item.year)} • ${escapeHtml(item.quality)}</small>
-          </div>
-        `;
-        const img = c.querySelector("img");
-        img.onerror = () => { img.onerror = null; img.src = svgPlaceholder("Khoii Poster", 500, 750); };
-        img.src = item.poster || svgPlaceholder("Khoii Poster", 500, 750);
-
-        c.addEventListener("click", ()=>{
-          if (!item.driveId || item.driveId === "YOUR_DRIVE_ID_HERE"){
-            alert("Phim này chưa có Drive ID. Vào Admin để thêm phim Drive thật.");
-            return;
-          }
-          location.href = `watch.html?drive=${encodeURIComponent(item.driveId)}&title=${encodeURIComponent(item.title)}`;
+      el.yearSel.addEventListener("change", ()=>{
+        state.year = el.yearSel.value;
+        render();
+      });
+      el.countrySel.addEventListener("change", ()=>{
+        state.country = el.countrySel.value;
+        render();
+      });
+      el.genreSel.addEventListener("change", ()=>{
+        state.genre = el.genreSel.value;
+        render();
+      });
+      el.shuffleBtn.addEventListener("click", shuffle);
+      el.clearFilter.addEventListener("click", clearFilters);
+      el.navBtns.forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          state.kind = btn.dataset.kind;
+          el.navBtns.forEach(b=>b.classList.toggle("active", b===btn));
+          render();
         });
-
-        container.appendChild(c);
       });
     }
 
-    async function loadItems(){
-      const db = await dbListMoviesPublic();
-      const saved = (db && db.length) ? db : loadMovies();
-      items = (saved.length ? saved : fallback).map(toIndexItem);
-      return items;
-    }
-
-    function stopAuto(){ if (autoTimer){ clearInterval(autoTimer); autoTimer = null; } }
-    function startAuto(){
-      stopAuto();
-      const n = Math.min(filtered.length, 8);
-      if (n <= 1) return;
-      autoTimer = setInterval(()=>{
-        const idx = (activeIndex + 1) % n;
-        setActive(idx, false);
-      }, 5000);
-    }
-    function restartAuto(){ startAuto(); }
-    function next(){
-      if (!filtered.length) return;
-      const n = Math.min(filtered.length, 8);
-      setActive((activeIndex + 1) % n, true);
-    }
-    function prev(){
-      if (!filtered.length) return;
-      const n = Math.min(filtered.length, 8);
-      setActive((activeIndex - 1 + n) % n, true);
-    }
-
-    // ===== Filter helpers =====
-    function getAllGenres(list){
-      const set = new Set();
-      list.forEach(x => (x.genres || []).forEach(g => { if (g) set.add(String(g)); }));
-      return [...set].sort((a,b)=>a.localeCompare(b));
-    }
-    function getAllCountries(list){
-      const set = new Set();
-      list.forEach(x => { if (x.country) set.add(String(x.country)); });
-      return [...set].sort((a,b)=>a.localeCompare(b));
-    }
-    function openPanel(title, chips){
-      fp.title.textContent = title;
-      fp.chips.innerHTML = "";
-      chips.forEach(({label,on,action})=>{
-        const b = document.createElement("button");
-        b.type="button";
-        b.className = "chip" + (on ? " on" : "");
-        b.textContent = label;
-        b.addEventListener("click", action);
-        fp.chips.appendChild(b);
-      });
-      fp.panel.hidden = false;
-      fp.panel.scrollIntoView({ behavior:"smooth", block:"nearest" });
-    }
-    function closePanel(){ fp.panel.hidden = true; }
-
-    fp.close?.addEventListener("click", closePanel);
-    fp.clear?.addEventListener("click", ()=>{
-      filterState.kind = null; filterState.genre = null; filterState.country = null;
-      applyAllFilters();
-      closePanel();
-    });
-
-    function updateNavActive(){
-      fp.navBtns.forEach(a => a.classList.remove("active"));
-      fp.navBtns.forEach(a=>{
-        const action = a.dataset.action;
-        if (action === "kind" && filterState.kind && a.dataset.kind === filterState.kind) a.classList.add("active");
-        if (action === "genres" && filterState.genre) a.classList.add("active");
-        if (action === "countries" && filterState.country) a.classList.add("active");
-      });
-    }
-
-    function applyAllFilters(){
-      const q = (el.q.value || "").trim().toLowerCase();
-
-      filtered = items.filter(x=>{
-        const matchQ = !q || (x.title||"").toLowerCase().includes(q) || (x.subtitle||"").toLowerCase().includes(q);
-        const matchKind = !filterState.kind || x.kind === filterState.kind;
-        const gs = Array.isArray(x.genres) ? x.genres.map(s=>String(s).toLowerCase()) : [];
-        const matchGenre = !filterState.genre || gs.includes(String(filterState.genre).toLowerCase());
-        const xc = String(x.country||"").toLowerCase();
-        const matchCountry = !filterState.country || xc === String(filterState.country).toLowerCase();
-        return matchQ && matchKind && matchGenre && matchCountry;
-      });
-
-      updateNavActive();
-
-      if (!filtered.length){
-        el.heroTitle.textContent = "Không tìm thấy phim";
-        el.heroSubtitle.textContent = "";
-        el.heroBadges.innerHTML = "";
-        el.heroGenres.innerHTML = "";
-        el.heroDesc.textContent = "Hãy thử từ khóa khác hoặc xoá bộ lọc.";
-
-        setHeroImage(svgPlaceholder("No result", 1600, 900));
-        renderThumbs([]);
-        renderHeroPosters([]);
-        el.heroDots.innerHTML = "";
-        stopAuto();
-
-        el.rowSuggest.innerHTML = "";
-        el.rowNew.innerHTML = "";
-        el.rowAnime.innerHTML = "";
-        return;
-      }
-
-      renderThumbs(filtered);
-      renderHeroPosters(filtered);
-activeIndex = 0;
-      renderHeroDots();
-      setActive(activeIndex, false);
-
-      const byNew = filtered.slice().sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
-      const suggest = filtered.slice(0,12);
-      const anime = filtered.filter(x=>x.kind==="anime").slice(0,12);
-      const newest = byNew.slice(0,12);
-
-      renderCards(el.rowSuggest, suggest, "HOT");
-      renderCards(el.rowNew, newest, "NEW");
-      renderCards(el.rowAnime, anime.length ? anime : suggest, "ANIME");
-
-      startAuto();
-    }
-
-    // ===== events =====
-    el.prevBtn.addEventListener("click", prev);
-    el.nextBtn.addEventListener("click", next);
-
-    el.btnPlay.addEventListener("click", ()=>{
-      const item = filtered[activeIndex];
-      if (!item) return;
-      if (!item.driveId || item.driveId === "YOUR_DRIVE_ID_HERE"){
-        alert("Phim này chưa có Drive ID. Vào Admin để thêm phim Drive thật.");
-        return;
-      }
-      location.href = `watch.html?drive=${encodeURIComponent(item.driveId)}&title=${encodeURIComponent(item.title)}`;
-    });
-
-    el.btnFav.addEventListener("click", ()=>{
-      const item = filtered[activeIndex];
-      if (!item) return;
-      alert(`Đã thêm vào yêu thích (demo): ${item.title}`);
-    });
-
-    el.btnInfo.addEventListener("click", ()=>{
-      const item = filtered[activeIndex];
-      if (!item) return;
-      const gs = (item.genres || []).join(", ");
-      alert(`Thông tin (demo): ${item.title}\nIMDb: ${item.imdb || "—"}\nNăm: ${item.year} • ${item.quality}\nQuốc gia: ${item.country || "—"}\nThể loại: ${gs || "—"}`);
-    });
-
-    el.q.addEventListener("input", applyAllFilters);
-
-    el.btnMore.addEventListener("click", ()=>{
-      document.getElementById("rows")?.scrollIntoView({ behavior:"smooth", block:"start" });
-    });
-
-    // NAV actions
-    fp.navBtns.forEach(a=>{
-      a.addEventListener("click",(ev)=>{
-        ev.preventDefault();
-        const action = a.dataset.action;
-
-        if (action === "kind"){
-          const k = a.dataset.kind;
-          filterState.kind = (filterState.kind === k) ? null : k;
-          applyAllFilters();
-          return;
-        }
-
-        if (action === "genres"){
-          const genres = getAllGenres(items);
-          const chips = genres.length ? [
-            { label:"Tất cả", on:!filterState.genre, action:()=>{ filterState.genre=null; applyAllFilters(); } },
-            ...genres.slice(0,40).map(g=>({
-              label:g,
-              on:filterState.genre===g,
-              action:()=>{ filterState.genre = (filterState.genre===g ? null : g); applyAllFilters(); }
-            }))
-          ] : [{ label:"Chưa có dữ liệu thể loại", on:false, action:()=>{} }];
-          openPanel("Chọn thể loại", chips);
-          return;
-        }
-
-        if (action === "countries"){
-          const cs = getAllCountries(items);
-          const chips = cs.length ? [
-            { label:"Tất cả", on:!filterState.country, action:()=>{ filterState.country=null; applyAllFilters(); } },
-            ...cs.slice(0,40).map(c=>({
-              label:c,
-              on:filterState.country===c,
-              action:()=>{ filterState.country = (filterState.country===c ? null : c); applyAllFilters(); }
-            }))
-          ] : [{ label:"Chưa có dữ liệu quốc gia", on:false, action:()=>{} }];
-          openPanel("Chọn quốc gia", chips);
-          return;
-        }
-      });
-    });
-
-    async function refreshHome(){
-      await loadItems();
-      applyAllFilters();
-    }
-
-    (async ()=>{ await refreshHome(); })();
-
-    // auto refresh
-    window.addEventListener("storage",(e)=>{ if (e.key === STORAGE_KEY) refreshHome(); });
-    document.addEventListener("visibilitychange",()=>{ if (!document.hidden) refreshHome(); });
-    window.addEventListener("pageshow",()=>refreshHome());
+    (async function init(){
+      el.yearNow.textContent = String(new Date().getFullYear());
+      await loadData();
+      buildFilters();
+      bind();
+      render();
+    })();
   </script>
 </body>
 </html>
