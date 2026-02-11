@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>UI Skeleton (Load Supabase + Drive stream)</title>
+  <title>PhimApp • Home</title>
   <style>
     :root{
       --bg0:#0a0b10;
@@ -124,7 +124,7 @@
     .dd-panel{
       position:absolute;
       top:44px; left:0;
-      width: 220px;
+      width: 240px;
       border-radius: 16px;
       border:1px solid rgba(255,255,255,.10);
       background: rgba(10,11,16,.92);
@@ -132,6 +132,8 @@
       box-shadow: var(--shadow2);
       padding:8px;
       display:none;
+      max-height: 280px;
+      overflow:auto;
     }
     .dd-panel.open{display:block;}
     .dd-item{
@@ -172,12 +174,24 @@
       overflow:hidden;
       position:relative;
     }
-    .hero::after{
+
+    /* ✅ banner layer (fix banner không hiện) */
+    .hero .hero-banner{
+      position:absolute; inset:0;
+      background-size: cover;
+      background-position: center;
+      filter: blur(0px);
+      opacity:.22;
+      transform: scale(1.02);
+    }
+    .hero .hero-banner::after{
       content:"";
       position:absolute; inset:0;
-      background: radial-gradient(1000px 520px at 70% 50%, rgba(255,255,255,.05), transparent 60%);
-      pointer-events:none;
+      background:
+        radial-gradient(1200px 520px at 70% 50%, rgba(255,255,255,.06), transparent 60%),
+        linear-gradient(180deg, rgba(10,11,16,.25), rgba(10,11,16,.75));
     }
+
     .hero-inner{
       position:relative;
       display:grid;
@@ -376,6 +390,10 @@
       font-size:13px;
       display:none;
       z-index:120;
+      max-width:min(92vw, 760px);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
     }
     .toast.show{display:block;}
   </style>
@@ -408,6 +426,7 @@
           <div class="mitem" id="btnCountry">Quốc gia ▾</div>
           <div class="dd-panel" id="ddCountry"></div>
         </div>
+        <a class="mitem" href="list.html">Danh sách</a>
       </div>
 
       <div class="member" id="memberBtn" title="Mở trang Admin">
@@ -424,6 +443,9 @@
     </div>
 
     <section class="hero">
+      <!-- ✅ banner layer -->
+      <div class="hero-banner" id="heroBanner"></div>
+
       <div class="hero-inner">
         <div class="hero-left">
           <h1 class="hero-h1" id="heroTitle">—</h1>
@@ -473,8 +495,9 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     // ================== CONFIG ==================
+    // ⚠️ Anon key có thể public, nhưng nên đặt RLS + policy đúng.
     const SUPABASE_URL = "https://nzalaxolteaiafvuceqz.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56YWxheG9sdGVhaWFmdnVjZXF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyOTY2MjAsImV4cCI6MjA4NTg3MjYyMH0.0eIz6cfB4Dr_g5Wja70tZCMvVfUKoI5H4D8MJBP49Bg";
+    const SUPABASE_ANON_KEY = "YOUR_ANON_KEY_HERE";
     const SUPABASE_TABLE = "movies";
 
     const LS_FAV = "phimapp_favs_v1";
@@ -482,8 +505,20 @@
 
     // fallback demo (nếu Supabase + cache rỗng)
     const DEMO = [
-      { id:"movie1", type:"movie", title:"Demo Movie", sub:"Demo", imdb:"7.0", quality:"HD", year:"2026", part:"", ep:"",
-        tags:["Demo"], genre:"Demo", country:"VN", desc:"Demo data", poster:"", poster_img:"", driveid:"" },
+      {
+        id:"demo1",
+        kind:"movie",
+        title:"Demo Movie",
+        imdb:"7.0",
+        quality:"HD",
+        year:"2026",
+        country:"VN",
+        genre:"Demo",
+        poster:"",
+        banner:"",
+        url:"",
+        driveid:""
+      },
     ];
 
     const state = {
@@ -506,6 +541,7 @@
       heroMetaTags: document.getElementById("heroMetaTags"),
       heroDesc: document.getElementById("heroDesc"),
       heroPoster: document.getElementById("heroPoster"),
+      heroBanner: document.getElementById("heroBanner"),
 
       playBtn: document.getElementById("playBtn"),
       favBtn: document.getElementById("favBtn"),
@@ -543,7 +579,7 @@
       el.toast.textContent = msg;
       el.toast.classList.add("show");
       clearTimeout(toast._t);
-      toast._t = setTimeout(()=> el.toast.classList.remove("show"), 1200);
+      toast._t = setTimeout(()=> el.toast.classList.remove("show"), 1400);
     }
 
     function unique(list){
@@ -552,45 +588,25 @@
       return [...s].sort((a,b)=>a.localeCompare(b));
     }
 
-    // ===== Drive helpers (poster/video) =====
-    // ✅ FIX: decode nhiều lớp + bắt fb l.php?u=... + nhiều dạng link Drive
+    // ===== Drive helpers (poster/banner/video) =====
     function extractDriveId(link){
-      let s = String(link || "").trim();
-      if(!s) return "";
-
-      for(let i=0;i<3;i++){
-        try{
-          const dec = decodeURIComponent(s);
-          if(dec === s) break;
-          s = dec;
-        }catch{ break; }
-      }
-
-      try{
-        const u = new URL(s);
-        const inner = u.searchParams.get("u") || u.searchParams.get("url") || "";
-        if(inner){
-          let t = inner;
-          for(let i=0;i<3;i++){
-            try{
-              const dec = decodeURIComponent(t);
-              if(dec === t) break;
-              t = dec;
-            }catch{ break; }
-          }
-          s = t;
-        }
-      }catch{}
-
+      const s = String(link || "");
       let m = s.match(/\/file\/d\/([a-zA-Z0-9_-]+)/); if(m) return m[1];
       m = s.match(/open\?id=([a-zA-Z0-9_-]+)/); if(m) return m[1];
       m = s.match(/[?&]id=([a-zA-Z0-9_-]+)/); if(m) return m[1];
-      m = s.match(/drive\.google\.com\/uc\?[^#]*\bid=([a-zA-Z0-9_-]+)/); if(m) return m[1];
       return "";
     }
 
-    function driveImageUrl(id){
+    // ✅ FIX: thumbnail + fallback để ảnh hiện ổn định hơn
+    function driveThumbUrl(id, size=1400){
+      return `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w${size}`;
+    }
+    function driveUcViewUrl(id){
       return `https://drive.google.com/uc?export=view&id=${encodeURIComponent(id)}`;
+    }
+    function driveBgCss(id, size=1400){
+      // CSS multiple backgrounds => fallback
+      return `url('${driveThumbUrl(id,size)}'), url('${driveUcViewUrl(id)}')`;
     }
 
     function loadFavs(){
@@ -618,18 +634,22 @@
       localStorage.setItem(LS_CACHE, JSON.stringify(items));
     }
 
-    // ===== Map DB row -> UI item (poster from Drive) =====
+    // ===== Map DB row -> UI item =====
     function mapDbRowToUi(row){
-      const type = (row.kind === "movie") ? "movie" : "series";
+      const kind = String(row.kind ?? row.type ?? "movie");
+      const type = (kind === "movie") ? "movie" : "series";
 
       const posterLink = String(row.poster ?? "");
-      const posterId = extractDriveId(posterLink);
-      const poster_img = posterId ? driveImageUrl(posterId) : "";
+      const bannerLink = String(row.banner ?? ""); // optional
 
-      // ✅ FIX: nếu driveid rỗng, thử parse từ row.url (watch url)
-      const driveid =
-        String(row.driveid ?? "").trim() ||
-        extractDriveId(row.url ?? "");
+      const posterId = extractDriveId(posterLink);
+      const bannerId = extractDriveId(bannerLink);
+
+      const poster_img = posterId ? driveBgCss(posterId, 1400) : "";
+      const banner_img = bannerId ? driveBgCss(bannerId, 1800) : (posterId ? driveBgCss(posterId, 1800) : "");
+
+      // ✅ video driveid: ưu tiên row.driveid, nếu trống thì lấy từ row.url (link Drive video)
+      const driveid = String(row.driveid ?? "") || extractDriveId(row.url ?? "");
 
       return {
         id: String(row.id ?? ""),
@@ -639,25 +659,27 @@
         imdb: String(row.imdb ?? ""),
         quality: String(row.quality ?? ""),
         year: String(row.year ?? ""),
-        part: "",
-        ep: "",
         tags: row.genre ? [String(row.genre)] : [],
         genre: String(row.genre ?? ""),
         country: String(row.country ?? ""),
-        desc: "",
+        desc: String(row.desc ?? row.description ?? ""),
         poster: posterLink,
+        banner: bannerLink,
         poster_img,
-        driveid, // ✅ VIDEO id (để stream)
+        banner_img,
+        url: String(row.url ?? ""),
+        driveid,
+        kind,
       };
     }
 
     async function loadFromSupabase(){
-      if(!SUPABASE_URL || !SUPABASE_ANON_KEY) return [];
+      if(!SUPABASE_URL || !SUPABASE_ANON_KEY || SUPABASE_ANON_KEY==="YOUR_ANON_KEY_HERE") return [];
       try{
         const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const { data, error } = await sb
           .from(SUPABASE_TABLE)
-          .select("id,title,kind,year,quality,imdb,country,genre,poster,url,driveid")
+          .select("id,title,kind,year,quality,imdb,country,genre,poster,banner,desc,description,url,driveid")
           .order("id", { ascending: false })
           .limit(200);
         if(error) throw error;
@@ -678,7 +700,7 @@
       if(fromCache.length){
         return { items: fromCache, source: "localStorage" };
       }
-      return { items: DEMO, source: "demo" };
+      return { items: DEMO.map(mapDbRowToUi), source: "demo" };
     }
 
     function filteredItems(){
@@ -711,6 +733,7 @@
         el.favBtn.textContent = "♡";
         el.heroPoster.style.backgroundImage = "";
         el.heroPoster.textContent = "NO PREVIEW";
+        el.heroBanner.style.backgroundImage = "";
         return;
       }
 
@@ -721,8 +744,6 @@
       if(x.imdb) top.push(`<span class="tag imdb">IMDb ${escapeHtml(x.imdb)}</span>`);
       if(x.quality) top.push(`<span class="tag">${escapeHtml(x.quality)}</span>`);
       if(x.year) top.push(`<span class="tag">${escapeHtml(x.year)}</span>`);
-      if(x.part) top.push(`<span class="tag">${escapeHtml(x.part)}</span>`);
-      if(x.ep) top.push(`<span class="tag">${escapeHtml(x.ep)}</span>`);
       el.heroMetaTop.innerHTML = top.join("");
 
       el.heroMetaTags.innerHTML = (x.tags || []).map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join("");
@@ -731,12 +752,20 @@
       el.favBtn.textContent = state.favs.has(x.id) ? "♥" : "♡";
       el.favBtn.title = state.favs.has(x.id) ? "Bỏ yêu thích" : "Yêu thích";
 
+      // ✅ FIX poster: dùng multiple url backgroundImage (không bọc url() thêm lần nữa)
       if(x.poster_img){
-        el.heroPoster.style.backgroundImage = `url('${x.poster_img}')`;
+        el.heroPoster.style.backgroundImage = x.poster_img;
         el.heroPoster.textContent = "";
       }else{
         el.heroPoster.style.backgroundImage = "";
         el.heroPoster.textContent = "NO POSTER";
+      }
+
+      // ✅ FIX banner
+      if(x.banner_img){
+        el.heroBanner.style.backgroundImage = x.banner_img;
+      }else{
+        el.heroBanner.style.backgroundImage = "";
       }
     }
 
@@ -750,8 +779,9 @@
         const isActive = x.id===state.activeId;
         const isFav = state.favs.has(x.id);
 
+        // ✅ FIX: poster_img đã là "url('a'), url('b')" => không bọc url() nữa
         const bg = x.poster_img
-          ? `style="background-image:url('${escapeHtml(x.poster_img)}')"`
+          ? `style="background-image:${escapeHtml(x.poster_img)}"`
           : "";
 
         return `
@@ -873,13 +903,12 @@
       document.addEventListener("click", ()=> closeDropdowns());
 
       // ✅ STREAM: bấm xem ngay -> watch.html?id=<movieId>
-      // (watch.html sẽ tự tìm driveid trong item)
+      // watch.html sẽ lấy driveid từ cache bằng movieId, không bị nhầm.
       el.playBtn.addEventListener("click", ()=>{
         const x = getActive();
         if(!x) return;
-
         if(!x.driveid){
-          toast("❌ Thiếu driveid (video). Hãy nhập Watch URL (link Drive video) ở Admin.");
+          toast("❌ Thiếu driveid (video). Hãy nhập Watch URL (Drive video) ở Admin.");
           return;
         }
         location.href = `watch.html?id=${encodeURIComponent(x.id)}`;
@@ -910,9 +939,11 @@
             ${x.year ? `<span class="tag">${escapeHtml(x.year)}</span>`:""}
             ${x.genre ? `<span class="tag">${escapeHtml(x.genre)}</span>`:""}
             ${x.country ? `<span class="tag">${escapeHtml(x.country)}</span>`:""}
-            <span class="tag">${escapeHtml(x.type)}</span>
+            <span class="tag">${escapeHtml(x.kind || x.type)}</span>
           </div>
-          <div><b>Drive Video ID:</b> ${escapeHtml(x.driveid || "—")}</div>
+          <div><b>Video driveid:</b> ${escapeHtml(x.driveid || "—")}</div>
+          <div><b>Poster:</b> ${escapeHtml(x.poster || "—")}</div>
+          <div><b>Banner:</b> ${escapeHtml(x.banner || "—")}</div>
           <div style="margin-top:10px;color:rgba(233,237,246,.78)">
             <b>ID:</b> ${escapeHtml(x.id)}
           </div>
