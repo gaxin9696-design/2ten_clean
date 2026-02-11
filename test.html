@@ -48,7 +48,7 @@
       outline:none;
       font-size:13px;
     }
-    textarea{min-height:140px;resize:vertical;font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;}
+    textarea{min-height:120px;resize:vertical;font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;}
     .row{display:flex;gap:10px;flex-wrap:wrap}
     .row > *{flex:1 1 180px}
     .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
@@ -65,6 +65,7 @@
       padding:14px;
       color:#d1d5db;
       font-size:13px;line-height:1.45;
+      word-break: break-word;
     }
     .muted{color:var(--muted)}
     .k{color:#9ec1ff;font-weight:800}
@@ -77,7 +78,7 @@
     <header>
       <div>
         <h1>Admin / Test</h1>
-        <div class="muted" style="font-size:12px;margin-top:2px">Add / update item (localStorage + Supabase optional)</div>
+        <div class="muted" style="font-size:12px;margin-top:2px">Add / update item (localStorage + Supabase)</div>
       </div>
       <a class="pill" href="index.html">← Home</a>
     </header>
@@ -105,18 +106,25 @@
       </div>
 
       <div class="card">
-        <h2>Item</h2>
+        <h2>Item (schema mới)</h2>
         <div class="body">
+          <label>Title</label>
+          <input id="title" placeholder="Tên phim...">
+
           <div class="row">
-            <div>
-              <label>Title</label>
-              <input id="title" placeholder="Tên phim...">
-            </div>
             <div>
               <label>Kind</label>
               <select id="kind">
-                <option value="movie">movie</option>
                 <option value="anime">anime</option>
+                <option value="movie">movie</option>
+              </select>
+            </div>
+            <div>
+              <label>Quality</label>
+              <select id="quality">
+                <option>FHD</option>
+                <option>HD</option>
+                <option>4K</option>
               </select>
             </div>
           </div>
@@ -127,13 +135,8 @@
               <input id="year" placeholder="2026">
             </div>
             <div>
-              <label>Quality</label>
-              <select id="quality">
-                <option value="">(empty)</option>
-                <option>HD</option>
-                <option>FHD</option>
-                <option>4K</option>
-              </select>
+              <label>IMDb</label>
+              <input id="imdb" placeholder="7.8">
             </div>
           </div>
 
@@ -143,22 +146,31 @@
               <input id="country" placeholder="VN/JP...">
             </div>
             <div>
-              <label>Genre</label>
+              <label>Genre (text)</label>
               <input id="genre" placeholder="Action/Fantasy...">
             </div>
           </div>
 
-          <label>Poster URL (Drive file link)</label>
-          <input id="poster" placeholder="https://drive.google.com/file/d/.../view">
+          <label>Genres (text[] - nhập cách nhau dấu phẩy)</label>
+          <input id="genres" placeholder="Action, Drama, Fantasy">
 
-          <label>Banner URL (Drive file link) (optional)</label>
-          <input id="banner" placeholder="https://drive.google.com/file/d/.../view">
+          <label>Desc</label>
+          <textarea id="desc" placeholder="Mô tả phim..."></textarea>
 
-          <label>Watch URL (Drive video link)</label>
-          <input id="url" placeholder="https://drive.google.com/file/d/.../view">
+          <label>Poster URL (posterurl)</label>
+          <input id="posterurl" placeholder="https://drive.google.com/file/d/.../view">
+
+          <label>Hero/Banner URL (herourl)</label>
+          <input id="herourl" placeholder="https://drive.google.com/file/d/.../view">
+
+          <label>DriveLink (drivelink) - link video (có thể là Facebook redirect)</label>
+          <input id="drivelink" placeholder="https://drive.google.com/file/d/... hoặc https://l.facebook.com/l.php?u=...">
+
+          <label>DriveID (driveid) - để trống sẽ tự extract từ drivelink</label>
+          <input id="driveid" placeholder="14gEVKOK...">
 
           <label>JSON raw (optional)</label>
-          <textarea id="raw" placeholder='{"title":"...","poster":"...","url":"..."}'></textarea>
+          <textarea id="raw" placeholder='{"title":"...","kind":"anime","posterurl":"...","drivelink":"..."}'></textarea>
 
           <div class="btns">
             <button class="btn good" id="saveLocal">Save → localStorage</button>
@@ -186,21 +198,25 @@
 
       title: document.getElementById("title"),
       kind: document.getElementById("kind"),
-      year: document.getElementById("year"),
       quality: document.getElementById("quality"),
+      year: document.getElementById("year"),
+      imdb: document.getElementById("imdb"),
       country: document.getElementById("country"),
       genre: document.getElementById("genre"),
-      poster: document.getElementById("poster"),
-      banner: document.getElementById("banner"),
-      url: document.getElementById("url"),
+      genres: document.getElementById("genres"),
+      desc: document.getElementById("desc"),
+
+      posterurl: document.getElementById("posterurl"),
+      herourl: document.getElementById("herourl"),
+      drivelink: document.getElementById("drivelink"),
+      driveid: document.getElementById("driveid"),
+
       raw: document.getElementById("raw"),
       saveLocal: document.getElementById("saveLocal"),
       saveSb: document.getElementById("saveSb"),
       preview: document.getElementById("preview"),
       log2: document.getElementById("log2"),
     };
-
-    function safeText(s){ return String(s ?? ""); }
 
     function escapeHtml(s){
       return String(s ?? "")
@@ -215,60 +231,126 @@
     function ok(msg){ return `✅ <span class="ok">${escapeHtml(msg)}</span>`; }
     function err(msg){ return `❌ <span class="err">${escapeHtml(msg)}</span>`; }
 
-    // ✅ extract drive file id từ link Google Drive
+    function tryDecodeUrlOnce(s){
+      try { return decodeURIComponent(s); } catch { return s; }
+    }
+
+    // ✅ extractDriveId: bắt cả link Facebook redirect
     function extractDriveId(link){
-      const s = String(link || "");
+      let s = String(link || "").trim();
+      if(!s) return "";
+
+      if(s.includes("l.facebook.com/l.php?")){
+        try{
+          const u = new URL(s);
+          const enc = u.searchParams.get("u");
+          if(enc) s = tryDecodeUrlOnce(enc);
+        }catch{}
+      }
+
+      try{
+        const u = new URL(s);
+        const maybe = u.searchParams.get("url") || u.searchParams.get("href") || u.searchParams.get("u");
+        if(maybe && maybe.includes("drive.google.com")){
+          s = tryDecodeUrlOnce(maybe);
+        }
+      }catch{}
+
       let m = s.match(/\/file\/d\/([a-zA-Z0-9_-]+)/); if(m) return m[1];
       m = s.match(/open\?id=([a-zA-Z0-9_-]+)/); if(m) return m[1];
       m = s.match(/[?&]id=([a-zA-Z0-9_-]+)/); if(m) return m[1];
       return "";
     }
 
-    // ✅ normalize item + auto driveid từ Watch URL
-    function normalizeItem(x){
-      const poster = safeText(x.poster ?? x.thumb ?? x.image ?? "");
-      const banner = safeText(x.banner ?? "");
-      const url    = safeText(x.url ?? x.link ?? x.watch ?? "");
+    function parseGenres(s){
+      return String(s || "")
+        .split(",")
+        .map(x => x.trim())
+        .filter(Boolean);
+    }
 
-      const driveid = safeText(
-        x.driveid ?? x.drive_id ?? extractDriveId(url) ?? ""
-      );
+    // cache: lưu UI item giống index để list/watch đọc được
+    function normalizeForCache(row){
+      const posterLink = String(row.posterurl ?? row.poster ?? "");
+      const heroLink = String(row.herourl ?? "");
 
+      const did = String(row.driveid ?? "")
+        || extractDriveId(row.drivelink ?? "")
+        || extractDriveId(row.url ?? "");
+
+      const genresArr = Array.isArray(row.genres) ? row.genres : parseGenres(row.genres);
+      const genreText = String(row.genre ?? "");
+      const tags = [
+        ...genresArr.map(x => String(x||"").trim()).filter(Boolean),
+        ...(genreText ? [genreText] : [])
+      ];
+
+      // Lưu raw link; index sẽ tự tạo bg css khi load supabase; nhưng cache cũng nên có driveid
       return {
-        id: safeText(x.id ?? x.slug ?? crypto.randomUUID()),
-        title: safeText(x.title ?? x.name ?? "Untitled"),
-        kind: safeText(x.kind ?? x.type ?? "movie"),
-        year: safeText(x.year ?? ""),
-        quality: safeText(x.quality ?? x.q ?? ""),
-        imdb: safeText(x.imdb ?? x.rating ?? ""),
-        country: safeText(x.country ?? x.nation ?? ""),
-        genre: safeText(x.genre ?? x.categories ?? ""),
-        poster,
-        banner,
-        url,
-        driveid
+        id: String(row.id ?? crypto.randomUUID()),
+        kind: String(row.kind ?? "anime"),
+        type: (String(row.kind ?? "anime")==="movie") ? "movie" : "series",
+        title: String(row.title ?? ""),
+        year: String(row.year ?? ""),
+        quality: String(row.quality ?? "FHD"),
+        imdb: String(row.imdb ?? ""),
+        country: String(row.country ?? ""),
+        genre: genreText,
+        tags,
+        desc: String(row.desc ?? ""),
+
+        poster: posterLink,
+        banner: heroLink,
+        poster_img: "", // index sẽ fill khi load supabase; cache cũ không bắt buộc
+        banner_img: "",
+
+        drivelink: String(row.drivelink ?? row.url ?? ""),
+        driveid: did,
+        updatedat: row.updatedat ?? Date.now(),
       };
     }
 
     let supabaseClient = null;
 
-    function getFormItem(){
+    function getFormPayload(){
       const raw = el.raw.value.trim();
       if(raw){
-        try{ return normalizeItem(JSON.parse(raw)); }
-        catch(e){ throw new Error("JSON raw không hợp lệ."); }
+        let obj;
+        try{ obj = JSON.parse(raw); }
+        catch{ throw new Error("JSON raw không hợp lệ."); }
+        return obj;
       }
-      return normalizeItem({
-        title: el.title.value,
-        kind: el.kind.value,
-        year: el.year.value,
-        quality: el.quality.value,
-        country: el.country.value,
-        genre: el.genre.value,
-        poster: el.poster.value,
-        banner: el.banner.value,
-        url: el.url.value,
-      });
+
+      const genres = parseGenres(el.genres.value);
+
+      const drivelink = el.drivelink.value.trim();
+      const driveid = el.driveid.value.trim() || extractDriveId(drivelink);
+
+      return {
+        title: el.title.value.trim() || null,
+        kind: el.kind.value.trim() || "anime",
+        year: el.year.value.trim() || null,
+        quality: el.quality.value.trim() || "FHD",
+        imdb: el.imdb.value.trim() || null,
+
+        country: el.country.value.trim() || null,
+        genre: el.genre.value.trim() || null,
+        genres: genres.length ? genres : [],
+
+        desc: el.desc.value.trim() || null,
+
+        driveid: driveid || null,
+        drivelink: drivelink || null,
+
+        posterurl: el.posterurl.value.trim() || null,
+        herourl: el.herourl.value.trim() || null,
+
+        // legacy (nếu table có)
+        poster: el.posterurl.value.trim() || null,
+        url: drivelink || null,
+
+        updatedat: Date.now(),
+      };
     }
 
     function readCache(){
@@ -308,8 +390,8 @@
 
     el.preview.addEventListener("click", ()=>{
       try{
-        const item = getFormItem();
-        setLog(el.log2, `👀 Preview: <span class="k">${escapeHtml(JSON.stringify(item, null, 2))}</span>`);
+        const payload = getFormPayload();
+        setLog(el.log2, `👀 Preview payload: <span class="k">${escapeHtml(JSON.stringify(payload, null, 2))}</span>`);
       }catch(e){
         setLog(el.log2, err(e.message || String(e)));
       }
@@ -317,14 +399,15 @@
 
     el.saveLocal.addEventListener("click", ()=>{
       try{
-        const item = getFormItem();
-        const items = readCache().map(normalizeItem);
+        const payload = getFormPayload();
+        const items = readCache();
 
-        const idx = items.findIndex(x=>x.id===item.id);
-        if(idx>=0) items[idx] = item;
-        else items.unshift(item);
+        // cache lưu dạng UI item
+        const ui = normalizeForCache(payload);
 
+        items.unshift(ui);
         writeCache(items);
+
         setLog(el.log2, ok(`Saved localStorage (total ${items.length})`));
       }catch(e){
         setLog(el.log2, err(e.message || String(e)));
@@ -333,15 +416,14 @@
 
     el.saveSb.addEventListener("click", async ()=>{
       try{
-        const item = getFormItem();
+        const payload = getFormPayload();
         if(!supabaseClient){ setLog(el.log2, err("Chưa init Supabase.")); return; }
         const table = el.sbTable.value.trim() || "movies";
 
-        // Insert đơn giản (tránh lỗi select khi RLS)
-        const { error } = await supabaseClient.from(table).insert(item);
+        const { error } = await supabaseClient.from(table).insert(payload);
         if(error) throw error;
 
-        setLog(el.log2, ok(`Inserted to Supabase: ${item.id}`));
+        setLog(el.log2, ok(`Inserted to Supabase`));
       }catch(e){
         setLog(el.log2, err(e?.message || String(e)));
       }
