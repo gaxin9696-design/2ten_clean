@@ -65,6 +65,7 @@
       padding:14px;
       color:#d1d5db;
       font-size:13px;line-height:1.45;
+      word-break: break-word;
     }
     .muted{color:var(--muted)}
     .k{color:#9ec1ff;font-weight:800}
@@ -149,17 +150,17 @@
           </div>
 
           <label>Poster URL</label>
-          <input id="poster" placeholder="https://...jpg">
+          <input id="poster" placeholder="https://drive.google.com/file/d/.../view">
 
           <label>Watch URL</label>
-          <input id="url" placeholder="watch.html?url=... hoặc link player">
+          <input id="url" placeholder="link Drive video hoặc facebook l.php?u=...">
 
           <label>JSON raw (optional)</label>
           <textarea id="raw" placeholder='{"id":"...","title":"..."}'></textarea>
 
           <div class="btns">
             <button class="btn good" id="saveLocal">Save → localStorage</button>
-            <button class="btn good" id="saveSb">Insert → Supabase</button>
+            <button class="btn good" id="saveSb">Upsert → Supabase</button>
             <button class="btn" id="preview">Preview JSON</button>
           </div>
         </div>
@@ -211,50 +212,65 @@
     function ok(msg){ return `✅ <span class="ok">${escapeHtml(msg)}</span>`; }
     function err(msg){ return `❌ <span class="err">${escapeHtml(msg)}</span>`; }
 
-    // ✅ FIX: tách drive file id từ link Google Drive
+    // ✅ FIX: decode nhiều lớp + bắt fb l.php?u=... + nhiều dạng link Drive
     function extractDriveId(link){
-      const s = String(link || "");
+      let s = String(link || "").trim();
+      if(!s) return "";
 
-      // dạng: https://drive.google.com/file/d/<ID>/view
-      let m = s.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-      if(m) return m[1];
+      for(let i=0;i<3;i++){
+        try{
+          const dec = decodeURIComponent(s);
+          if(dec === s) break;
+          s = dec;
+        }catch{ break; }
+      }
 
-      // dạng: https://drive.google.com/open?id=<ID>
-      m = s.match(/open\?id=([a-zA-Z0-9_-]+)/);
-      if(m) return m[1];
+      try{
+        const u = new URL(s);
+        const inner = u.searchParams.get("u") || u.searchParams.get("url") || "";
+        if(inner){
+          let t = inner;
+          for(let i=0;i<3;i++){
+            try{
+              const dec = decodeURIComponent(t);
+              if(dec === t) break;
+              t = dec;
+            }catch{ break; }
+          }
+          s = t;
+        }
+      }catch{}
 
-      // dạng: ...?id=<ID>
-      m = s.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-      if(m) return m[1];
-
+      let m = s.match(/\/file\/d\/([a-zA-Z0-9_-]+)/); if(m) return m[1];
+      m = s.match(/open\?id=([a-zA-Z0-9_-]+)/); if(m) return m[1];
+      m = s.match(/[?&]id=([a-zA-Z0-9_-]+)/); if(m) return m[1];
+      m = s.match(/drive\.google\.com\/uc\?[^#]*\bid=([a-zA-Z0-9_-]+)/); if(m) return m[1];
       return "";
     }
 
-    // ✅ FIX: thêm driveid vào item để không bị NOT NULL
     function normalizeItem(x){
-	  const poster = safeText(x.poster ?? x.thumb ?? x.image ?? "");
-	  const url    = safeText(x.url ?? x.link ?? x.watch ?? "");
+      const poster = safeText(x.poster ?? x.thumb ?? x.image ?? "");
+      const url    = safeText(x.url ?? x.link ?? x.watch ?? "");
 
-	  // ✅ driveid = VIDEO id (ưu tiên lấy từ Watch URL)
-	  const driveid = safeText(
-		x.driveid ?? x.drive_id ?? extractDriveId(url) ?? extractDriveId(poster)
-	  );
+      // ✅ driveid = VIDEO id (ưu tiên lấy từ Watch URL / FB redirect)
+      const driveid = safeText(
+        x.driveid ?? x.drive_id ?? extractDriveId(url) ?? extractDriveId(poster)
+      );
 
-	  return {
-		id: safeText(x.id ?? x.slug ?? crypto.randomUUID()),
-		title: safeText(x.title ?? x.name ?? "Untitled"),
-		kind: safeText(x.kind ?? x.type ?? "movie"),
-		year: safeText(x.year ?? ""),
-		quality: safeText(x.quality ?? x.q ?? ""),
-		imdb: safeText(x.imdb ?? x.rating ?? ""),
-		country: safeText(x.country ?? x.nation ?? ""),
-		genre: safeText(x.genre ?? x.categories ?? ""),
-		poster, // link ảnh Drive
-		url,    // link video Drive (optional)
-		driveid // ✅ video id
-	  };
-	}
-
+      return {
+        id: safeText(x.id ?? x.slug ?? crypto.randomUUID()),
+        title: safeText(x.title ?? x.name ?? "Untitled"),
+        kind: safeText(x.kind ?? x.type ?? "movie"),
+        year: safeText(x.year ?? ""),
+        quality: safeText(x.quality ?? x.q ?? ""),
+        imdb: safeText(x.imdb ?? x.rating ?? ""),
+        country: safeText(x.country ?? x.nation ?? ""),
+        genre: safeText(x.genre ?? x.categories ?? ""),
+        poster,
+        url,
+        driveid
+      };
+    }
 
     let supabaseClient = null;
 
@@ -330,7 +346,7 @@
         else items.unshift(item);
 
         writeCache(items);
-        setLog(el.log2, ok(`Saved localStorage (total ${items.length})`));
+        setLog(el.log2, ok(`Saved localStorage (total ${items.length}) • driveid=${item.driveid || "—"}`));
       }catch(e){
         setLog(el.log2, err(e.message || String(e)));
       }
@@ -339,14 +355,21 @@
     el.saveSb.addEventListener("click", async ()=>{
       try{
         const item = getFormItem();
+        if(!item.driveid){
+          setLog(el.log2, err("Không lấy được driveid từ Watch URL. Hãy dán link Drive chuẩn hoặc link FB l.php?u=..."));
+          return;
+        }
         if(!supabaseClient){ setLog(el.log2, err("Chưa init Supabase.")); return; }
         const table = el.sbTable.value.trim() || "movies";
 
-        // ✅ FIX: insert đơn giản, không phụ thuộc select/single (tránh lỗi do RLS select)
-        const { error } = await supabaseClient.from(table).insert(item);
+        // ✅ FIX: Upsert theo id (update nếu đã tồn tại)
+        const { error } = await supabaseClient
+          .from(table)
+          .upsert(item, { onConflict: "id" });
+
         if(error) throw error;
 
-        setLog(el.log2, ok(`Inserted to Supabase: ${item.id}`));
+        setLog(el.log2, ok(`Upsert to Supabase: ${item.id} • driveid=${item.driveid}`));
       }catch(e){
         setLog(el.log2, err(e?.message || String(e)));
       }
