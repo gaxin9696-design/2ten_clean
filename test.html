@@ -232,28 +232,29 @@
 
     // ✅ FIX: thêm driveid vào item để không bị NOT NULL
     function normalizeItem(x){
-      const poster = safeText(x.poster ?? x.thumb ?? x.image ?? "");
-      const url    = safeText(x.url ?? x.link ?? x.watch ?? "");
+	  const poster = safeText(x.poster ?? x.thumb ?? x.image ?? "");
+	  const url    = safeText(x.url ?? x.link ?? x.watch ?? "");
 
-      // ưu tiên lấy driveid từ poster, nếu không có thì lấy từ url
-      const driveid = safeText(
-        x.driveid ?? x.drive_id ?? extractDriveId(poster) ?? extractDriveId(url)
-      );
+	  // ✅ driveid = VIDEO id (ưu tiên lấy từ Watch URL)
+	  const driveid = safeText(
+		x.driveid ?? x.drive_id ?? extractDriveId(url) ?? extractDriveId(poster)
+	  );
 
-      return {
-        id: safeText(x.id ?? x.slug ?? crypto.randomUUID()),
-        title: safeText(x.title ?? x.name ?? "Untitled"),
-        kind: safeText(x.kind ?? x.type ?? "movie"),
-        year: safeText(x.year ?? ""),
-        quality: safeText(x.quality ?? x.q ?? ""),
-        imdb: safeText(x.imdb ?? x.rating ?? ""),
-        country: safeText(x.country ?? x.nation ?? ""),
-        genre: safeText(x.genre ?? x.categories ?? ""),
-        poster,
-        url,
-        driveid, // ✅ bắt buộc (table đang NOT NULL)
-      };
-    }
+	  return {
+		id: safeText(x.id ?? x.slug ?? crypto.randomUUID()),
+		title: safeText(x.title ?? x.name ?? "Untitled"),
+		kind: safeText(x.kind ?? x.type ?? "movie"),
+		year: safeText(x.year ?? ""),
+		quality: safeText(x.quality ?? x.q ?? ""),
+		imdb: safeText(x.imdb ?? x.rating ?? ""),
+		country: safeText(x.country ?? x.nation ?? ""),
+		genre: safeText(x.genre ?? x.categories ?? ""),
+		poster, // link ảnh Drive
+		url,    // link video Drive (optional)
+		driveid // ✅ video id
+	  };
+	}
+
 
     let supabaseClient = null;
 
