@@ -1,133 +1,148 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <!-- ===== SEO / Social (static OG mặc định) ===== -->
-  <meta name="description" content="Khoii – Trang xem phim. Mở nhanh, xem mượt." />
-  <meta name="robots" content="index,follow" />
-
-  <link rel="canonical" href="https://YOUR-DOMAIN.COM/watch.html" />
-
-  <!-- Open Graph -->
-  <meta property="og:type" content="video.other" />
-  <meta property="og:site_name" content="Khoii" />
-  <meta property="og:title" content="Khoii – Xem phim" />
-  <meta property="og:description" content="Khoii – Trang xem phim. Mở nhanh, xem mượt." />
-  <meta property="og:url" content="https://YOUR-DOMAIN.COM/watch.html" />
-  <meta property="og:image" content="https://YOUR-DOMAIN.COM/og.jpg" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-
-  <!-- Twitter -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Khoii – Xem phim" />
-  <meta name="twitter:description" content="Khoii – Trang xem phim. Mở nhanh, xem mượt." />
-  <meta name="twitter:image" content="https://YOUR-DOMAIN.COM/og.jpg" />
-
-  <link rel="icon" href="/favicon.ico" />
-  <meta name="theme-color" content="#0b1224" />
-  <title>Khoii - Xem phim</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Watch</title>
   <style>
     :root{
-      --bg:#0b1224;
-      --text:#e7edf9;
-      --muted:rgba(231,237,249,.7);
-      --accent:#f2c64f;
-      --line:rgba(255,255,255,.12);
+      --bg:#0b0e14;
+      --line:#1f2937;
+      --muted:#9ca3af;
+      --accent:#22c55e;
     }
-    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui}
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background: linear-gradient(180deg, #070a10 0%, #0b0e14 25%, #06080d 100%);
+      color:#e5e7eb;
+    }
     .wrap{max-width:1100px;margin:0 auto;padding:18px}
-    h2{margin:6px 0 14px}
-    .player{
-      position:relative;width:100%;padding-top:56.25%;
-      border-radius:18px;overflow:hidden;
-      border:1px solid var(--line);
-      box-shadow:0 18px 60px rgba(0,0,0,.45);
-      background:#000;
+    header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0 18px;border-bottom:1px solid var(--line)}
+    h1{font-size:18px;margin:0}
+    .pill{
+      padding:8px 12px;border-radius:999px;border:1px solid var(--line);
+      background:rgba(255,255,255,.03);color:#e5e7eb;
+      font-size:13px;cursor:pointer;font-weight:600;text-decoration:none;
     }
-    iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
-    a{color:var(--accent);text-decoration:none}
-    a:hover{text-decoration:underline}
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px;color:var(--muted)}
-    .pill{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04)}
+    .player{
+      margin-top:14px;
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(0,0,0,.25);
+      box-shadow: 0 14px 40px rgba(0,0,0,.35);
+      overflow:hidden;
+    }
+    iframe{width:100%;height:70vh;border:0;background:#000}
+    .bar{display:flex;gap:10px;flex-wrap:wrap;padding:14px;border-top:1px solid rgba(255,255,255,.08)}
+    input{
+      flex: 1 1 360px;
+      padding:10px 12px;border-radius:14px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.04);
+      color:#e5e7eb;
+      outline:none;
+      font-size:13px;
+    }
+    button{
+      padding:9px 12px;border-radius:12px;border:1px solid rgba(34,197,94,.35);
+      background:rgba(34,197,94,.10);
+      font-weight:800;font-size:13px;color:#e5e7eb;cursor:pointer;
+    }
+    button:hover{background:rgba(34,197,94,.16)}
+    .muted{color:var(--muted);font-size:12px}
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h2 id="title">Đang tải…</h2>
+    <header>
+      <div>
+        <h1>Watch</h1>
+        <div class="muted" style="margin-top:2px">Paste a Google Drive link / embed link</div>
+      </div>
+      <a class="pill" href="index.html">← Home</a>
+    </header>
 
     <div class="player">
-      <iframe id="frame" allow="autoplay; fullscreen"></iframe>
+      <iframe id="frame" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      <div class="bar">
+        <input id="url" placeholder="Dán link Drive: https://drive.google.com/file/d/.../view">
+        <button id="go">Load</button>
+      </div>
     </div>
 
-    <div class="row">
-      <span class="pill" id="fileId">ID: —</span>
-      <a id="openDrive" target="_blank" rel="noreferrer">Mở trên Drive</a>
-      <span>•</span>
-      <a href="index.html">← Quay lại</a>
-    </div>
+    <p class="muted" style="margin-top:12px">
+      Tip: Link Drive dạng <code>file/d/ID/view</code> sẽ tự chuyển sang <code>.../preview</code>.
+    </p>
   </div>
 
   <script>
-    const DriveTool = (() => {
-      const patterns = [
-        /drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]{10,})/i,
-        /drive\.google\.com\/open\?id=([a-zA-Z0-9_-]{10,})/i,
-        /drive\.google\.com\/uc\?id=([a-zA-Z0-9_-]{10,})/i,
-        /drive\.google\.com\/uc\?export=download&id=([a-zA-Z0-9_-]{10,})/i,
-      ];
-      function extractId(input){
-        const s = String(input || "").trim();
-        if (/^[a-zA-Z0-9_-]{10,}$/.test(s)) return s;
-        try{
-          const u = new URL(s);
-          const qid = u.searchParams.get("id");
-          if(qid && /^[a-zA-Z0-9_-]{10,}$/.test(qid)) return qid;
-        }catch{}
-        for(const re of patterns){
-          const m = s.match(re);
-          if(m && m[1]) return m[1];
-        }
-        return null;
-      }
-      function links(id){
-        return {
-          id,
-          preview: `https://drive.google.com/file/d/${id}/preview`,
-          view: `https://drive.google.com/file/d/${id}/view`,
-        };
-      }
-      function normalize(input){
-        const id = extractId(input);
-        if(!id) return { ok:false, error:"Không tách được ID từ link Drive.", id:null, links:null };
-        return { ok:true, id, links: links(id) };
-      }
-      return { normalize };
-    })();
+    const el = {
+      frame: document.getElementById("frame"),
+      url: document.getElementById("url"),
+      go: document.getElementById("go"),
+    };
 
-    const params = new URLSearchParams(location.search);
-    const drive = params.get("drive") || params.get("m") || "";
-    const titleQ = params.get("title") || "Xem phim";
-
-    const titleEl = document.getElementById("title");
-    const frameEl = document.getElementById("frame");
-    const fileIdEl = document.getElementById("fileId");
-    const openDrive = document.getElementById("openDrive");
-
-    const r = DriveTool.normalize(drive);
-
-    if(!r.ok){
-      titleEl.textContent = "Link Drive không hợp lệ";
-      fileIdEl.textContent = "ID: —";
-      frameEl.src = "";
-      openDrive.href = "index.html";
-    }else{
-      titleEl.textContent = titleQ;
-      fileIdEl.textContent = "ID: " + r.id;
-      frameEl.src = r.links.preview;
-      openDrive.href = r.links.view;
+    function getParam(name){
+      const u = new URL(location.href);
+      return u.searchParams.get(name);
     }
+
+    function extractDriveId(link){
+      try{
+        const u = new URL(link);
+        const s = u.pathname;
+
+        // /file/d/<ID>/view
+        const m1 = s.match(/\/file\/d\/([^\/]+)/);
+        if(m1) return m1[1];
+
+        // /open?id=<ID>
+        const id = u.searchParams.get("id");
+        if(id) return id;
+
+        // uc?id=<ID>
+        const id2 = u.searchParams.get("id");
+        if(id2) return id2;
+
+        return "";
+      }catch{
+        // maybe plain id
+        return link.trim();
+      }
+    }
+
+    function toDrivePreview(linkOrId){
+      const raw = String(linkOrId || "").trim();
+      if(!raw) return "";
+      if(raw.startsWith("http")){
+        const id = extractDriveId(raw);
+        if(id) return `https://drive.google.com/file/d/${id}/preview`;
+        return raw;
+      }
+      // treat as id
+      return `https://drive.google.com/file/d/${raw}/preview`;
+    }
+
+    function load(url){
+      el.frame.src = url;
+    }
+
+    el.go.addEventListener("click", ()=>{
+      const url = toDrivePreview(el.url.value);
+      if(url) load(url);
+    });
+
+    // auto from query param ?url=
+    (function init(){
+      const q = getParam("url");
+      if(q){
+        el.url.value = q;
+        const url = toDrivePreview(q);
+        if(url) load(url);
+      }
+    })();
   </script>
 </body>
 </html>
