@@ -1,0 +1,511 @@
+<!-- =========================
+     FILE: list.html
+========================= -->
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Khoii – Danh sách phim. Lọc theo thể loại, quốc gia, loại phim, tìm kiếm nhanh." />
+  <meta name="robots" content="index,follow" />
+  <meta name="theme-color" content="#0b1224" />
+  <title>Khoii - List</title>
+
+  <style>
+    :root{
+      --bg0:#0b0f17;
+      --bg1:#0b1224;
+      --text:#e7edf9;
+      --glass: rgba(18,24,36,.72);
+      --glass2: rgba(18,24,36,.55);
+      --accent:#f2c64f;
+      --shadow: 0 18px 65px rgba(0,0,0,.55);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 500px at 20% -10%, rgba(99,102,241,.18), transparent 55%),
+        radial-gradient(900px 420px at 85% 10%, rgba(245,158,11,.10), transparent 55%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+    }
+    .container{max-width:1320px;margin:0 auto;padding:18px 22px 40px}
+
+    .topbar{display:flex;align-items:center;gap:16px}
+    .brand{display:flex;align-items:center;gap:10px;min-width:170px;cursor:pointer}
+    .brand-logo{
+      width:44px;height:34px;border-radius:10px;display:grid;place-items:center;
+      font-weight:900;color:#0b1224;
+      background: linear-gradient(135deg, #f59e0b, #fb7185);
+      box-shadow: 0 10px 25px rgba(245,158,11,.22);
+    }
+    .brand-name{font-weight:900;letter-spacing:.3px;font-size:18px}
+    .brand-sub{font-size:11px;color:rgba(231,237,249,.55);margin-top:2px}
+
+    .search{
+      flex:1;max-width:720px;
+      display:flex;align-items:center;gap:10px;
+      padding:10px 14px;border-radius:12px;
+      background: var(--glass);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 10px 30px rgba(0,0,0,.30);
+      backdrop-filter: blur(14px);
+    }
+    .search input{
+      width:100%;border:0;outline:0;background:transparent;
+      color:var(--text);font-size:14px;
+    }
+    .search input::placeholder{color: rgba(231,237,249,.50)}
+
+    .btn{
+      border:1px solid rgba(255,255,255,.12);
+      background: var(--glass2);
+      color:var(--text);
+      padding:10px 14px;border-radius:999px;
+      cursor:pointer;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 10px 30px rgba(0,0,0,.24);
+      display:inline-flex;align-items:center;gap:10px;
+    }
+    .btn:hover{border-color: rgba(255,255,255,.20); background: rgba(255,255,255,.06)}
+
+    .bar{
+      margin-top:14px;
+      display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+    }
+    .chips{display:flex;flex-wrap:wrap;gap:10px}
+    .chip{
+      padding:8px 12px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(18,24,36,.45);
+      color: rgba(231,237,249,.88);
+      cursor:pointer;
+      font-size:13px;
+    }
+    .chip:hover{background: rgba(255,255,255,.06)}
+    .chip.on{
+      border-color: rgba(242,198,79,.65);
+      background: rgba(242,198,79,.12);
+    }
+
+    .right{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    select{
+      background: rgba(18,24,36,.45);
+      color: rgba(231,237,249,.88);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:12px;
+      padding:10px 12px;
+      outline:none;
+    }
+
+    .grid{
+      margin-top:16px;
+      display:grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap:14px;
+    }
+    .card{
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(18,24,36,.40);
+      overflow:hidden;
+      box-shadow: 0 18px 50px rgba(0,0,0,.35);
+      cursor:pointer;
+      transition: transform .14s ease, border-color .14s ease;
+      position:relative;
+    }
+    .card:hover{transform: translateY(-4px); border-color: rgba(255,255,255,.22)}
+    .img{height:220px;background:#000;border-bottom:1px solid rgba(255,255,255,.10)}
+    .img img{width:100%;height:100%;object-fit:cover;display:block}
+    .meta{padding:10px 10px 12px}
+    .meta b{display:block;font-size:13px;line-height:1.25}
+    .meta small{display:block;margin-top:6px;color:rgba(231,237,249,.65)}
+    .tag{
+      position:absolute; top:10px; left:10px;
+      padding:6px 8px;border-radius:999px;
+      font-size:11px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(10,14,22,.65);
+      backdrop-filter: blur(10px);
+    }
+
+    .footer{
+      margin-top:18px;
+      display:flex;justify-content:center;
+    }
+    .loadmore{
+      padding:12px 16px;border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(18,24,36,.45);
+      color:rgba(231,237,249,.92);
+      cursor:pointer;
+    }
+    .loadmore:hover{background: rgba(255,255,255,.06)}
+
+    .muted{color:rgba(231,237,249,.65)}
+    .title-row{margin-top:14px;display:flex;align-items:end;justify-content:space-between;gap:12px}
+    .title-row h1{margin:0;font-size:24px;letter-spacing:.2px}
+    .title-row .count{font-size:13px}
+
+    @media (max-width: 1200px){ .grid{grid-template-columns: repeat(5, minmax(0, 1fr));} }
+    @media (max-width: 1020px){ .grid{grid-template-columns: repeat(4, minmax(0, 1fr));} .brand-sub{display:none} }
+    @media (max-width: 820px){ .grid{grid-template-columns: repeat(3, minmax(0, 1fr));} }
+    @media (max-width: 640px){ .grid{grid-template-columns: repeat(2, minmax(0, 1fr));} }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="topbar">
+      <div class="brand" onclick="location.href='index.html'">
+        <div class="brand-logo" aria-hidden="true">K</div>
+        <div>
+          <div class="brand-name">Khoii</div>
+          <div class="brand-sub">Danh sách phim</div>
+        </div>
+      </div>
+
+      <div class="search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M10.5 19a8.5 8.5 0 1 1 0-17 8.5 8.5 0 0 1 0 17Z" stroke="rgba(231,237,249,.85)" stroke-width="2"/>
+          <path d="M16.8 16.8 21 21" stroke="rgba(231,237,249,.85)" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <input id="q" placeholder="Tìm kiếm phim..." />
+      </div>
+
+      <button class="btn" id="btnClear">
+        Xoá lọc
+      </button>
+    </header>
+
+    <div class="title-row">
+      <h1 id="pageTitle">Danh sách phim</h1>
+      <div class="count muted"><span id="count">0</span> phim</div>
+    </div>
+
+    <div class="bar">
+      <div class="chips" id="chipsKind"></div>
+      <div class="right">
+        <select id="sort">
+          <option value="new">Mới cập nhật</option>
+          <option value="title">Tên A→Z</option>
+          <option value="year">Năm (mới→cũ)</option>
+        </select>
+        <select id="filterGenre"></select>
+        <select id="filterCountry"></select>
+        <select id="filterYear"></select>
+      </div>
+    </div>
+
+    <div class="grid" id="grid"></div>
+
+    <div class="footer">
+      <button class="loadmore" id="loadMore">Tải thêm</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://nzalaxolteaiafvuceqz.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56YWxheG9sdGVhaWFmdnVjZXF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyOTY2MjAsImV4cCI6MjA4NTg3MjYyMH0.0eIz6cfB4Dr_g5Wja70tZCMvVfUKoI5H4D8MJBP49Bg";
+    const supabase = window.supabase?.createClient
+      ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+      : null;
+
+    const el = {
+      q: document.getElementById("q"),
+      grid: document.getElementById("grid"),
+      count: document.getElementById("count"),
+      title: document.getElementById("pageTitle"),
+      btnClear: document.getElementById("btnClear"),
+      chipsKind: document.getElementById("chipsKind"),
+      sort: document.getElementById("sort"),
+      filterGenre: document.getElementById("filterGenre"),
+      filterCountry: document.getElementById("filterCountry"),
+      filterYear: document.getElementById("filterYear"),
+      loadMore: document.getElementById("loadMore"),
+    };
+
+    const state = {
+      tab: "all",
+      kind: null,      // anime/movie/series
+      genre: "",
+      country: "",
+      year: "",
+      q: "",
+      sort: "new",
+      page: 0,
+      pageSize: 35,
+      all: [],
+      view: [],
+    };
+
+    function svgPlaceholder(title="Khoii • Poster", w=500, h=750){
+      const safe = String(title).replace(/[<>&"]/g, "");
+      const svg =
+`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1">
+      <stop offset="0" stop-color="#0b0f17"/>
+      <stop offset="1" stop-color="#141a2a"/>
+    </linearGradient>
+    <radialGradient id="r" cx="30%" cy="25%" r="70%">
+      <stop offset="0" stop-color="rgba(242,198,79,.28)"/>
+      <stop offset="1" stop-color="rgba(0,0,0,0)"/>
+    </radialGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#g)"/>
+  <rect width="100%" height="100%" fill="url(#r)"/>
+  <text x="6%" y="52%" fill="rgba(231,237,249,.92)" font-family="system-ui,Segoe UI,Roboto" font-size="44" font-weight="800">${safe}</text>
+</svg>`;
+      return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    }
+
+    function escapeHtml(s){
+      return String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function parseParams(){
+      const u = new URL(location.href);
+      state.tab = u.searchParams.get("tab") || "all";
+
+      // optional deep link filters
+      state.kind = u.searchParams.get("kind");
+      state.genre = u.searchParams.get("genre") || "";
+      state.country = u.searchParams.get("country") || "";
+      state.year = u.searchParams.get("year") || "";
+
+      // title by tab
+      if(state.tab === "suggest") el.title.textContent = "Đề xuất hôm nay";
+      else if(state.tab === "new") el.title.textContent = "Phim mới cập nhật";
+      else if(state.tab === "anime") { el.title.textContent = "Anime nổi bật"; state.kind = state.kind || "anime"; }
+      else el.title.textContent = "Danh sách phim";
+    }
+
+    async function loadAll(){
+      if(!supabase){
+        alert("Không tải được Supabase. Kiểm tra CDN hoặc mạng.");
+        return;
+      }
+      const { data, error } = await supabase
+        .from("movies")
+        .select("id,title,kind,year,quality,desc,driveid,drivelink,posterurl,herourl,updatedat,genres,country")
+        .order("updatedat", { ascending: false });
+
+      if(error){
+        console.warn(error);
+        alert("Lỗi tải dữ liệu từ Supabase.");
+        return;
+      }
+
+      state.all = (data || []).map(r=>({
+        id: r.id,
+        title: r.title || "Không tên",
+        kind: r.kind || "anime",
+        year: r.year || "",
+        quality: r.quality || "FHD",
+        desc: r.desc || "",
+        driveId: r.driveid,
+        poster: r.posterurl || (r.driveid ? `https://drive.google.com/thumbnail?id=${r.driveid}&sz=w600` : ""),
+        genres: Array.isArray(r.genres) ? r.genres : [],
+        country: r.country || "",
+        updatedAt: Number(r.updatedat || 0),
+      }));
+    }
+
+    function buildDropdowns(){
+      // Genre
+      const gset = new Set();
+      const cset = new Set();
+      const yset = new Set();
+
+      state.all.forEach(x=>{
+        (x.genres||[]).forEach(g=>{ if(g) gset.add(String(g)); });
+        if(x.country) cset.add(String(x.country));
+        if(x.year) yset.add(String(x.year));
+      });
+
+      const genres = ["", ...[...gset].sort((a,b)=>a.localeCompare(b))];
+      const countries = ["", ...[...cset].sort((a,b)=>a.localeCompare(b))];
+      const years = ["", ...[...yset].sort((a,b)=>{
+        const na = Number(a), nb = Number(b);
+        if(!Number.isNaN(na) && !Number.isNaN(nb)) return nb - na;
+        return b.localeCompare(a);
+      })];
+
+      el.filterGenre.innerHTML = genres.map(v=>`<option value="${escapeHtml(v)}">${v?escapeHtml(v):"Thể loại (tất cả)"}</option>`).join("");
+      el.filterCountry.innerHTML = countries.map(v=>`<option value="${escapeHtml(v)}">${v?escapeHtml(v):"Quốc gia (tất cả)"}</option>`).join("");
+      el.filterYear.innerHTML = years.map(v=>`<option value="${escapeHtml(v)}">${v?escapeHtml(v):"Năm (tất cả)"}</option>`).join("");
+
+      el.filterGenre.value = state.genre;
+      el.filterCountry.value = state.country;
+      el.filterYear.value = state.year;
+    }
+
+    function buildKindChips(){
+      const kinds = [
+        { label:"Tất cả", value:null },
+        { label:"Anime", value:"anime" },
+        { label:"Phim Lẻ", value:"movie" },
+        { label:"Phim Bộ", value:"series" },
+      ];
+
+      el.chipsKind.innerHTML = "";
+      kinds.forEach(k=>{
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "chip" + ((state.kind===k.value) ? " on" : "");
+        b.textContent = k.label;
+        b.addEventListener("click", ()=>{
+          state.kind = (state.kind===k.value) ? null : k.value;
+          state.page = 0;
+          apply();
+        });
+        el.chipsKind.appendChild(b);
+      });
+    }
+
+    function apply(){
+      state.q = (el.q.value || "").trim().toLowerCase();
+      state.sort = el.sort.value;
+
+      let list = state.all.slice();
+
+      // tab effect
+      if(state.tab === "anime") list = list.filter(x=>x.kind === "anime");
+      if(state.tab === "new") list = list.slice().sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+      if(state.tab === "suggest") list = list; // keep order, then user filters
+
+      // filters
+      if(state.kind) list = list.filter(x=>x.kind === state.kind);
+      if(state.genre) list = list.filter(x=>(x.genres||[]).map(s=>String(s).toLowerCase()).includes(String(state.genre).toLowerCase()));
+      if(state.country) list = list.filter(x=>String(x.country||"").toLowerCase() === String(state.country).toLowerCase());
+      if(state.year) list = list.filter(x=>String(x.year||"") === String(state.year));
+
+      // search
+      if(state.q){
+        list = list.filter(x => (x.title||"").toLowerCase().includes(state.q));
+      }
+
+      // sort
+      if(state.sort === "new"){
+        list.sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+      }else if(state.sort === "title"){
+        list.sort((a,b)=>(a.title||"").localeCompare((b.title||""), "vi"));
+      }else if(state.sort === "year"){
+        list.sort((a,b)=>{
+          const na = Number(a.year||0), nb = Number(b.year||0);
+          if(!Number.isNaN(na) && !Number.isNaN(nb)) return nb - na;
+          return String(b.year||"").localeCompare(String(a.year||""));
+        });
+      }
+
+      // paginate
+      state.view = list;
+      el.count.textContent = String(list.length);
+
+      // reset grid and render first page
+      el.grid.innerHTML = "";
+      state.page = 0;
+      renderNextPage();
+      syncChipsUI();
+    }
+
+    function syncChipsUI(){
+      [...el.chipsKind.querySelectorAll(".chip")].forEach(ch=>{
+        const t = ch.textContent;
+        const map = { "Anime":"anime", "Phim Lẻ":"movie", "Phim Bộ":"series", "Tất cả":null };
+        const v = map[t];
+        ch.classList.toggle("on", state.kind === v);
+      });
+    }
+
+    function renderNextPage(){
+      const start = state.page * state.pageSize;
+      const end = start + state.pageSize;
+      const slice = state.view.slice(start, end);
+
+      slice.forEach(item=>{
+        const c = document.createElement("div");
+        c.className = "card";
+        c.innerHTML = `
+          <div class="tag">${escapeHtml(item.kind === "movie" ? "Phim Lẻ" : item.kind === "series" ? "Phim Bộ" : "Anime")}</div>
+          <div class="img"><img alt="" loading="lazy"></div>
+          <div class="meta">
+            <b>${escapeHtml(item.title)}</b>
+            <small>${escapeHtml(item.year || "—")} • ${escapeHtml(item.quality || "FHD")} ${item.country ? "• " + escapeHtml(item.country) : ""}</small>
+          </div>
+        `;
+        const img = c.querySelector("img");
+        img.onerror = ()=>{ img.onerror=null; img.src = svgPlaceholder("Khoii • Poster", 500, 750); };
+        img.src = item.poster || svgPlaceholder("Khoii • Poster", 500, 750);
+
+        c.addEventListener("click", ()=>{
+          if(!item.driveId){
+            alert("Phim này chưa có Drive ID.");
+            return;
+          }
+          location.href = `watch.html?drive=${encodeURIComponent(item.driveId)}&title=${encodeURIComponent(item.title)}`;
+        });
+
+        el.grid.appendChild(c);
+      });
+
+      state.page += 1;
+
+      // toggle load more
+      const hasMore = state.page * state.pageSize < state.view.length;
+      el.loadMore.style.display = hasMore ? "inline-block" : "none";
+    }
+
+    // events
+    el.loadMore.addEventListener("click", renderNextPage);
+    el.q.addEventListener("input", ()=> apply());
+    el.sort.addEventListener("change", ()=> apply());
+
+    el.filterGenre.addEventListener("change", ()=>{
+      state.genre = el.filterGenre.value || "";
+      apply();
+    });
+    el.filterCountry.addEventListener("change", ()=>{
+      state.country = el.filterCountry.value || "";
+      apply();
+    });
+    el.filterYear.addEventListener("change", ()=>{
+      state.year = el.filterYear.value || "";
+      apply();
+    });
+
+    el.btnClear.addEventListener("click", ()=>{
+      state.kind = null;
+      state.genre = "";
+      state.country = "";
+      state.year = "";
+      el.q.value = "";
+      el.sort.value = "new";
+      state.tab = state.tab; // keep tab
+      buildKindChips();
+      buildDropdowns();
+      apply();
+    });
+
+    (async ()=>{
+      parseParams();
+      await loadAll();
+      buildKindChips();
+      buildDropdowns();
+
+      // apply URL presets to UI
+      el.sort.value = "new";
+      if(state.tab === "new") el.sort.value = "new";
+      apply();
+    })();
+  </script>
+</body>
+</html>
