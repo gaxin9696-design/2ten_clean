@@ -156,7 +156,10 @@
       .poster{width:78px;height:58px}
     }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    // Init
+    refreshAuthUI().then(refreshList);
+</script>
 </head>
 <body>
   <div class="wrap">
@@ -171,6 +174,7 @@
         <a class="pill-link" href="https://drive.google.com/file/d/14gEVKOKDl88TIr3RQgUmvfIaVH5ytBr-/view?usp=sharing" target="_blank" rel="noreferrer">
           🔧 Tool xử ảnh (Drive)
         </a>
+        <button class="btn danger" id="btnLogout" style="display:none">Đăng xuất</button>
       </div>
     </div>
 
@@ -321,6 +325,8 @@
       </div>
     </div>
 
+    
+<!-- /TOOL_CROP_DISABLED -->
 
     <div id="loginBox" class="card" style="max-width:520px;margin:12px auto;">
       <b>Admin Login</b>
@@ -332,12 +338,10 @@
       </div>
       <div class="row" style="margin-top:10px;justify-content:flex-end">
         <button class="btn" id="btnLogin">Đăng nhập</button>
-        <button class="btn danger" id="btnLogout" style="display:none">Đăng xuất</button>
       </div>
       <small id="loginMsg" style="opacity:.8"></small>
     </div>
 
-<!-- /TOOL_CROP_DISABLED -->
 <div class="card">
       <b>Danh sách phim đã lưu</b>
       <div class="list" id="list"></div>
@@ -349,11 +353,103 @@
     const LEGACY_KEY  = "my_drive_movies_v2";
 
     
+
     // ===== Supabase (Public read + Admin write via RLS) =====
     const SUPABASE_URL = "https://nzalaxolteaiafvuceqz.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56YWxheG9sdGVhaWFmdnVjZXF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyOTY2MjAsImV4cCI6MjA4NTg3MjYyMH0.0eIz6cfB4Dr_g5Wja70tZCMvVfUKoI5H4D8MJBP49Bg";
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    // ===== AUTH (Admin) =====
+    const loginBox = document.getElementById("loginBox");
+    const btnLogin = document.getElementById("btnLogin");
+    const btnLogout = document.getElementById("btnLogout");
+    const loginMsg = document.getElementById("loginMsg");
+
+    async function refreshAuthUI(){
+      const { data: { session } } = await sb.auth.getSession();
+      const locked = !session;
+
+      if(loginBox) loginBox.style.display = locked ? "block" : "none";
+      if(btnLogout) btnLogout.style.display = locked ? "none" : "inline-flex";
+
+      ["btnAdd","btnUpdate","btnClearAll"].forEach(id=>{
+        const b = document.getElementById(id);
+        if(b) b.disabled = locked;
+      });
+
+      if(loginMsg){
+        loginMsg.textContent = locked ? "Vui lòng đăng nhập admin để thêm/sửa/xóa phim." : "Đã đăng nhập.";
+      }
+    }
+
+    btnLogin?.addEventListener("click", async () => {
+      if(loginMsg) loginMsg.textContent = "Đang đăng nhập...";
+      const email = document.getElementById("email")?.value?.trim() || "";
+      const password = document.getElementById("password")?.value || "";
+
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) {
+        if(loginMsg) loginMsg.textContent = "Sai email hoặc mật khẩu.";
+        return;
+      }
+      if(loginMsg) loginMsg.textContent = "OK!";
+      await refreshAuthUI();
+      await refreshList();
+    });
+
+    btnLogout?.addEventListener("click", async () => {
+      await sb.auth.signOut();
+      await refreshAuthUI();
+      await refreshList();
+    });
+
+    async function apiGetMovies(){
+      const { data, error } = await sb.from("movies").select("*").order("created_at", { ascending: false });
+      if(error){ console.error(error); return []; }
+      return (data || []).map(m => ({
+        id: m.id,
+        title: m.title,
+        kind: m.kind || "anime",
+        year: m.year || "",
+        quality: m.quality || "FHD",
+        desc: m.desc || "",
+        driveId: m.driveid,
+        driveLink: m.drivelink || m.driveid,
+        posterUrl: m.posterurl || "",
+        heroUrl: m.herourl || "",
+        updatedAt: m.updatedat || Date.now(),
+      }));
+    }
+
+    async function apiUpsertMovie(movie){
+      const payload = {
+        title: movie.title,
+        kind: movie.kind,
+        year: movie.year,
+        quality: movie.quality,
+        "desc": movie.desc,
+        driveid: movie.driveId,
+        drivelink: movie.driveLink,
+        posterurl: movie.posterUrl,
+        herourl: movie.heroUrl,
+        updatedat: Date.now()
+      };
+      const { error } = await sb.from("movies").upsert(payload, { onConflict: "driveid" });
+      if(error) throw error;
+      return await apiGetMovies();
+    }
+
+    async function apiDeleteMovieByDriveId(driveId){
+      const { error } = await sb.from("movies").delete().eq("driveid", driveId);
+      if(error) throw error;
+      return await apiGetMovies();
+    }
+
+    async function apiClearAll(){
+      const { error } = await sb.from("movies").delete().neq("driveid", "___never___");
+      if(error) throw error;
+      return [];
+    }
 const DriveTool = (() => {
       const patterns = [
         /drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]{10,})/i,
@@ -421,64 +517,17 @@ function escapeHtml(s){
         .replaceAll("'","&#039;");
     }
 
-    async function apiGetMovies(){
-      const { data, error } = await sb
-        .from("movies")
-        .select("*")
-        .order("created_at", { ascending: false });
+        // legacy localStorage loader removed (Supabase is used)
 
-      if(error){ console.error(error); return []; }
-
-      return (data || []).map(m => ({
-        id: m.id,
-        title: m.title,
-        kind: m.kind || "anime",
-        year: m.year || "",
-        quality: m.quality || "FHD",
-        desc: m.desc || "",
-        driveId: m.driveid,
-        driveLink: m.drivelink || m.driveid,
-        posterUrl: m.posterurl || "",
-        heroUrl: m.herourl || "",
-        updatedAt: m.updatedat || Date.now(),
-      }));
+        }
+        const arr = raw ? JSON.parse(raw) : [];
+        return Array.isArray(arr) ? arr : [];
+      }catch{ return []; }
     }
+        // legacy localStorage saver removed (Supabase is used)
 
-    async function apiUpsertMovie(movie){
-      const payload = {
-        title: movie.title,
-        kind: movie.kind,
-        year: movie.year,
-        quality: movie.quality,
-        "desc": movie.desc,
-        driveid: movie.driveId,
-        drivelink: movie.driveLink,
-        posterurl: movie.posterUrl,
-        herourl: movie.heroUrl,
-        updatedat: Date.now()
-      };
 
-      const { error } = await sb
-        .from("movies")
-        .upsert(payload, { onConflict: "driveid" });
-
-      if(error) throw error;
-      return await apiGetMovies();
-    }
-
-    async function apiDeleteMovieByDriveId(driveId){
-      const { error } = await sb.from("movies").delete().eq("driveid", driveId);
-      if(error) throw error;
-      return await apiGetMovies();
-    }
-
-    async function apiClearAll(){
-      // Xóa tất cả rows (RLS sẽ chỉ cho admin làm)
-      const { error } = await sb.from("movies").delete().neq("driveid", "___never___");
-      if(error) throw error;
-      return [];
-    }
-function uid(){
+    function uid(){
       return "m_" + Math.random().toString(16).slice(2) + Date.now().toString(16);
     }
 
@@ -504,11 +553,10 @@ function uid(){
 
     async function refreshList(){
       movies = await apiGetMovies();
-      render();
+    // render() will be called after loading from Supabase
     }
-
-
-    function render(){
+function render(){
+      movies = loadMovies();
       el.list.innerHTML = "";
 
       if(movies.length === 0){
@@ -537,7 +585,7 @@ function uid(){
         wrap.querySelector('img').onerror = () => { wrap.querySelector('img').style.display = "none"; };
 
         wrap.querySelector('[data-act="fill"]').addEventListener("click", () => fillForm(m));
-        wrap.querySelector('[data-act="del"]').addEventListener("click", () => delMovie(m.driveId));
+        wrap.querySelector('[data-act="del"]').addEventListener("click", () => delMovie(m.id));
         el.list.appendChild(wrap);
       });
     }
@@ -585,36 +633,51 @@ function uid(){
       el.desc.value = "";
     }
 
-    async function addMovie(){
+    
+async function addMovie(){
+  const r = getFormData();
+  if(!r.ok){ alert(r.error); return; }
+
+  try{
+    movies = await apiUpsertMovie(r.data);
+    clearForm();
+    render();
+    alert("Đã thêm/cập nhật phim! Quay về trang chủ để xem.");
+  }catch(e){
+    console.error(e);
+    alert("Không thể lưu. Bạn đã đăng nhập admin chưa?");
+  }
+}
+
+    function updateByDriveId(){
       const r = getFormData();
       if(!r.ok){ alert(r.error); return; }
 
-      try{
-        movies = await apiUpsertMovie(r.data);
-        clearForm();
-        render();
-        alert("Đã thêm/cập nhật phim! Quay về trang chủ để xem.");
-      }catch(e){
-        console.error(e);
-        alert("Không thể lưu. Bạn đã đăng nhập admin chưa?");
+      movies = loadMovies();
+      const idx = movies.findIndex(x => x.driveId === r.data.driveId);
+      if(idx === -1){
+        alert("Không tìm thấy phim nào trùng Drive ID để cập nhật. Bạn hãy bấm 'Thêm phim'.");
+        return;
       }
+
+      const keepId = movies[idx].id;
+      movies[idx] = { ...movies[idx], ...r.data, id: keepId };
+      saveMovies(movies);
+      render();
+      alert("Đã cập nhật phim theo Drive ID!");
     }
 
-    async function updateByDriveId(){
-      // Supabase upsert theo driveId => dùng chung addMovie()
-      return addMovie();
-    }
-
-    async function delMovie(driveId){
-      if(!confirm("Xóa phim này?")) return;
-      try{
-        movies = await apiDeleteMovieByDriveId(driveId);
-        render();
-      }catch(e){
-        console.error(e);
-        alert("Không thể xóa. Bạn đã đăng nhập admin chưa?");
-      }
-    }
+    
+async function delMovie(driveId){
+  if(!confirm("Xóa phim này?")) return;
+  try{
+    movies = await apiDeleteMovieByDriveId(driveId);
+    render();
+  }catch(e){
+    console.error(e);
+    alert("Không thể xóa. Bạn đã đăng nhập admin chưa?");
+  }
+}
 
     function fillForm(m){
       el.drive.value = m.driveLink || m.driveId || "";
@@ -629,16 +692,17 @@ function uid(){
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    async function clearAll(){
-      if(!confirm("Xóa hết dữ liệu đã lưu?")) return;
-      try{
-        movies = await apiClearAll();
-        render();
-      }catch(e){
-        console.error(e);
-        alert("Không thể xóa hết. Bạn đã đăng nhập admin chưa?");
-      }
-    }
+    
+async function clearAll(){
+  if(!confirm("Xóa hết dữ liệu đã lưu?")) return;
+  try{
+    movies = await apiClearAll();
+    render();
+  }catch(e){
+    console.error(e);
+    alert("Không thể xóa hết. Bạn đã đăng nhập admin chưa?");
+  }
+}
 
     el.drive.addEventListener("input", syncDriveId);
 
