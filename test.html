@@ -1,944 +1,334 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <!-- ===== Admin: tránh index/search ===== -->
-  <meta name="robots" content="noindex,nofollow" />
-  <meta name="referrer" content="no-referrer" />
-
-  <link rel="canonical" href="https://YOUR-DOMAIN.COM/test.html" />
-  <link rel="icon" href="/favicon.ico" />
-  <meta name="theme-color" content="#0b1224" />
-  <title>Khoii - Admin</title>
+  <title>Admin / Test</title>
   <style>
     :root{
-      --bg0:#0a0f1d; --bg1:#0b1224;
-      --line:rgba(255,255,255,.10); --line2:rgba(255,255,255,.16);
-      --text:#e7edf9; --muted:#a8b3cc;
-      --accent:#f2c64f;
-      --glass: rgba(15,23,42,.55);
-      --glass2: rgba(15,23,42,.42);
+      --bg:#0b0e14;
+      --line:#1f2937;
+      --muted:#9ca3af;
+      --accent:#22c55e;
+      --danger:#ff7c7c;
     }
     *{box-sizing:border-box}
     body{
       margin:0;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-      color:var(--text);
-      background:linear-gradient(180deg,var(--bg0),var(--bg1));
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background: linear-gradient(180deg, #070a10 0%, #0b0e14 25%, #06080d 100%);
+      color:#e5e7eb;
     }
-    .wrap{max-width:1100px;margin:0 auto;padding:18px 22px 40px}
-
-    .topbar{
-      display:flex; gap:10px; align-items:center; justify-content:space-between;
-      margin-bottom:8px;
+    .wrap{max-width:1100px;margin:0 auto;padding:18px}
+    header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0 18px;border-bottom:1px solid var(--line)}
+    h1{font-size:18px;margin:0}
+    .pill{
+      padding:8px 12px;border-radius:999px;border:1px solid var(--line);
+      background:rgba(255,255,255,.03);color:#e5e7eb;
+      font-size:13px;cursor:pointer;font-weight:600;text-decoration:none;
     }
-    .left{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
-    .right{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
-
-    a{color:var(--accent);text-decoration:none}
-    a:hover{text-decoration:underline}
-
-    .pill-link{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:8px 10px;border-radius:999px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.06);
-      color:var(--text);
-      text-decoration:none;
-      white-space:nowrap;
-    }
-    .pill-link:hover{border-color:var(--line2);text-decoration:none}
-
-    h1{margin:10px 0 6px;font-size:22px}
-
+    .grid{display:grid;grid-template-columns: 1fr 1fr;gap:12px;margin-top:14px}
+    @media (max-width: 980px){ .grid{grid-template-columns:1fr;} }
     .card{
-      margin-top:14px;
-      border:1px solid var(--line);
-      background:var(--glass);
-      border-radius:16px;
-      padding:14px;
-      backdrop-filter: blur(10px);
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(0,0,0,.25);
+      border-radius:18px;
+      box-shadow: 0 14px 40px rgba(0,0,0,.35);
+      overflow:hidden;
     }
-    .grid{
-      display:grid;
-      grid-template-columns: 1.2fr .8fr .6fr .6fr;
-      gap:10px;
-    }
-    label{font-size:12px;color:rgba(231,237,249,.75)}
-    input,select,textarea{
+    .card h2{margin:0;padding:14px;font-size:14px;border-bottom:1px solid rgba(255,255,255,.08)}
+    .body{padding:14px}
+    label{display:block;font-size:12px;color:var(--muted);margin:10px 0 6px}
+    input,textarea,select{
       width:100%;
-      padding:11px 12px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      background:rgba(10,16,32,.55);
-      color:var(--text);
-      outline:none;
-    }
-    textarea{min-height:90px;resize:vertical}
-
-    .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-    .btn{
-      padding:11px 12px;border-radius:12px;border:1px solid var(--line);
-      background:rgba(255,255,255,.06);color:var(--text);
-      cursor:pointer;
-    }
-    .btn:hover{border-color:var(--line2)}
-    .btn.primary{background:var(--accent);color:#0b1224;font-weight:800;border-color:rgba(0,0,0,.15)}
-    .btn.danger{background:rgba(255,82,82,.14);border-color:rgba(255,82,82,.25)}
-    .btn.ghost{background:rgba(255,255,255,.04)}
-    .hint{margin-top:10px;color:rgba(231,237,249,.7);font-size:13px;line-height:1.45}
-
-    .list{margin-top:14px;display:grid;gap:10px}
-    .item{
-      border:1px solid var(--line);
-      background:var(--glass2);
-      border-radius:14px;
-      padding:12px;
-      display:grid;
-      grid-template-columns: 92px 1fr auto;
-      gap:12px;
-      align-items:center;
-    }
-    .poster{
-      width:92px;height:64px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,.10);
-      background:#000;
-    }
-    .poster img{width:100%;height:100%;object-fit:cover;display:block}
-    .meta b{display:block}
-    .meta small{color:rgba(231,237,249,.7)}
-
-    /* ===== Tool xử ảnh ===== */
-    .tool-wrap{display:grid;grid-template-columns: 1fr 1fr; gap:12px}
-    .tool-box{
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:12px;
-      background:rgba(10,16,32,.42);
-    }
-    .tool-title{font-weight:800;margin:0 0 6px}
-    .tool-sub{margin:0 0 10px;color:rgba(231,237,249,.65);font-size:13px;line-height:1.35}
-    .tool-grid{display:grid;grid-template-columns: 1fr 1fr; gap:10px}
-    .tool-grid .full{grid-column:1/-1}
-
-    .previews{
-      display:grid; grid-template-columns: 1fr 1fr; gap:12px; align-items:start;
-    }
-    .preview{
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:10px;
-      background:rgba(10,16,32,.42);
-    }
-    .preview b{display:block;margin-bottom:8px}
-    .preview img{
-      width:100%;
-      height:auto;
-      border-radius:12px;
+      padding:10px 12px;border-radius:12px;
       border:1px solid rgba(255,255,255,.10);
-      background:#000;
-      display:block;
+      background:rgba(255,255,255,.04);
+      color:#e5e7eb;
+      outline:none;
+      font-size:13px;
     }
-    .mini{
-      margin-top:8px;
-      color:rgba(231,237,249,.65);
-      font-size:12px;
-      line-height:1.35;
-      word-break:break-word;
+    textarea{min-height:140px;resize:vertical;font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .row > *{flex:1 1 180px}
+    .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .btn{
+      padding:9px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      font-weight:800;font-size:13px;color:#e5e7eb;cursor:pointer;
     }
-
-    @media (max-width: 900px){
-      .grid{grid-template-columns:1fr 1fr}
-      .tool-wrap{grid-template-columns:1fr}
-      .previews{grid-template-columns:1fr}
-      .item{grid-template-columns: 78px 1fr; }
-      .item .row{grid-column:1/-1}
-      .poster{width:78px;height:58px}
+    .btn.good{border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.10)}
+    .btn.bad{border-color:rgba(255,124,124,.35);background:rgba(255,124,124,.12)}
+    .btn:hover{background:rgba(255,255,255,.10)}
+    .log{
+      border-top:1px solid rgba(255,255,255,.08);
+      padding:14px;
+      color:#d1d5db;
+      font-size:13px;line-height:1.45;
     }
+    .muted{color:var(--muted)}
+    .k{color:#9ec1ff;font-weight:800}
+    .ok{color:#7cffb2;font-weight:900}
+    .err{color:#ff7c7c;font-weight:900}
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="topbar">
-      <div class="left">
-        <a href="index.html">← Về trang chủ</a>
-        <span style="color:rgba(231,237,249,.5)">•</span>
-        <span style="color:rgba(231,237,249,.75)">Khoii Admin</span>
+    <header>
+      <div>
+        <h1>Admin / Test</h1>
+        <div class="muted" style="font-size:12px;margin-top:2px">Add / update item (localStorage + Supabase optional)</div>
+      </div>
+      <a class="pill" href="index.html">← Home</a>
+    </header>
+
+    <div class="grid">
+      <div class="card">
+        <h2>Config</h2>
+        <div class="body">
+          <label>Supabase URL</label>
+          <input id="sbUrl" placeholder="https://xxxx.supabase.co">
+
+          <label>Supabase Anon Key</label>
+          <input id="sbKey" placeholder="anon key">
+
+          <label>Table</label>
+          <input id="sbTable" value="movies">
+
+          <div class="btns">
+            <button class="btn good" id="initSb">Init Supabase</button>
+            <button class="btn" id="loadCache">Load localStorage</button>
+            <button class="btn bad" id="clearCache">Clear localStorage</button>
+          </div>
+        </div>
+        <div class="log" id="log1"><span class="muted">—</span></div>
       </div>
 
-      <div class="right">
-        <button class="pill-link" id="btnLogin" type="button">🔐 Login</button>
-        <button class="pill-link" id="btnLogout" type="button" style="display:none">🚪 Logout</button>
-        <span id="authState" style="margin-left:8px;color:rgba(231,237,249,.65);font-size:13px"></span>
-
-        <a class="pill-link" href="https://drive.google.com/file/d/14gEVKOKDl88TIr3RQgUmvfIaVH5ytBr-/view?usp=sharing" target="_blank" rel="noreferrer">
-          🔧 Tool xử ảnh (Drive)
-        </a>
-      </div>
-    </div>
-
-    <h1>Quản lý phim (Google Drive)</h1>
-
-    <div class="card">
-      <div class="grid">
-        <div>
-          <label>Link Google Drive (hoặc ID)</label>
-          <input id="drive" placeholder="https://drive.google.com/file/d/.... hoặc FILE_ID" />
-        </div>
-
-        <div>
-          <label>Tên phim</label>
-          <input id="title" placeholder="Ví dụ: One Piece..." />
-        </div>
-
-        <div>
-          <label>Phân loại</label>
-          <select id="kind">
-            <option value="anime">Anime</option>
-            <option value="movie">Phim lẻ</option>
-            <option value="series">Phim bộ</option>
-          </select>
-        </div>
-
-        <div>
-          <label>Năm</label>
-          <input id="year" placeholder="2026" />
-        </div>
-
-        <div>
-          <label>Chất lượng</label>
-          <input id="quality" placeholder="FHD / 4K / HD..." />
-        </div>
-
-        <div>
-          <label>Poster (Link ảnh Google Drive hoặc ID ảnh)</label>
-          <input id="posterUrl" placeholder="Dán link ảnh Drive: https://drive.google.com/file/d/.../view hoặc ID ảnh" />
-        </div>
-
-        <div>
-          <label>Hero (Link ảnh Google Drive hoặc ID ảnh)</label>
-          <input id="heroUrl" placeholder="Dán link ảnh Drive: https://drive.google.com/file/d/.../view hoặc ID ảnh" />
-        </div>
-
-        <div>
-          <label>Drive ID (tự lấy)</label>
-          <input id="driveId" placeholder="Auto..." disabled />
-        </div>
-      </div>
-
-      <div style="margin-top:10px">
-        <label>Mô tả</label>
-        <textarea id="desc" placeholder="Ghi chú ngắn (tùy chọn)"></textarea>
-      </div>
-
-      <div class="row">
-        <button class="btn primary" id="btnAdd">Thêm phim</button>
-        <button class="btn" id="btnUpdate">Cập nhật theo Drive ID (nếu trùng)</button>
-        <button class="btn danger" id="btnClearAll">Xóa hết dữ liệu</button>
-        <button class="btn ghost" id="btnClearForm">Xóa form</button>
-      </div>
-
-      <div class="hint">
-        - Thumbnail Drive: <b>drive.google.com/thumbnail?id=FILE_ID</b> (có thể không ra nếu file private).<br>
-        - Nếu thumb xấu → dùng <b>Poster URL</b> / <b>Hero URL</b> hoặc Tool xử ảnh bên dưới (xuất ảnh base64).
-      </div>
-    </div>
-
-    <!-- TOOL_CROP_DISABLED: removed to avoid base64/localStorage bloat -->
-<div class="card">
-      <b>Tool xử lý ảnh (tạo Poster 2:3 + Hero 16:9)</b>
-
-      <div class="hint" style="margin-top:8px">
-        Chọn ảnh từ máy → hệ thống sẽ <b>center-crop</b> đúng tỉ lệ và nén ảnh.
-        Nếu ảnh base64 quá nặng (localStorage giới hạn ~5MB), hãy giảm Quality hoặc dùng link ảnh ngoài.
-      </div>
-
-      <div class="tool-wrap" style="margin-top:12px">
-        <div class="tool-box">
-          <p class="tool-title">1) Chọn ảnh nguồn</p>
-          <p class="tool-sub">Nên chọn ảnh lớn, rõ (jpg/png/webp). Tool sẽ tự cắt giữa cho đẹp.</p>
-
-          <div class="tool-grid">
-            <div class="full">
-              <label>Chọn file ảnh</label>
-              <input id="imgFile" type="file" accept="image/*" />
-            </div>
-
+      <div class="card">
+        <h2>Item</h2>
+        <div class="body">
+          <div class="row">
             <div>
-              <label>Định dạng xuất</label>
-              <select id="outFormat">
-                <option value="image/webp">WEBP (nhẹ)</option>
-                <option value="image/jpeg">JPG (ổn định)</option>
+              <label>Title</label>
+              <input id="title" placeholder="Tên phim...">
+            </div>
+            <div>
+              <label>Kind</label>
+              <select id="kind">
+                <option value="movie">movie</option>
+                <option value="anime">anime</option>
               </select>
             </div>
+          </div>
 
+          <div class="row">
             <div>
-              <label>Quality: <span id="qVal">0.85</span></label>
-              <input id="qualityRange" type="range" min="0.5" max="0.95" step="0.01" value="0.85" />
+              <label>Year</label>
+              <input id="year" placeholder="2026">
             </div>
-
             <div>
-              <label>Focus X (dịch khung cắt)</label>
-              <input id="focusX" type="range" min="-100" max="100" step="1" value="0" />
-            </div>
-
-            <div>
-              <label>Focus Y (dịch khung cắt)</label>
-              <input id="focusY" type="range" min="-100" max="100" step="1" value="0" />
-            </div>
-
-            <div class="full row">
-              <button class="btn primary" id="btnMakeBoth">Tạo Poster + Hero</button>
-              <button class="btn" id="btnMakePoster">Tạo Poster</button>
-              <button class="btn" id="btnMakeHero">Tạo Hero</button>
+              <label>Quality</label>
+              <select id="quality">
+                <option value="">(empty)</option>
+                <option>HD</option>
+                <option>FHD</option>
+                <option>4K</option>
+              </select>
             </div>
           </div>
-        </div>
 
-        <div class="tool-box">
-          <p class="tool-title">2) Kết quả</p>
-          <p class="tool-sub">Bấm “Dùng làm … URL” để tự điền vào form phía trên.</p>
-
-          <div class="previews">
-            <div class="preview">
-              <b>Poster (500×750)</b>
-              <img id="posterPreview" alt="" />
-              <div class="row" style="margin-top:10px">
-                <button class="btn" id="usePoster">Dùng làm Poster URL</button>
-                <button class="btn" id="copyPoster">Copy</button>
-              </div>
-              <div class="mini" id="posterInfo">Chưa tạo.</div>
+          <div class="row">
+            <div>
+              <label>Country</label>
+              <input id="country" placeholder="VN/JP...">
             </div>
-
-            <div class="preview">
-              <b>Hero (1600×900)</b>
-              <img id="heroPreview" alt="" />
-              <div class="row" style="margin-top:10px">
-                <button class="btn" id="useHero">Dùng làm Hero URL</button>
-                <button class="btn" id="copyHero">Copy</button>
-              </div>
-              <div class="mini" id="heroInfo">Chưa tạo.</div>
+            <div>
+              <label>Genre</label>
+              <input id="genre" placeholder="Action/Fantasy...">
             </div>
           </div>
+
+          <label>Poster URL</label>
+          <input id="poster" placeholder="https://...jpg">
+
+          <label>Watch URL</label>
+          <input id="url" placeholder="watch.html?url=... hoặc link player">
+
+          <label>JSON raw (optional)</label>
+          <textarea id="raw" placeholder='{"id":"...","title":"..."}'></textarea>
+
+          <div class="btns">
+            <button class="btn good" id="saveLocal">Save → localStorage</button>
+            <button class="btn good" id="saveSb">Insert → Supabase</button>
+            <button class="btn" id="preview">Preview JSON</button>
+          </div>
         </div>
+        <div class="log" id="log2"><span class="muted">—</span></div>
       </div>
-    </div>
-
-    
-<!-- /TOOL_CROP_DISABLED -->
-<div class="card">
-      <b>Danh sách phim đã lưu</b>
-      <div class="list" id="list"></div>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-    // ================== SUPABASE ==================
-    // Điền thông tin của bạn:
-    const SUPABASE_URL = "https://nzalaxolteaiafvuceqz.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56YWxheG9sdGVhaWFmdnVjZXF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyOTY2MjAsImV4cCI6MjA4NTg3MjYyMH0.0eIz6cfB4Dr_g5Wja70tZCMvVfUKoI5H4D8MJBP49Bg";
-    const supabase = window.supabase?.createClient
-      ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-      : null;
+  <script>
+    const STORAGE_KEY = "movieapp_data_cache_v1";
 
-    async function getAdminUser(){
-      if(!supabase) return null;
-      const { data: { user } } = await supabase.auth.getUser();
-      return user || null;
-    }
+    const el = {
+      sbUrl: document.getElementById("sbUrl"),
+      sbKey: document.getElementById("sbKey"),
+      sbTable: document.getElementById("sbTable"),
+      initSb: document.getElementById("initSb"),
+      loadCache: document.getElementById("loadCache"),
+      clearCache: document.getElementById("clearCache"),
+      log1: document.getElementById("log1"),
 
-    async function ensureAdminLogin(){
-      if(!supabase){ alert("Thiếu supabase-js. Kiểm tra lại CDN."); return false; }
-      const { data: { session } } = await supabase.auth.getSession();
-      if(session) return true;
+      title: document.getElementById("title"),
+      kind: document.getElementById("kind"),
+      year: document.getElementById("year"),
+      quality: document.getElementById("quality"),
+      country: document.getElementById("country"),
+      genre: document.getElementById("genre"),
+      poster: document.getElementById("poster"),
+      url: document.getElementById("url"),
+      raw: document.getElementById("raw"),
+      saveLocal: document.getElementById("saveLocal"),
+      saveSb: document.getElementById("saveSb"),
+      preview: document.getElementById("preview"),
+      log2: document.getElementById("log2"),
+    };
 
-      const email = prompt("Admin email:");
-      const password = prompt("Admin password:");
-      if(!email || !password) return false;
+    function safeText(s){ return String(s ?? ""); }
 
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if(error){ alert("Đăng nhập thất bại: " + error.message); return false; }
-      await syncAuthUI();
-      return true;
-    }
-
-    async function syncAuthUI(){
-      const btnLogin = document.getElementById("btnLogin");
-      const btnLogout = document.getElementById("btnLogout");
-      const authState = document.getElementById("authState");
-      if(!btnLogin || !btnLogout || !authState) return;
-
-      const user = await getAdminUser();
-      if(user){
-        btnLogin.style.display = "none";
-        btnLogout.style.display = "";
-        authState.textContent = `UID: ${user.id.slice(0,8)}…`;
-      }else{
-        btnLogin.style.display = "";
-        btnLogout.style.display = "none";
-        authState.textContent = "Chưa đăng nhập";
-      }
-    }
-
-
-    const STORAGE_KEY = "khoii_drive_movies_v1";
-    const LEGACY_KEY  = "my_drive_movies_v2";
-
-    const DriveTool = (() => {
-      const patterns = [
-        /drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]{10,})/i,
-        /drive\.google\.com\/open\?id=([a-zA-Z0-9_-]{10,})/i,
-        /drive\.google\.com\/uc\?id=([a-zA-Z0-9_-]{10,})/i,
-        /drive\.google\.com\/uc\?export=download&id=([a-zA-Z0-9_-]{10,})/i,
-      ];
-      function extractId(input){
-        const s = String(input || "").trim();
-        if (/^[a-zA-Z0-9_-]{10,}$/.test(s)) return s;
-        try{
-          const u = new URL(s);
-          const qid = u.searchParams.get("id");
-          if(qid && /^[a-zA-Z0-9_-]{10,}$/.test(qid)) return qid;
-        }catch{}
-        for(const re of patterns){
-          const m = s.match(re);
-          if(m && m[1]) return m[1];
-        }
-        return null;
-      }
-      function thumbSmall(id){ return `https://drive.google.com/thumbnail?id=${id}&sz=w400`; }
-      // Link ảnh ổn cho <img> (cần file ảnh Drive để public)
-      function imgView(id){ return `https://drive.google.com/uc?export=view&id=${id}`; }
-      // Thumbnail size tuỳ chỉnh (nhanh, nhẹ)
-      function thumb(id, w=1200){ return `https://drive.google.com/thumbnail?id=${id}&sz=w${w}`; }
-      return { extractId, thumbSmall, imgView, thumb };
-    })();
-
-    // Bóc link redirect (Facebook l.php?u=...) để lấy URL thật
-    function unwrapRedirectLink(input){
-      const s = String(input || "").trim();
-      if(!s) return "";
-      try{
-        const url = new URL(s);
-        const host = url.hostname.toLowerCase();
-        if ((host === "l.facebook.com" || host === "www.facebook.com" || host === "facebook.com") && url.pathname === "/l.php"){
-          const u = url.searchParams.get("u");
-          if(u) return decodeURIComponent(u);
-        }
-        return s;
-      }catch(e){
-        return s;
-      }
-    }
-
-    // Chuẩn hoá input ảnh (link/ID Drive) -> link ảnh dùng được
-    function normalizeDriveImage(input, prefer = "thumb", w = 1200){
-      let s = String(input || "").trim();
-      if(!s) return "";
-      // NEW: bóc redirect trước khi extract ID Drive
-      s = unwrapRedirectLink(s);
-
-      const id = DriveTool.extractId(s);
-      if(!id) return s; // không phải drive -> giữ nguyên (phòng khi dán link ảnh ngoài)
-      return prefer === "view" ? DriveTool.imgView(id) : DriveTool.thumb(id, w);
-    }
-
-function escapeHtml(s){
+    function escapeHtml(s){
       return String(s ?? "")
         .replaceAll("&","&amp;")
         .replaceAll("<","&lt;")
         .replaceAll(">","&gt;")
         .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
+        .replaceAll("'","&#39;");
     }
 
-    async function loadMovies(){
-      // Ưu tiên lấy từ Supabase (public read)
-      if(supabase){
-        const { data, error } = await supabase
-          .from("movies")
-          .select("*")
-          .order("updatedat", { ascending: false });
+    function setLog(target, html){ target.innerHTML = html; }
+    function ok(msg){ return `✅ <span class="ok">${escapeHtml(msg)}</span>`; }
+    function err(msg){ return `❌ <span class="err">${escapeHtml(msg)}</span>`; }
 
-        if(!error){
-          return (data || []).map(row => ({
-            id: row.id,
-            title: row.title,
-            kind: row.kind,
-            year: row.year || "",
-            quality: row.quality || "FHD",
-            desc: row.desc || "",
-            driveId: row.driveid,
-            driveLink: row.drivelink || "",
-            posterUrl: row.posterurl || "",
-            heroUrl: row.herourl || "",
-            updatedAt: Number(row.updatedat || 0),
-            created_at: row.created_at
-          }));
-        }
-        console.warn("Supabase load error:", error);
+    function normalizeItem(x){
+      return {
+        id: safeText(x.id ?? x.slug ?? crypto.randomUUID()),
+        title: safeText(x.title ?? x.name ?? "Untitled"),
+        kind: safeText(x.kind ?? x.type ?? "movie"),
+        year: safeText(x.year ?? ""),
+        quality: safeText(x.quality ?? x.q ?? ""),
+        imdb: safeText(x.imdb ?? x.rating ?? ""),
+        country: safeText(x.country ?? x.nation ?? ""),
+        genre: safeText(x.genre ?? x.categories ?? ""),
+        poster: safeText(x.poster ?? x.thumb ?? x.image ?? ""),
+        url: safeText(x.url ?? x.link ?? x.watch ?? ""),
+      };
+    }
+
+    let supabaseClient = null;
+
+    async function ensureAdminLogin(){
+      if(!supabaseClient){ setLog(el.log2, err("Chưa init Supabase.")); return false; }
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if(session) return true;
+      setLog(el.log2, err("Chưa đăng nhập Supabase Auth (nếu table bật RLS)."));
+      return false;
+    }
+
+    function getFormItem(){
+      const raw = el.raw.value.trim();
+      if(raw){
+        try{ return normalizeItem(JSON.parse(raw)); }
+        catch(e){ throw new Error("JSON raw không hợp lệ."); }
       }
+      return normalizeItem({
+        title: el.title.value,
+        kind: el.kind.value,
+        year: el.year.value,
+        quality: el.quality.value,
+        country: el.country.value,
+        genre: el.genre.value,
+        poster: el.poster.value,
+        url: el.url.value,
+      });
+    }
 
-      // Fallback: localStorage (giữ tương thích dữ liệu cũ)
+    function readCache(){
+      const s = localStorage.getItem(STORAGE_KEY);
+      if(!s) return [];
       try{
-        let raw = localStorage.getItem(STORAGE_KEY);
-        if(!raw){
-          const old = localStorage.getItem(LEGACY_KEY);
-          if(old){
-            localStorage.setItem(STORAGE_KEY, old);
-            raw = old;
-          }
-        }
-        const arr = raw ? JSON.parse(raw) : [];
+        const arr = JSON.parse(s);
         return Array.isArray(arr) ? arr : [];
       }catch{ return []; }
     }
 
-    async function saveMovies(_arr){
-      // Không dùng localStorage nữa (DB là nguồn chính).
-      return true;
+    function writeCache(items){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
     }
 
-    function uiToDbPayload(m){
-      return {
-        title: m.title,
-        kind: m.kind || "anime",
-        year: (m.year ?? "").toString(),
-        quality: m.quality || "FHD",
-        desc: m.desc || "",
-        driveid: m.driveId,
-        drivelink: m.driveLink || "",
-        posterurl: m.posterUrl || "",
-        herourl: m.heroUrl || "",
-        updatedat: m.updatedAt || Date.now()
-      };
-    }
-
-function uid(){
-      return "m_" + Math.random().toString(16).slice(2) + Date.now().toString(16);
-    }
-
-    const el = {
-      drive: document.getElementById("drive"),
-      title: document.getElementById("title"),
-      kind: document.getElementById("kind"),
-      year: document.getElementById("year"),
-      quality: document.getElementById("quality"),
-      posterUrl: document.getElementById("posterUrl"),
-      heroUrl: document.getElementById("heroUrl"),
-      driveId: document.getElementById("driveId"),
-      desc: document.getElementById("desc"),
-
-      btnAdd: document.getElementById("btnAdd"),
-      btnUpdate: document.getElementById("btnUpdate"),
-      btnClearAll: document.getElementById("btnClearAll"),
-      btnClearForm: document.getElementById("btnClearForm"),
-      list: document.getElementById("list"),
-    };
-
-    let movies = await loadMovies();
-
-    async function render(){
-      movies = await loadMovies();
-      el.list.innerHTML = "";
-
-      if(movies.length === 0){
-        el.list.innerHTML = `<div style="color:rgba(231,237,249,.7)">Chưa có phim nào.</div>`;
-        return;
-      }
-
-      movies.forEach(m => {
-        const wrap = document.createElement("div");
-        wrap.className = "item";
-
-        const poster = m.posterUrl || (m.driveId ? DriveTool.thumbSmall(m.driveId) : "");
-        wrap.innerHTML = `
-          <div class="poster"><img src="${poster}" alt=""></div>
-          <div class="meta">
-            <b>${escapeHtml(m.title || "Không tên")}</b>
-            <small>${escapeHtml(m.kind || "anime")} • ${escapeHtml(m.year || "—")} • ${escapeHtml(m.quality || "FHD")}</small><br>
-            <small>DriveID: ${escapeHtml(m.driveId || "—")}</small>
-          </div>
-          <div class="row">
-            <button class="btn" data-act="fill">Sửa</button>
-            <button class="btn danger" data-act="del">Xóa</button>
-          </div>
-        `;
-
-        wrap.querySelector('img').onerror = () => { wrap.querySelector('img').style.display = "none"; };
-
-        wrap.querySelector('[data-act="fill"]').addEventListener("click", () => fillForm(m));
-        wrap.querySelector('[data-act="del"]').addEventListener("click", async () => await delMovie(m.id));
-        el.list.appendChild(wrap);
-      });
-    }
-
-    function syncDriveId(){
-      const id = DriveTool.extractId(el.drive.value);
-      el.driveId.value = id || "";
-      return id;
-    }
-
-    function getFormData(){
-      const driveId = syncDriveId();
-      if(!driveId) return { ok:false, error:"Link/ID Google Drive không hợp lệ." };
-
-      const title = el.title.value.trim();
-      if(!title) return { ok:false, error:"Bạn chưa nhập tên phim." };
-
-      return {
-        ok:true,
-        data:{
-          id: uid(),
-          title,
-          kind: el.kind.value,
-          year: el.year.value.trim() || "",
-          quality: el.quality.value.trim() || "FHD",
-          desc: el.desc.value.trim() || "",
-          driveId,
-          driveLink: el.drive.value.trim(),
-          posterUrl: normalizeDriveImage(el.posterUrl.value, "thumb", 600),
-          heroUrl: normalizeDriveImage(el.heroUrl.value, "thumb", 1600),
-          updatedAt: Date.now()
-        }
-      };
-    }
-
-    function clearForm(){
-      el.drive.value = "";
-      el.title.value = "";
-      el.kind.value = "anime";
-      el.year.value = "";
-      el.quality.value = "";
-      el.posterUrl.value = "";
-      el.heroUrl.value = "";
-      el.driveId.value = "";
-      el.desc.value = "";
-    }
-
-    async function addMovie(){
-      const r = getFormData();
-      if(!r.ok){ alert(r.error); return; }
-
-      if(!(await ensureAdminLogin())) return;
-
-      const payload = uiToDbPayload(r.data);
-      const { error } = await supabase.from("movies").insert([payload]);
-      if(error){
-        alert("Lỗi thêm phim: " + error.message);
-        return;
-      }
-
-      clearForm();
-      await render();
-      alert("Đã thêm phim! Quay về trang chủ để xem.");
-    }
-
-    async function updateByDriveId(){
-      const r = getFormData();
-      if(!r.ok){ alert(r.error); return; }
-
-      if(!(await ensureAdminLogin())) return;
-
-      const payload = uiToDbPayload(r.data);
-
-      const { error } = await supabase
-        .from("movies")
-        .upsert([payload], { onConflict: "driveid" });
-
-      if(error){
-        alert("Lỗi cập nhật: " + error.message);
-        return;
-      }
-
-      await render();
-      alert("Đã cập nhật phim theo Drive ID!");
-    }
-
-    async function delMovie(id){
-      if(!confirm("Xóa phim này?")) return;
-
-      if(!(await ensureAdminLogin())) return;
-
-      const { error } = await supabase.from("movies").delete().eq("id", id);
-      if(error){
-        alert("Lỗi xóa: " + error.message);
-        return;
-      }
-      await render();
-    }
-
-    function fillForm(m){
-      el.drive.value = m.driveLink || m.driveId || "";
-      el.title.value = m.title || "";
-      el.kind.value = m.kind || "anime";
-      el.year.value = m.year || "";
-      el.quality.value = m.quality || "FHD";
-      el.desc.value = m.desc || "";
-      el.posterUrl.value = m.posterUrl || "";
-      el.heroUrl.value = m.heroUrl || "";
-      el.driveId.value = m.driveId || "";
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-
-    async function clearAll(){
-      if(!confirm("Xóa hết dữ liệu đã lưu?")) return;
-
-      if(!(await ensureAdminLogin())) return;
-
-      const { error } = await supabase.from("movies").delete().neq("id", "00000000-0000-0000-0000-000000000000");
-      if(error){
-        alert("Lỗi clear all: " + error.message);
-        return;
-      }
-      await render();
-    }
-
-    el.drive.addEventListener("input", syncDriveId);
-
-    // Auto convert link/ID ảnh Drive -> link ảnh hiển thị được
-    el.posterUrl.addEventListener("change", () => {
-      el.posterUrl.value = normalizeDriveImage(el.posterUrl.value, "thumb", 600);
-    });
-    el.heroUrl.addEventListener("change", () => {
-      el.heroUrl.value = normalizeDriveImage(el.heroUrl.value, "thumb", 1600);
-    });
-
-    el.btnAdd.addEventListener("click", async () => await addMovie());
-    el.btnUpdate.addEventListener("click", async () => await updateByDriveId());
-    el.btnClearAll.addEventListener("click", async () => await clearAll());
-    el.btnClearForm.addEventListener("click", clearForm);
-
-    const btnLogin = document.getElementById("btnLogin");
-    const btnLogout = document.getElementById("btnLogout");
-    if(btnLogin) btnLogin.addEventListener("click", async () => { await ensureAdminLogin(); });
-    if(btnLogout) btnLogout.addEventListener("click", async () => {
-      if(!supabase) return;
-      await supabase.auth.signOut();
-      await syncAuthUI();
-      alert("Đã logout.");
-    });
-
-
-    (async () => { await syncAuthUI(); await render(); })();
-
-    /* ================== TOOL XỬ ẢNH (Canvas) ================== */
-    const tool = {
-      file: document.getElementById("imgFile"),
-      format: document.getElementById("outFormat"),
-      quality: document.getElementById("qualityRange"),
-      qVal: document.getElementById("qVal"),
-      fx: document.getElementById("focusX"),
-      fy: document.getElementById("focusY"),
-
-      btnBoth: document.getElementById("btnMakeBoth"),
-      btnPoster: document.getElementById("btnMakePoster"),
-      btnHero: document.getElementById("btnMakeHero"),
-
-      posterImg: document.getElementById("posterPreview"),
-      heroImg: document.getElementById("heroPreview"),
-      posterInfo: document.getElementById("posterInfo"),
-      heroInfo: document.getElementById("heroInfo"),
-
-      usePoster: document.getElementById("usePoster"),
-      useHero: document.getElementById("useHero"),
-      copyPoster: document.getElementById("copyPoster"),
-      copyHero: document.getElementById("copyHero"),
-    };
-
-    let srcImage = null;
-    let posterDataUrl = "";
-    let heroDataUrl = "";
-
-    tool.qVal.textContent = Number(tool.quality.value).toFixed(2);
-    tool.quality.addEventListener("input", () => {
-      tool.qVal.textContent = Number(tool.quality.value).toFixed(2);
-    });
-
-    tool.file.addEventListener("change", async (e) => {
-      const f = e.target.files?.[0];
-      if(!f) return;
-
-      if(!f.type.startsWith("image/")){
-        alert("File không phải ảnh.");
-        return;
-      }
-
-      const dataUrl = await readFileAsDataURL(f);
-      srcImage = await loadImage(dataUrl);
-
-      tool.posterInfo.textContent = "Đã nạp ảnh nguồn: " + srcImage.width + "×" + srcImage.height;
-      tool.heroInfo.textContent = "Đã nạp ảnh nguồn: " + srcImage.width + "×" + srcImage.height;
-
-      posterDataUrl = "";
-      heroDataUrl = "";
-      tool.posterImg.removeAttribute("src");
-      tool.heroImg.removeAttribute("src");
-      tool.posterInfo.textContent += " • Chưa tạo Poster.";
-      tool.heroInfo.textContent += " • Chưa tạo Hero.";
-    });
-
-    function readFileAsDataURL(file){
-      return new Promise((resolve, reject) => {
-        const fr = new FileReader();
-        fr.onload = () => resolve(String(fr.result || ""));
-        fr.onerror = reject;
-        fr.readAsDataURL(file);
-      });
-    }
-
-    function loadImage(url){
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.onload = () => resolve(img);
-        img.onerror = reject;
-        img.src = url;
-      });
-    }
-
-    function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
-
-    function centerCropDraw(img, outW, outH, focusX, focusY, mime, quality){
-      const targetAspect = outW / outH;
-      const sw = img.width, sh = img.height;
-      const srcAspect = sw / sh;
-
-      let cropW, cropH;
-      if(srcAspect > targetAspect){
-        cropH = sh;
-        cropW = sh * targetAspect;
-      }else{
-        cropW = sw;
-        cropH = sw / targetAspect;
-      }
-
-      const maxDx = (sw - cropW) / 2;
-      const maxDy = (sh - cropH) / 2;
-
-      const fx = clamp(focusX, -1, 1);
-      const fy = clamp(focusY, -1, 1);
-
-      const sx = (sw - cropW)/2 + fx * maxDx;
-      const sy = (sh - cropH)/2 + fy * maxDy;
-
-      const canvas = document.createElement("canvas");
-      canvas.width = outW;
-      canvas.height = outH;
-      const ctx = canvas.getContext("2d");
-
-      ctx.fillStyle = "#000";
-      ctx.fillRect(0,0,outW,outH);
-
-      ctx.drawImage(img, sx, sy, cropW, cropH, 0, 0, outW, outH);
-
-      let m = mime;
-      if(m === "image/webp"){
-        try{
-          const test = canvas.toDataURL("image/webp", 0.8);
-          if(!test.startsWith("data:image/webp")) m = "image/jpeg";
-        }catch{
-          m = "image/jpeg";
-        }
-      }
-
-      const dataUrl = canvas.toDataURL(m, quality);
-      return { dataUrl, mime: m };
-    }
-
-    function approxKB(dataUrl){
-      const i = dataUrl.indexOf("base64,");
-      if(i === -1) return 0;
-      const b64 = dataUrl.slice(i + 7);
-      const bytes = Math.floor(b64.length * 0.75);
-      return Math.round(bytes / 1024);
-    }
-
-    function requireSrc(){
-      if(!srcImage){
-        alert("Bạn chưa chọn ảnh nguồn.");
-        return false;
-      }
-      return true;
-    }
-
-    function getFocus(){
-      const fx = Number(tool.fx.value) / 100;
-      const fy = Number(tool.fy.value) / 100;
-      return { fx, fy };
-    }
-
-    function getSettings(){
-      return {
-        mime: tool.format.value,
-        quality: Number(tool.quality.value),
-      };
-    }
-
-    function makePoster(){
-      if(!requireSrc()) return;
-      const { fx, fy } = getFocus();
-      const { mime, quality } = getSettings();
-
-      const r = centerCropDraw(srcImage, 500, 750, fx, fy, mime, quality);
-      posterDataUrl = r.dataUrl;
-
-      tool.posterImg.src = posterDataUrl;
-      tool.posterInfo.textContent = `Định dạng: ${r.mime} • ~${approxKB(posterDataUrl)}KB • 500×750`;
-    }
-
-    function makeHero(){
-      if(!requireSrc()) return;
-      const { fx, fy } = getFocus();
-      const { mime, quality } = getSettings();
-
-      const r = centerCropDraw(srcImage, 1600, 900, fx, fy, mime, quality);
-      heroDataUrl = r.dataUrl;
-
-      tool.heroImg.src = heroDataUrl;
-      tool.heroInfo.textContent = `Định dạng: ${r.mime} • ~${approxKB(heroDataUrl)}KB • 1600×900`;
-    }
-
-    tool.btnPoster.addEventListener("click", makePoster);
-    tool.btnHero.addEventListener("click", makeHero);
-    tool.btnBoth.addEventListener("click", () => { makePoster(); makeHero(); });
-
-    tool.usePoster.addEventListener("click", () => {
-      if(!posterDataUrl){ alert("Chưa tạo Poster."); return; }
-      el.posterUrl.value = posterDataUrl;
-      alert("Đã gán Poster URL vào form!");
-    });
-
-    tool.useHero.addEventListener("click", () => {
-      if(!heroDataUrl){ alert("Chưa tạo Hero."); return; }
-      el.heroUrl.value = heroDataUrl;
-      alert("Đã gán Hero URL vào form!");
-    });
-
-    async function copyText(text){
+    el.initSb.addEventListener("click", ()=>{
+      const url = el.sbUrl.value.trim();
+      const key = el.sbKey.value.trim();
+      if(!url || !key){ setLog(el.log1, err("Thiếu URL hoặc Anon key.")); return; }
       try{
-        await navigator.clipboard.writeText(text);
-        return true;
-      }catch{
-        const ta = document.createElement("textarea");
-        ta.value = text;
-        document.body.appendChild(ta);
-        ta.select();
-        const ok = document.execCommand("copy");
-        ta.remove();
-        return ok;
+        supabaseClient = window.supabase.createClient(url, key);
+        setLog(el.log1, ok("Supabase init OK"));
+      }catch(e){
+        setLog(el.log1, err("Init fail: " + (e?.message || e)));
       }
-    }
-
-    tool.copyPoster.addEventListener("click", async () => {
-      if(!posterDataUrl){ alert("Chưa tạo Poster."); return; }
-      const ok = await copyText(posterDataUrl);
-      alert(ok ? "Đã copy Poster!" : "Copy thất bại (trình duyệt chặn).");
     });
 
-    tool.copyHero.addEventListener("click", async () => {
-      if(!heroDataUrl){ alert("Chưa tạo Hero."); return; }
-      const ok = await copyText(heroDataUrl);
-      alert(ok ? "Đã copy Hero!" : "Copy thất bại (trình duyệt chặn).");
+    el.loadCache.addEventListener("click", ()=>{
+      const items = readCache();
+      setLog(el.log1, ok(`Loaded cache: ${items.length} items`));
+    });
+
+    el.clearCache.addEventListener("click", ()=>{
+      localStorage.removeItem(STORAGE_KEY);
+      setLog(el.log1, ok("Cleared localStorage cache"));
+    });
+
+    el.preview.addEventListener("click", ()=>{
+      try{
+        const item = getFormItem();
+        setLog(el.log2, `👀 Preview: <span class="k">${escapeHtml(JSON.stringify(item, null, 2))}</span>`);
+      }catch(e){
+        setLog(el.log2, err(e.message || String(e)));
+      }
+    });
+
+    el.saveLocal.addEventListener("click", ()=>{
+      try{
+        const item = getFormItem();
+        const items = readCache().map(normalizeItem);
+
+        const idx = items.findIndex(x=>x.id===item.id);
+        if(idx>=0) items[idx] = item;
+        else items.unshift(item);
+
+        writeCache(items);
+        setLog(el.log2, ok(`Saved localStorage (total ${items.length})`));
+      }catch(e){
+        setLog(el.log2, err(e.message || String(e)));
+      }
+    });
+
+    el.saveSb.addEventListener("click", async ()=>{
+      try{
+        const item = getFormItem();
+        if(!supabaseClient){ setLog(el.log2, err("Chưa init Supabase.")); return; }
+        const table = el.sbTable.value.trim() || "movies";
+
+        // optional check auth if needed
+        // await ensureAdminLogin();
+
+        const { data, error } = await supabaseClient.from(table).insert(item).select("*").single();
+        if(error) throw error;
+        setLog(el.log2, ok(`Inserted to Supabase: ${data?.id || item.id}`));
+      }catch(e){
+        setLog(el.log2, err(e?.message || String(e)));
+      }
     });
   </script>
 </body>
