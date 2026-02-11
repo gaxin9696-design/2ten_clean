@@ -35,7 +35,6 @@
     }
     a{color:inherit;text-decoration:none}
 
-    /* TOPBAR (giống style index) */
     .topbar{
       position:sticky; top:0; z-index:50;
       background: linear-gradient(180deg, rgba(10,11,16,.92), rgba(10,11,16,.75));
@@ -109,7 +108,6 @@
       .brand{min-width:auto}
     }
 
-    /* PAGE */
     .wrap{max-width:var(--max); margin:0 auto; padding:16px 18px 26px;}
     @media (max-width:540px){ .wrap{padding:14px} }
 
@@ -150,7 +148,6 @@
       .layout{grid-template-columns:1fr;}
     }
 
-    /* PLAYER CARD */
     .card{
       border-radius: var(--r24);
       border:1px solid rgba(255,255,255,.10);
@@ -219,7 +216,6 @@
       margin-top:14px;
     }
 
-    /* EPISODE / SERVER */
     .panel{
       border-radius: var(--r20);
       border:1px solid rgba(255,255,255,.10);
@@ -286,12 +282,6 @@
       background: rgba(241,197,90,.10);
     }
 
-    /* INFO BLOCK */
-    .infogrid{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap:10px;
-    }
     .meta{
       display:flex; gap:10px; flex-wrap:wrap;
     }
@@ -312,7 +302,6 @@
       font-size:13px;
     }
 
-    /* SIDEBAR */
     .side .card{border-radius: var(--r20);}
     .sidehead{
       padding:14px 14px 0;
@@ -332,7 +321,6 @@
     .sitem .t{font-weight:950; margin-bottom:6px;}
     .sitem .m{color: var(--muted2); font-weight:800; font-size:12px;}
 
-    /* TOAST */
     .toast{
       position:fixed;
       left:50%;
@@ -358,7 +346,6 @@
 </head>
 
 <body>
-  <!-- TOPBAR -->
   <div class="topbar">
     <div class="topbar-inner">
       <div class="brand" id="homeBtn" title="Về trang chủ">
@@ -369,7 +356,6 @@
         </div>
       </div>
 
-      <!-- search chỉ để giống layout mẫu (không cần hoạt động ở watch) -->
       <div class="search" title="(Trang watch không cần tìm kiếm)">
         <div>🔎</div>
         <input placeholder="Tìm kiếm phim, diễn viên..." disabled />
@@ -390,7 +376,6 @@
   </div>
 
   <div class="wrap">
-    <!-- crumb/title -->
     <div class="crumb">
       <div class="back" id="backBtn" title="Quay lại">←</div>
       <div style="min-width:0">
@@ -400,9 +385,7 @@
     </div>
 
     <div class="layout">
-      <!-- LEFT -->
       <div>
-        <!-- player -->
         <div class="card">
           <div class="player-head">
             <div class="left" style="min-width:0">
@@ -421,7 +404,6 @@
         </div>
 
         <div class="below">
-          <!-- episodes -->
           <div class="panel">
             <div class="panel-head">
               <div class="h">Tập phim</div>
@@ -436,25 +418,19 @@
             </div>
           </div>
 
-          <!-- info -->
           <div class="panel">
             <div class="panel-head">
               <div class="h">Nội dung</div>
               <div class="note">Thông tin nhanh</div>
             </div>
             <div class="panel-body">
-              <div class="infogrid">
-                <div class="meta" id="metaTags"></div>
-                <div class="desc" id="desc">
-                  —
-                </div>
-              </div>
+              <div class="meta" id="metaTags"></div>
+              <div class="desc" id="desc">—</div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- RIGHT -->
       <div class="side">
         <div class="card">
           <div class="sidehead">Đề xuất</div>
@@ -467,11 +443,9 @@
   <div class="toast" id="toast">Loaded</div>
 
   <script>
-    // ====== CONFIG / KEYS ======
-    const LS_CACHE = "movieapp_data_cache_v1";   // cache bạn đã sync từ Supabase ở index
+    const LS_CACHE = "movieapp_data_cache_v1";
     const LS_FAV   = "phimapp_favs_v1";
 
-    // ====== DOM ======
     const el = {
       homeBtn: document.getElementById("homeBtn"),
       memberBtn: document.getElementById("memberBtn"),
@@ -495,7 +469,6 @@
       toast: document.getElementById("toast"),
     };
 
-    // ====== helpers ======
     function toast(msg){
       el.toast.textContent = msg;
       el.toast.classList.add("show");
@@ -517,14 +490,39 @@
       return u.searchParams.get(name);
     }
 
+    // ✅ FIX: decode nhiều lớp + bắt fb l.php?u=... + nhiều dạng link Drive
     function extractDriveId(link){
-      const s = String(link || "");
-      let m = s.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-      if(m) return m[1];
-      m = s.match(/open\?id=([a-zA-Z0-9_-]+)/);
-      if(m) return m[1];
-      m = s.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-      if(m) return m[1];
+      let s = String(link || "").trim();
+      if(!s) return "";
+
+      for(let i=0;i<3;i++){
+        try{
+          const dec = decodeURIComponent(s);
+          if(dec === s) break;
+          s = dec;
+        }catch{ break; }
+      }
+
+      try{
+        const u = new URL(s);
+        const inner = u.searchParams.get("u") || u.searchParams.get("url") || "";
+        if(inner){
+          let t = inner;
+          for(let i=0;i<3;i++){
+            try{
+              const dec = decodeURIComponent(t);
+              if(dec === t) break;
+              t = dec;
+            }catch{ break; }
+          }
+          s = t;
+        }
+      }catch{}
+
+      let m = s.match(/\/file\/d\/([a-zA-Z0-9_-]+)/); if(m) return m[1];
+      m = s.match(/open\?id=([a-zA-Z0-9_-]+)/); if(m) return m[1];
+      m = s.match(/[?&]id=([a-zA-Z0-9_-]+)/); if(m) return m[1];
+      m = s.match(/drive\.google\.com\/uc\?[^#]*\bid=([a-zA-Z0-9_-]+)/); if(m) return m[1];
       return "";
     }
 
@@ -536,7 +534,6 @@
         if(id) return `https://drive.google.com/file/d/${id}/preview`;
         return "";
       }
-      // assume raw is ID
       return `https://drive.google.com/file/d/${raw}/preview`;
     }
 
@@ -559,25 +556,22 @@
       localStorage.setItem(LS_FAV, JSON.stringify([...set]));
     }
 
-    // ====== state ======
     const state = {
       item: null,
       favs: new Set(),
       server: "main",
-      // demo eps: nếu bạn chưa có field tập/driveid theo từng tập
       episodes: Array.from({length: 12}, (_,i)=>({ ep:i+1 })),
       activeEp: 1,
       all: [],
     };
 
-    // ====== ui builders ======
     function setTitle(){
       const it = state.item;
       if(!it){
         el.pageTitle.textContent = "Không tìm thấy phim";
         el.pageSub.textContent = "Hãy mở từ trang chủ hoặc kiểm tra id/driveid.";
         el.miniInfo.textContent = "—";
-        el.desc.textContent = "Không có dữ liệu để phát. Bạn cần truyền ?id= hoặc ?driveid=.";
+        el.desc.textContent = "Không có dữ liệu để phát.";
         return;
       }
       const year = it.year ? `(${it.year})` : "";
@@ -603,7 +597,6 @@
       if(it && it.kind) tags.push(`<span class="tag">${escapeHtml(it.kind)}</span>`);
       el.metaTags.innerHTML = tags.join("");
 
-      // mô tả: nếu bạn chưa có field desc thì hiển thị placeholder gọn
       const d = (it && (it.desc || it.description)) ? String(it.desc || it.description) :
         "Trang watch chỉ cần sườn giao diện. Khi bạn thêm field mô tả (desc) trong DB, nội dung sẽ hiện ở đây.";
       el.desc.textContent = d;
@@ -629,14 +622,12 @@
           const ep = Number(btn.getAttribute("data-ep") || "1");
           state.activeEp = ep || 1;
           renderEpisodes();
-          // hiện tại 1 driveid cho cả phim (chưa có theo tập) => vẫn phát cùng video
           loadPlayer();
         });
       });
     }
 
     function renderReco(){
-      // lấy vài item khác từ cache (không ảnh, chỉ text)
       const list = (state.all || []).filter(x=> state.item && x.id !== state.item.id).slice(0, 6);
       if(!list.length){
         el.reco.innerHTML = `
@@ -658,15 +649,13 @@
         it.addEventListener("click", ()=>{
           const id = it.getAttribute("data-id");
           if(!id) return;
-          // điều hướng sang phim khác, giữ style như web mẫu
           location.href = `watch.html?id=${encodeURIComponent(id)}`;
         });
       });
     }
 
-    // ====== player ======
     function pickDriveId(){
-      // ưu tiên: query driveid -> query url -> item.driveid -> item.url (nếu chứa drive link)
+      // ưu tiên: query driveid -> query url -> item.driveid -> item.url
       const qDrive = getParam("driveid");
       if(qDrive) return String(qDrive).trim();
 
@@ -693,11 +682,9 @@
         toast("Thiếu driveid: hãy mở từ trang chủ hoặc thêm driveid vào DB.");
         return;
       }
-      const src = toDrivePreview(driveId);
-      el.frame.src = src;
+      el.frame.src = toDrivePreview(driveId);
     }
 
-    // ====== bootstrap item ======
     function findItemById(id){
       const all = readCache();
       state.all = all;
@@ -708,11 +695,9 @@
     function init(){
       state.favs = loadFavs();
 
-      // 1) lấy id từ query
       const id = getParam("id") || "";
       state.item = findItemById(id);
 
-      // 2) nếu không có item mà có driveid/url -> vẫn cho xem nhưng title placeholder
       if(!state.item){
         const d = pickDriveId();
         if(d){
@@ -730,7 +715,6 @@
         }
       }
 
-      // 3) render
       setTitle();
       renderMeta();
       renderFav();
@@ -738,7 +722,6 @@
       renderReco();
       loadPlayer();
 
-      // events
       el.homeBtn.addEventListener("click", ()=> location.href = "index.html");
       el.memberBtn.addEventListener("click", ()=> location.href = "test.html");
       el.backBtn.addEventListener("click", ()=> history.length > 1 ? history.back() : (location.href="index.html"));
@@ -756,14 +739,12 @@
         toast("Bạn có thể mở modal thông tin ở đây (nếu muốn).");
       });
 
-      // server chips (chỉ UI)
       document.querySelectorAll(".chip").forEach(ch=>{
         ch.addEventListener("click", ()=>{
           document.querySelectorAll(".chip").forEach(x=>x.classList.remove("active"));
           ch.classList.add("active");
           state.server = ch.getAttribute("data-sv") || "main";
           toast(state.server==="main" ? "Server: Drive" : "Server 2 (placeholder)");
-          // hiện tại vẫn dùng driveid => không đổi nguồn
         });
       });
 
