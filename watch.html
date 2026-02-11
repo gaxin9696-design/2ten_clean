@@ -8,18 +8,12 @@
     :root{
       --bg0:#0a0b10;
       --bg1:#0f1320;
-      --panel: rgba(255,255,255,.06);
-      --panel2: rgba(255,255,255,.04);
-      --stroke: rgba(255,255,255,.10);
-      --stroke2: rgba(255,255,255,.16);
       --text:#e9edf6;
-      --muted:#a6b0c3;
       --muted2:#7f8aa6;
       --accent:#f1c55a;
-      --accent2:#60a5fa;
       --shadow: 0 18px 60px rgba(0,0,0,.45);
       --shadow2: 0 10px 30px rgba(0,0,0,.35);
-      --r12:12px; --r16:16px; --r20:20px; --r24:24px;
+      --r20:20px; --r24:24px;
       --max: 1180px;
     }
     *{box-sizing:border-box}
@@ -33,8 +27,6 @@
         radial-gradient(900px 520px at 78% 12%, rgba(241,197,90,.12), transparent 58%),
         linear-gradient(180deg, var(--bg0), var(--bg1));
     }
-    a{color:inherit;text-decoration:none}
-
     .topbar{
       position:sticky; top:0; z-index:50;
       background: linear-gradient(180deg, rgba(10,11,16,.92), rgba(10,11,16,.75));
@@ -58,40 +50,8 @@
     }
     .brand .t1{font-weight:950; letter-spacing:.2px; line-height:1}
     .brand .t2{font-size:11px; color:var(--muted2); margin-top:2px}
-
-    .search{
-      flex: 1 1 auto;
-      display:flex; align-items:center; gap:10px;
-      padding:10px 12px;
-      border-radius: 999px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
-      min-width: 240px;
-      opacity:.8;
-    }
-    .search input{
-      width:100%;
-      border:none; outline:none;
-      background:transparent;
-      color:var(--text);
-      font-size:14px;
-    }
-    .menu{display:flex; align-items:center; gap:6px; flex: 0 0 auto;}
-    .mitem{
-      padding:10px 12px;
-      border-radius: 999px;
-      border:1px solid transparent;
-      color: rgba(233,237,246,.92);
-      font-weight:800;
-      font-size:13px;
-      opacity:.92;
-      cursor:pointer;
-      white-space:nowrap;
-      user-select:none;
-    }
-    .mitem:hover{border-color: rgba(255,255,255,.10); background: rgba(255,255,255,.03); opacity:1;}
     .member{
-      margin-left:6px;
+      margin-left:auto;
       display:inline-flex; align-items:center; gap:8px;
       padding:10px 12px;
       border-radius: 999px;
@@ -103,20 +63,9 @@
       user-select:none;
     }
     .member .dot{width:10px;height:10px;border-radius:999px;background: rgba(241,197,90,.9);box-shadow: 0 0 0 3px rgba(241,197,90,.14);}
-    @media (max-width: 980px){
-      .menu{display:none}
-      .brand{min-width:auto}
-    }
 
     .wrap{max-width:var(--max); margin:0 auto; padding:16px 18px 26px;}
-    @media (max-width:540px){ .wrap{padding:14px} }
-
-    .crumb{
-      display:flex; align-items:center; gap:10px;
-      margin:14px 0 12px;
-      color: rgba(233,237,246,.9);
-      font-weight:900;
-    }
+    .crumb{display:flex; align-items:center; gap:10px; margin:14px 0 12px; font-weight:900;}
     .back{
       width:40px;height:40px;border-radius:999px;
       display:flex;align-items:center;justify-content:center;
@@ -126,28 +75,7 @@
       user-select:none;
     }
     .back:hover{background: rgba(255,255,255,.10);}
-    .crumb .title{
-      font-size:18px;
-      letter-spacing:.2px;
-      line-height:1.15;
-    }
-    .crumb .sub{
-      margin-top:3px;
-      font-size:12px;
-      color: var(--muted2);
-      font-weight:800;
-    }
-
-    .layout{
-      display:grid;
-      grid-template-columns: 1.6fr .9fr;
-      gap:14px;
-      align-items:start;
-    }
-    @media (max-width: 980px){
-      .layout{grid-template-columns:1fr;}
-    }
-
+    .layout{display:grid; grid-template-columns: 1fr; gap:14px;}
     .card{
       border-radius: var(--r24);
       border:1px solid rgba(255,255,255,.10);
@@ -160,10 +88,6 @@
       border-bottom:1px solid rgba(255,255,255,.10);
       display:flex; align-items:center; justify-content:space-between; gap:10px;
     }
-    .player-head .left{
-      display:flex; align-items:center; gap:10px;
-      min-width: 0;
-    }
     .badge{
       display:inline-flex; align-items:center; justify-content:center;
       padding:6px 10px;
@@ -172,174 +96,26 @@
       background: rgba(241,197,90,.10);
       font-weight:950;
       font-size:12px;
-      color: rgba(233,237,246,.95);
       white-space:nowrap;
     }
-    .mini{
-      color: var(--muted2);
-      font-size:12px;
-      font-weight:800;
-      white-space:nowrap;
-    }
-    .actions{
-      display:flex; align-items:center; gap:10px;
-      flex:0 0 auto;
-    }
-    .iconbtn{
-      width:40px;height:40px;border-radius:999px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.06);
-      cursor:pointer;
-      display:flex;align-items:center;justify-content:center;
-      font-weight:950;
-      user-select:none;
-    }
-    .iconbtn:hover{background: rgba(255,255,255,.10);}
-
-    .framewrap{
-      background:#000;
-      aspect-ratio: 16/9;
-      width:100%;
-      position:relative;
-    }
-    iframe{
-      position:absolute; inset:0;
-      width:100%; height:100%;
-      border:0;
-      background:#000;
-    }
-
-    .below{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap:14px;
-      margin-top:14px;
-    }
-
-    .panel{
-      border-radius: var(--r20);
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.18);
-      box-shadow: var(--shadow2);
-      overflow:hidden;
-    }
-    .panel-head{
-      padding:12px 14px;
-      border-bottom:1px solid rgba(255,255,255,.10);
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-    }
-    .panel-head .h{
-      font-weight:980;
-      letter-spacing:.2px;
-    }
-    .panel-head .note{
-      color: var(--muted2);
-      font-weight:900;
-      font-size:12px;
-    }
-    .panel-body{padding:12px 14px;}
-
-    .serverbar{
-      display:flex; align-items:center; gap:10px; flex-wrap:wrap;
-      margin-bottom:10px;
-    }
-    .chip{
-      padding:8px 10px;
-      border-radius: 999px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.06);
-      font-weight:950;
-      font-size:12px;
-      cursor:pointer;
-      user-select:none;
-    }
-    .chip.active{
-      border-color: rgba(241,197,90,.35);
-      background: rgba(241,197,90,.10);
-    }
-
-    .eps{
-      display:grid;
-      grid-template-columns: repeat(8, minmax(0, 1fr));
-      gap:10px;
-    }
-    @media (max-width: 980px){ .eps{grid-template-columns: repeat(6, minmax(0, 1fr));} }
-    @media (max-width: 680px){ .eps{grid-template-columns: repeat(4, minmax(0, 1fr));} }
-
-    .epbtn{
-      padding:10px 0;
-      border-radius: 14px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.06);
-      text-align:center;
-      font-weight:950;
-      cursor:pointer;
-      user-select:none;
-    }
-    .epbtn:hover{background: rgba(255,255,255,.10);}
-    .epbtn.active{
-      border-color: rgba(241,197,90,.35);
-      background: rgba(241,197,90,.10);
-    }
-
-    .meta{
-      display:flex; gap:10px; flex-wrap:wrap;
-    }
-    .tag{
-      display:inline-flex; align-items:center; justify-content:center;
-      padding:6px 10px;
-      border-radius: 10px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.22);
-      font-weight:900;
-      font-size:12px;
-      color: rgba(233,237,246,.92);
-    }
-    .tag.imdb{border-color: rgba(241,197,90,.35); box-shadow: 0 0 0 3px rgba(241,197,90,.08) inset;}
-    .desc{
-      color: rgba(233,237,246,.84);
-      line-height:1.6;
-      font-size:13px;
-    }
-
-    .side .card{border-radius: var(--r20);}
-    .sidehead{
-      padding:14px 14px 0;
-      font-weight:980;
-      letter-spacing:.2px;
-      font-size:18px;
-    }
-    .sidelist{padding:12px 14px 14px; display:flex; flex-direction:column; gap:10px;}
-    .sitem{
-      border-radius: 16px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.18);
-      padding:12px;
-      cursor:pointer;
-    }
-    .sitem:hover{background: rgba(255,255,255,.06);}
-    .sitem .t{font-weight:950; margin-bottom:6px;}
-    .sitem .m{color: var(--muted2); font-weight:800; font-size:12px;}
-
+    .mini{color: var(--muted2); font-size:12px; font-weight:800; white-space:nowrap;}
+    .framewrap{background:#000; aspect-ratio: 16/9; width:100%; position:relative;}
+    iframe{position:absolute; inset:0; width:100%; height:100%; border:0; background:#000;}
     .toast{
-      position:fixed;
-      left:50%;
-      bottom:18px;
-      transform:translateX(-50%);
+      position:fixed; left:50%; bottom:18px; transform:translateX(-50%);
       background: rgba(10,11,16,.92);
       border:1px solid rgba(255,255,255,.12);
       border-radius: 999px;
       padding:10px 14px;
       box-shadow: var(--shadow2);
-      color: rgba(233,237,246,.92);
       font-weight:900;
       font-size:13px;
       display:none;
-      z-index:120;
       max-width:min(92vw, 760px);
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
+      z-index:120;
     }
     .toast.show{display:block;}
   </style>
@@ -356,18 +132,6 @@
         </div>
       </div>
 
-      <div class="search" title="(Trang watch không cần tìm kiếm)">
-        <div>🔎</div>
-        <input placeholder="Tìm kiếm phim, diễn viên..." disabled />
-      </div>
-
-      <div class="menu">
-        <div class="mitem">Thể loại ▾</div>
-        <div class="mitem">Phim Lẻ</div>
-        <div class="mitem">Phim Bộ</div>
-        <div class="mitem">Quốc gia ▾</div>
-      </div>
-
       <div class="member" id="memberBtn" title="Mở trang Admin">
         <span class="dot"></span>
         <span>Thành viên</span>
@@ -379,62 +143,19 @@
     <div class="crumb">
       <div class="back" id="backBtn" title="Quay lại">←</div>
       <div style="min-width:0">
-        <div class="title" id="pageTitle">Đang tải…</div>
-        <div class="sub" id="pageSub">—</div>
+        <div id="pageTitle">Đang tải…</div>
+        <div class="mini" id="pageSub">—</div>
       </div>
     </div>
 
     <div class="layout">
-      <div>
-        <div class="card">
-          <div class="player-head">
-            <div class="left" style="min-width:0">
-              <span class="badge" id="badgeEp">Tập 01</span>
-              <span class="mini" id="miniInfo">HD • 2026 • JP</span>
-            </div>
-            <div class="actions">
-              <div class="iconbtn" id="favBtn" title="Yêu thích">♡</div>
-              <div class="iconbtn" id="infoBtn" title="Thông tin">i</div>
-            </div>
-          </div>
-
-          <div class="framewrap">
-            <iframe id="frame" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-          </div>
+      <div class="card">
+        <div class="player-head">
+          <span class="badge" id="badge">Drive Player</span>
+          <span class="mini" id="mini">—</span>
         </div>
-
-        <div class="below">
-          <div class="panel">
-            <div class="panel-head">
-              <div class="h">Tập phim</div>
-              <div class="note">Chọn tập để phát</div>
-            </div>
-            <div class="panel-body">
-              <div class="serverbar">
-                <div class="chip active" data-sv="main">Server • Drive</div>
-                <div class="chip" data-sv="alt">Server 2 (placeholder)</div>
-              </div>
-              <div class="eps" id="eps"></div>
-            </div>
-          </div>
-
-          <div class="panel">
-            <div class="panel-head">
-              <div class="h">Nội dung</div>
-              <div class="note">Thông tin nhanh</div>
-            </div>
-            <div class="panel-body">
-              <div class="meta" id="metaTags"></div>
-              <div class="desc" id="desc">—</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="side">
-        <div class="card">
-          <div class="sidehead">Đề xuất</div>
-          <div class="sidelist" id="reco"></div>
+        <div class="framewrap">
+          <iframe id="frame" allow="autoplay; encrypted-media" allowfullscreen></iframe>
         </div>
       </div>
     </div>
@@ -444,28 +165,16 @@
 
   <script>
     const LS_CACHE = "movieapp_data_cache_v1";
-    const LS_FAV   = "phimapp_favs_v1";
 
     const el = {
       homeBtn: document.getElementById("homeBtn"),
       memberBtn: document.getElementById("memberBtn"),
       backBtn: document.getElementById("backBtn"),
-
       pageTitle: document.getElementById("pageTitle"),
       pageSub: document.getElementById("pageSub"),
-      badgeEp: document.getElementById("badgeEp"),
-      miniInfo: document.getElementById("miniInfo"),
-
-      favBtn: document.getElementById("favBtn"),
-      infoBtn: document.getElementById("infoBtn"),
-
+      badge: document.getElementById("badge"),
+      mini: document.getElementById("mini"),
       frame: document.getElementById("frame"),
-      eps: document.getElementById("eps"),
-
-      metaTags: document.getElementById("metaTags"),
-      desc: document.getElementById("desc"),
-
-      reco: document.getElementById("reco"),
       toast: document.getElementById("toast"),
     };
 
@@ -476,53 +185,16 @@
       toast._t = setTimeout(()=> el.toast.classList.remove("show"), 1400);
     }
 
-    function escapeHtml(s){
-      return String(s ?? "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#39;");
-    }
-
     function getParam(name){
       const u = new URL(location.href);
       return u.searchParams.get(name);
     }
 
-    // ✅ FIX: decode nhiều lớp + bắt fb l.php?u=... + nhiều dạng link Drive
     function extractDriveId(link){
-      let s = String(link || "").trim();
-      if(!s) return "";
-
-      for(let i=0;i<3;i++){
-        try{
-          const dec = decodeURIComponent(s);
-          if(dec === s) break;
-          s = dec;
-        }catch{ break; }
-      }
-
-      try{
-        const u = new URL(s);
-        const inner = u.searchParams.get("u") || u.searchParams.get("url") || "";
-        if(inner){
-          let t = inner;
-          for(let i=0;i<3;i++){
-            try{
-              const dec = decodeURIComponent(t);
-              if(dec === t) break;
-              t = dec;
-            }catch{ break; }
-          }
-          s = t;
-        }
-      }catch{}
-
+      const s = String(link || "");
       let m = s.match(/\/file\/d\/([a-zA-Z0-9_-]+)/); if(m) return m[1];
       m = s.match(/open\?id=([a-zA-Z0-9_-]+)/); if(m) return m[1];
       m = s.match(/[?&]id=([a-zA-Z0-9_-]+)/); if(m) return m[1];
-      m = s.match(/drive\.google\.com\/uc\?[^#]*\bid=([a-zA-Z0-9_-]+)/); if(m) return m[1];
       return "";
     }
 
@@ -545,210 +217,53 @@
       }catch{ return []; }
     }
 
-    function loadFavs(){
-      try{
-        const raw = localStorage.getItem(LS_FAV);
-        const arr = JSON.parse(raw || "[]");
-        return new Set(Array.isArray(arr) ? arr : []);
-      }catch{ return new Set(); }
-    }
-    function saveFavs(set){
-      localStorage.setItem(LS_FAV, JSON.stringify([...set]));
+    function findItemById(id){
+      const all = readCache();
+      if(!id) return null;
+      return all.find(x=>String(x.id)===String(id)) || null;
     }
 
-    const state = {
-      item: null,
-      favs: new Set(),
-      server: "main",
-      episodes: Array.from({length: 12}, (_,i)=>({ ep:i+1 })),
-      activeEp: 1,
-      all: [],
-    };
-
-    function setTitle(){
-      const it = state.item;
-      if(!it){
-        el.pageTitle.textContent = "Không tìm thấy phim";
-        el.pageSub.textContent = "Hãy mở từ trang chủ hoặc kiểm tra id/driveid.";
-        el.miniInfo.textContent = "—";
-        el.desc.textContent = "Không có dữ liệu để phát.";
-        return;
-      }
-      const year = it.year ? `(${it.year})` : "";
-      el.pageTitle.textContent = `Xem phim ${it.title || "—"} ${year}`.trim();
-      el.pageSub.textContent = it.kind ? `Loại: ${it.kind}` : "—";
-
-      const mini = [
-        it.quality || "HD",
-        it.year || "—",
-        it.country || "—",
-        it.genre || ""
-      ].filter(Boolean).join(" • ");
-      el.miniInfo.textContent = mini || "—";
-    }
-
-    function renderMeta(){
-      const it = state.item;
-      const tags = [];
-      if(it && it.imdb) tags.push(`<span class="tag imdb">IMDb ${escapeHtml(it.imdb)}</span>`);
-      if(it && it.quality) tags.push(`<span class="tag">${escapeHtml(it.quality)}</span>`);
-      if(it && it.genre) tags.push(`<span class="tag">${escapeHtml(it.genre)}</span>`);
-      if(it && it.country) tags.push(`<span class="tag">${escapeHtml(it.country)}</span>`);
-      if(it && it.kind) tags.push(`<span class="tag">${escapeHtml(it.kind)}</span>`);
-      el.metaTags.innerHTML = tags.join("");
-
-      const d = (it && (it.desc || it.description)) ? String(it.desc || it.description) :
-        "Trang watch chỉ cần sườn giao diện. Khi bạn thêm field mô tả (desc) trong DB, nội dung sẽ hiện ở đây.";
-      el.desc.textContent = d;
-    }
-
-    function renderFav(){
-      const it = state.item;
-      if(!it) { el.favBtn.textContent = "♡"; return; }
-      el.favBtn.textContent = state.favs.has(it.id) ? "♥" : "♡";
-      el.favBtn.title = state.favs.has(it.id) ? "Bỏ yêu thích" : "Yêu thích";
-    }
-
-    function renderEpisodes(){
-      el.badgeEp.textContent = `Tập ${String(state.activeEp).padStart(2,"0")}`;
-
-      el.eps.innerHTML = state.episodes.map(e=>{
-        const active = e.ep === state.activeEp;
-        return `<div class="epbtn ${active ? "active":""}" data-ep="${e.ep}">${String(e.ep).padStart(2,"0")}</div>`;
-      }).join("");
-
-      [...el.eps.querySelectorAll(".epbtn")].forEach(btn=>{
-        btn.addEventListener("click", ()=>{
-          const ep = Number(btn.getAttribute("data-ep") || "1");
-          state.activeEp = ep || 1;
-          renderEpisodes();
-          loadPlayer();
-        });
-      });
-    }
-
-    function renderReco(){
-      const list = (state.all || []).filter(x=> state.item && x.id !== state.item.id).slice(0, 6);
-      if(!list.length){
-        el.reco.innerHTML = `
-          <div class="sitem" style="cursor:default">
-            <div class="t">Chưa có đề xuất</div>
-            <div class="m">Hãy thêm nhiều phim hơn để hiện danh sách.</div>
-          </div>
-        `;
-        return;
-      }
-      el.reco.innerHTML = list.map(x=>`
-        <div class="sitem" data-id="${escapeHtml(x.id)}">
-          <div class="t">${escapeHtml(x.title || "—")}</div>
-          <div class="m">${escapeHtml([x.quality, x.year, x.country].filter(Boolean).join(" • "))}</div>
-        </div>
-      `).join("");
-
-      [...el.reco.querySelectorAll(".sitem")].forEach(it=>{
-        it.addEventListener("click", ()=>{
-          const id = it.getAttribute("data-id");
-          if(!id) return;
-          location.href = `watch.html?id=${encodeURIComponent(id)}`;
-        });
-      });
-    }
-
-    function pickDriveId(){
-      // ưu tiên: query driveid -> query url -> item.driveid -> item.url
-      const qDrive = getParam("driveid");
-      if(qDrive) return String(qDrive).trim();
-
-      const qUrl = getParam("url");
-      if(qUrl){
-        const id = extractDriveId(qUrl);
-        if(id) return id;
-      }
-
-      const it = state.item;
-      if(it && it.driveid) return String(it.driveid).trim();
-
-      if(it && it.url){
-        const id = extractDriveId(it.url);
+    function pickDriveId(item){
+      // ưu tiên: item.driveid -> parse từ item.url
+      if(item && item.driveid) return String(item.driveid).trim();
+      if(item && item.url){
+        const id = extractDriveId(item.url);
         if(id) return id;
       }
       return "";
     }
 
-    function loadPlayer(){
-      const driveId = pickDriveId();
+    function loadPlayer(driveId){
       if(!driveId){
         el.frame.src = "";
-        toast("Thiếu driveid: hãy mở từ trang chủ hoặc thêm driveid vào DB.");
+        toast("Thiếu driveid video. Hãy nhập Watch URL ở Admin.");
         return;
       }
       el.frame.src = toDrivePreview(driveId);
     }
 
-    function findItemById(id){
-      const all = readCache();
-      state.all = all;
-      if(!id) return null;
-      return all.find(x=>String(x.id)===String(id)) || null;
-    }
-
     function init(){
-      state.favs = loadFavs();
+      const movieId = getParam("id") || "";
+      const item = findItemById(movieId);
 
-      const id = getParam("id") || "";
-      state.item = findItemById(id);
-
-      if(!state.item){
-        const d = pickDriveId();
-        if(d){
-          state.item = {
-            id: id || ("drive_" + d),
-            title: "Video Google Drive",
-            kind: "movie",
-            year: "",
-            quality: "HD",
-            imdb: "",
-            country: "",
-            genre: "",
-            driveid: d
-          };
-        }
+      if(!item){
+        el.pageTitle.textContent = "Không tìm thấy phim";
+        el.pageSub.textContent = "Hãy mở từ trang chủ hoặc kiểm tra cache.";
+        el.mini.textContent = "—";
+        toast("Không tìm thấy item trong cache");
+        return;
       }
 
-      setTitle();
-      renderMeta();
-      renderFav();
-      renderEpisodes();
-      renderReco();
-      loadPlayer();
+      el.pageTitle.textContent = item.title ? `Xem phim: ${item.title}` : "Xem phim";
+      el.pageSub.textContent = [item.quality, item.year, item.country, item.genre].filter(Boolean).join(" • ") || "—";
+
+      const driveId = pickDriveId(item);
+      el.mini.textContent = driveId ? `driveid: ${driveId}` : "driveid: —";
+      loadPlayer(driveId);
 
       el.homeBtn.addEventListener("click", ()=> location.href = "index.html");
       el.memberBtn.addEventListener("click", ()=> location.href = "test.html");
       el.backBtn.addEventListener("click", ()=> history.length > 1 ? history.back() : (location.href="index.html"));
-
-      el.favBtn.addEventListener("click", ()=>{
-        if(!state.item) return;
-        if(state.favs.has(state.item.id)) state.favs.delete(state.item.id);
-        else state.favs.add(state.item.id);
-        saveFavs(state.favs);
-        renderFav();
-        toast(state.favs.has(state.item.id) ? "Đã thêm yêu thích" : "Đã bỏ yêu thích");
-      });
-
-      el.infoBtn.addEventListener("click", ()=>{
-        toast("Bạn có thể mở modal thông tin ở đây (nếu muốn).");
-      });
-
-      document.querySelectorAll(".chip").forEach(ch=>{
-        ch.addEventListener("click", ()=>{
-          document.querySelectorAll(".chip").forEach(x=>x.classList.remove("active"));
-          ch.classList.add("active");
-          state.server = ch.getAttribute("data-sv") || "main";
-          toast(state.server==="main" ? "Server: Drive" : "Server 2 (placeholder)");
-        });
-      });
-
-      toast("Loaded watch");
     }
 
     init();
