@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Admin Tool - Thêm phim + Xuất SQL</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root { color-scheme: dark; }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; background:#0b1220; color:#e8eefc; }
+    header { padding:16px 18px; border-bottom:1px solid rgba(255,255,255,.08); display:flex; align-items:center; gap:12px; }
+    header a { color:#9ec1ff; text-decoration:none; }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 16px; }
+    .grid { display:grid; gap:14px; grid-template-columns: 1fr; }
+    @media (min-width: 980px) { .grid { grid-template-columns: 420px 1fr; } }
+    .card { background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 14px; box-shadow: 0 10px 25px rgba(0,0,0,.25); }
+    h2 { margin: 0 0 10px; font-size: 16px; }
+    label { display:block; font-size: 12px; opacity:.9; margin: 10px 0 6px; }
+    input, textarea, select { width:100%; box-sizing:border-box; background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.10);
+      color:#e8eefc; border-radius: 10px; padding: 10px 10px; outline:none; }
+    textarea { min-height: 84px; resize: vertical; }
+    .row { display:flex; gap:10px; }
+    .row > * { flex:1; }
+    button { cursor:pointer; border:1px solid rgba(255,255,255,.10); background: rgba(158,193,255,.14);
+      color:#e8eefc; padding: 10px 12px; border-radius: 10px; font-weight: 600; }
+    button.secondary { background: rgba(255,255,255,.06); }
+    button:disabled { opacity:.5; cursor:not-allowed; }
+    .muted { opacity:.8; font-size: 12px; line-height: 1.4; }
+    pre { margin: 10px 0 0; background: rgba(0,0,0,.35); border:1px solid rgba(255,255,255,.10);
+      border-radius: 12px; padding: 12px; overflow:auto; font-size: 12px; }
+    .ok { color:#7CFFB2; }
+    .err { color:#ff8c8c; white-space:pre-wrap; }
+    .pill { display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius: 999px;
+      background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.10); font-size: 12px; }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="index.html">← Về trang chủ</a>
+    <span class="pill" id="statusPill">Chưa đăng nhập</span>
+    <span class="muted" style="margin-left:auto">Tool: Thêm phim → (1) Lưu Supabase (2) Xuất SQL</span>
+  </header>
+
+  <div class="wrap">
+    <div class="grid">
+      <div class="card">
+        <h2>Đăng nhập Supabase (bắt buộc để insert do RLS)</h2>
+        <label>Email</label>
+        <input id="email" type="email" placeholder="email" autocomplete="username" />
+        <label>Mật khẩu</label>
+        <input id="password" type="password" placeholder="password" autocomplete="current-password" />
+        <div class="row" style="margin-top:12px">
+          <button id="btnLogin">Đăng nhập</button>
+          <button class="secondary" id="btnLogout" disabled>Đăng xuất</button>
+        </div>
+        <div id="authMsg" class="muted" style="margin-top:10px"></div>
+        <hr style="border:0;border-top:1px solid rgba(255,255,255,.08);margin:14px 0" />
+        <h2>SQL Setup (tham khảo)</h2>
+        <div class="muted">Copy các block: tạo bảng + policy + index.</div>
+        <div style="display:flex; gap:10px; margin-top:10px">
+          <button class="secondary" id="copySetup">Copy SQL Setup</button>
+        </div>
+        <pre id="sqlSetup"></pre>
+      </div>
+
+      <div class="card">
+        <h2>Thêm phim</h2>
+
+        <div class="row">
+          <div>
+            <label>Title *</label>
+            <input id="title" placeholder="VD: One Piece" />
+          </div>
+          <div>
+            <label>Kind</label>
+            <select id="kind">
+              <option value="anime">anime</option>
+              <option value="movie">movie</option>
+              <option value="series">series</option>
+              <option value="suggest">suggest</option>
+              <option value="new">new</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Year</label>
+            <input id="year" placeholder="2026" />
+          </div>
+          <div>
+            <label>Quality</label>
+            <input id="quality" placeholder="FHD" value="FHD" />
+          </div>
+        </div>
+
+        <label>Description</label>
+        <textarea id="desc" placeholder="Mô tả..."></textarea>
+
+        <div class="row">
+          <div>
+            <label>Drive ID *</label>
+            <input id="driveid" placeholder="VD: 1AbC... (ID của file)" />
+          </div>
+          <div>
+            <label>Drive link</label>
+            <input id="drivelink" placeholder="https://drive.google.com/..." />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Poster URL</label>
+            <input id="posterurl" placeholder="https://..." />
+          </div>
+          <div>
+            <label>Hero URL</label>
+            <input id="herourl" placeholder="https://..." />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Genres (cách nhau bằng dấu phẩy)</label>
+            <input id="genres" placeholder="Action, Adventure, Comedy" />
+          </div>
+          <div>
+            <label>Country</label>
+            <input id="country" placeholder="JP / VN / US ..." />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>updatedat (epoch ms, để trống = tự set)</label>
+            <input id="updatedat" placeholder="VD: 1760000000000" />
+          </div>
+          <div style="display:flex; align-items:flex-end; gap:10px">
+            <button id="btnAdd" disabled>Thêm phim (Lưu + Xuất SQL)</button>
+            <button class="secondary" id="btnClear">Xoá form</button>
+          </div>
+        </div>
+
+        <div id="saveMsg" class="muted" style="margin-top:10px"></div>
+
+        <h2 style="margin-top:14px">SQL INSERT được tạo ra</h2>
+        <div class="muted">Sau khi bấm “Thêm phim”, tool sẽ tạo INSERT và đồng thời insert vào Supabase.</div>
+        <div style="display:flex; gap:10px; margin-top:10px">
+          <button class="secondary" id="copyInsert" disabled>Copy SQL INSERT</button>
+        </div>
+        <pre id="sqlInsert"></pre>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // ================== SUPABASE ==================
+  const SUPABASE_URL = "https://nzalaxolteaiafvuceqz.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56YWxheG9sdGVhaWFmdnVjZXF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyOTY2MjAsImV4cCI6MjA4NTg3MjYyMH0.0eIz6cfB4Dr_g5Wja70tZCMvVfUKoI5H4D8MJBP49Bg";
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // ================== SQL blocks (setup) ==================
+  const SQL_SETUP = `create table if not exists public.movies (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  kind text default 'anime',
+  year text,
+  quality text default 'FHD',
+  "desc" text,
+  driveid text not null unique,
+  drivelink text,
+  posterurl text,
+  herourl text,
+  updatedat bigint,
+  created_at timestamptz default now()
+);
+
+alter table public.movies enable row level security;
+
+drop policy if exists "public read movies" on public.movies;
+create policy "public read movies"
+on public.movies for select
+to anon, authenticated
+using (true);
+
+drop policy if exists "admin write movies" on public.movies;
+create policy "admin write movies"
+on public.movies for insert
+to authenticated
+with check (auth.uid() = 'e812c719-d30e-4498-8807-50e9480853ef');
+
+drop policy if exists "admin update movies" on public.movies;
+create policy "admin update movies"
+on public.movies for update
+to authenticated
+using (auth.uid() = 'e812c719-d30e-4498-8807-50e9480853ef')
+with check (auth.uid() = 'e812c719-d30e-4498-8807-50e9480853ef');
+
+drop policy if exists "admin delete movies" on public.movies;
+create policy "admin delete movies"
+on public.movies for delete
+to authenticated
+using (auth.uid() = 'e812c719-d30e-4498-8807-50e9480853ef');
+
+-- 1) Add columns (safe)
+alter table public.movies
+  add column if not exists genres text[] not null default '{}'::text[],
+  add column if not exists country text;
+
+-- 2) Optional: indexes for faster filter/search
+create index if not exists movies_kind_idx on public.movies (kind);
+create index if not exists movies_year_idx on public.movies (year);
+create index if not exists movies_country_idx on public.movies (country);
+
+-- 3) Optional: GIN index for array genres (fast "contains" queries)
+create index if not exists movies_genres_gin_idx on public.movies using gin (genres);`;
+
+  const $ = (id) => document.getElementById(id);
+
+  function setPill(text, ok=false) {
+    const p = $("statusPill");
+    p.textContent = text;
+    p.style.borderColor = ok ? "rgba(124,255,178,.45)" : "rgba(255,255,255,.10)";
+    p.style.background = ok ? "rgba(124,255,178,.12)" : "rgba(255,255,255,.06)";
+  }
+
+  function escSqlString(s) {
+    return String(s).replace(/'/g, "''");
+  }
+
+  function toSqlValue(v) {
+    if (v === null || v === undefined || v === "") return "NULL";
+    return "'" + escSqlString(v) + "'";
+  }
+
+  function toSqlTextArray(arr) {
+    if (!arr || !arr.length) return "'{}'::text[]";
+    const items = arr.map(x => "'" + escSqlString(x) + "'");
+    return "ARRAY[" + items.join(", ") + "]::text[]";
+  }
+
+  function nowMs() { return Date.now(); }
+
+  function parseGenres(raw) {
+    return (raw || "").split(",").map(s => s.trim()).filter(Boolean);
+  }
+
+  function buildMovieFromForm() {
+    const title = $("title").value.trim();
+    const kind = $("kind").value.trim() || "anime";
+    const year = $("year").value.trim();
+    const quality = $("quality").value.trim() || "FHD";
+    const desc = $("desc").value.trim();
+    const driveid = $("driveid").value.trim();
+    const drivelink = $("drivelink").value.trim();
+    const posterurl = $("posterurl").value.trim();
+    const herourl = $("herourl").value.trim();
+    const genres = parseGenres($("genres").value);
+    const country = $("country").value.trim();
+    const updatedatRaw = $("updatedat").value.trim();
+    const updatedat = updatedatRaw ? Number(updatedatRaw) : nowMs();
+
+    if (!title) throw new Error("Thiếu title.");
+    if (!driveid) throw new Error("Thiếu driveid.");
+
+    return {
+      title,
+      kind,
+      year: year || null,
+      quality,
+      desc: desc || null,
+      driveid,
+      drivelink: drivelink || null,
+      posterurl: posterurl || null,
+      herourl: herourl || null,
+      updatedat: Number.isFinite(updatedat) ? updatedat : nowMs(),
+      genres,
+      country: country || null
+    };
+  }
+
+  function makeInsertSql(m) {
+    const cols = ["title","kind","year","quality","desc","driveid","drivelink","posterurl","herourl","updatedat","genres","country"];
+    const vals = [
+      toSqlValue(m.title),
+      toSqlValue(m.kind),
+      m.year ? toSqlValue(m.year) : "NULL",
+      toSqlValue(m.quality),
+      m.desc ? toSqlValue(m.desc) : "NULL",
+      toSqlValue(m.driveid),
+      m.drivelink ? toSqlValue(m.drivelink) : "NULL",
+      m.posterurl ? toSqlValue(m.posterurl) : "NULL",
+      m.herourl ? toSqlValue(m.herourl) : "NULL",
+      String(m.updatedat),
+      toSqlTextArray(m.genres),
+      m.country ? toSqlValue(m.country) : "NULL"
+    ];
+    return "insert into public.movies (" + cols.join(", ") + ")\nvalues (" + vals.join(", ") + ");";
+  }
+
+  async function refreshAuthUI() {
+    const { data } = await sb.auth.getSession();
+    const session = data?.session;
+    if (session?.user) {
+      setPill("Đã đăng nhập: " + session.user.email, true);
+      $("btnLogin").disabled = true;
+      $("btnLogout").disabled = false;
+      $("btnAdd").disabled = false;
+      $("authMsg").innerHTML = '<span class="ok">OK</span> - Có thể thêm phim.';
+    } else {
+      setPill("Chưa đăng nhập");
+      $("btnLogin").disabled = false;
+      $("btnLogout").disabled = true;
+      $("btnAdd").disabled = true;
+      $("authMsg").textContent = "Hãy đăng nhập để insert (policy chỉ cho authenticated).";
+    }
+  }
+
+  async function login() {
+    $("authMsg").textContent = "Đang đăng nhập...";
+    const email = $("email").value.trim();
+    const password = $("password").value;
+    const { error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) {
+      $("authMsg").innerHTML = '<span class="err">' + error.message + '</span>';
+      return;
+    }
+    $("authMsg").innerHTML = '<span class="ok">Đăng nhập thành công.</span>';
+    await refreshAuthUI();
+  }
+
+  async function logout() {
+    await sb.auth.signOut();
+    await refreshAuthUI();
+  }
+
+  function copyText(t) {
+    return navigator.clipboard.writeText(t);
+  }
+
+  async function addMovie() {
+    $("saveMsg").textContent = "";
+    $("sqlInsert").textContent = "";
+    $("copyInsert").disabled = true;
+
+    let movie;
+    try {
+      movie = buildMovieFromForm();
+    } catch (e) {
+      $("saveMsg").innerHTML = '<span class="err">' + e.message + '</span>';
+      return;
+    }
+
+    // 1) Generate SQL
+    const sql = makeInsertSql(movie);
+    $("sqlInsert").textContent = sql;
+    $("copyInsert").disabled = false;
+
+    // 2) Save to Supabase
+    $("btnAdd").disabled = true;
+    $("saveMsg").textContent = "Đang lưu Supabase...";
+
+    const dbRow = {
+      title: movie.title,
+      kind: movie.kind,
+      year: movie.year,
+      quality: movie.quality,
+      desc: movie.desc,
+      driveid: movie.driveid,
+      drivelink: movie.drivelink,
+      posterurl: movie.posterurl,
+      herourl: movie.herourl,
+      updatedat: movie.updatedat,
+      genres: movie.genres,
+      country: movie.country
+    };
+
+    const { data, error } = await sb.from("movies").insert(dbRow).select("id, title, driveid").maybeSingle();
+    if (error) {
+      $("saveMsg").innerHTML =
+        '<div class="err">Lưu Supabase thất bại:\n' + error.message +
+        (error.details ? ("\n" + error.details) : "") +
+        (error.hint ? ("\nHint: " + error.hint) : "") + '</div>';
+      $("btnAdd").disabled = false;
+      return;
+    }
+
+    $("saveMsg").innerHTML = '<span class="ok">Đã lưu Supabase.</span> id=' + (data?.id || "(n/a)");
+    $("btnAdd").disabled = false;
+  }
+
+  function clearForm() {
+    ["title","year","desc","driveid","drivelink","posterurl","herourl","genres","country","updatedat"].forEach(id => $(id).value = "");
+    $("quality").value = "FHD";
+    $("kind").value = "anime";
+    $("saveMsg").textContent = "";
+    $("sqlInsert").textContent = "";
+    $("copyInsert").disabled = true;
+  }
+
+  $("sqlSetup").textContent = SQL_SETUP;
+  $("btnLogin").addEventListener("click", login);
+  $("btnLogout").addEventListener("click", logout);
+  $("btnAdd").addEventListener("click", addMovie);
+  $("btnClear").addEventListener("click", clearForm);
+
+  $("copySetup").addEventListener("click", async () => {
+    await copyText(SQL_SETUP);
+    $("authMsg").innerHTML = '<span class="ok">Đã copy SQL Setup.</span>';
+    setTimeout(() => refreshAuthUI(), 900);
+  });
+
+  $("copyInsert").addEventListener("click", async () => {
+    const t = $("sqlInsert").textContent || "";
+    if (!t.trim()) return;
+    await copyText(t);
+    $("saveMsg").innerHTML = '<span class="ok">Đã copy SQL INSERT.</span>';
+  });
+
+  sb.auth.onAuthStateChange(() => refreshAuthUI());
+  refreshAuthUI();
+</script>
+</body>
+</html>
