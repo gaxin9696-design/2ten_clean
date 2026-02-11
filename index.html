@@ -552,7 +552,6 @@
     }
 
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
@@ -683,13 +682,7 @@
     const STORAGE_KEY = "khoii_drive_movies_v1";
     const LEGACY_KEY  = "my_drive_movies_v2";
 
-    
-
-    // ===== Supabase (Public read) =====
-    const SUPABASE_URL = "https://nzalaxolteaiafvuceqz.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56YWxheG9sdGVhaWFmdnVjZXF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyOTY2MjAsImV4cCI6MjA4NTg3MjYyMH0.0eIz6cfB4Dr_g5Wja70tZCMvVfUKoI5H4D8MJBP49Bg";
-    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-function svgPlaceholder(title="Khoii", w=1200, h=700){
+    function svgPlaceholder(title="Khoii", w=1200, h=700){
       const safe = String(title).replace(/[<>&"]/g, "");
       const svg =
 `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
@@ -738,33 +731,15 @@ function svgPlaceholder(title="Khoii", w=1200, h=700){
 
     function safeText(s){ return String(s ?? ""); }
 
-    async function loadMovies(){
-  // Đọc danh sách phim "chung" từ Supabase (ai cũng xem được)
-  const { data, error } = await sb
-    .from("movies")
-    .select("*")
-    .order("created_at", { ascending: false });
-
-  if(error){
-    console.error(error);
-    return [];
-  }
-
-  return (data || []).map(m => ({
-    id: m.id,
-    title: m.title,
-    kind: m.kind || "anime",
-    year: m.year || "",
-    quality: m.quality || "FHD",
-    desc: m.desc || "",
-    driveId: m.driveid,
-    driveLink: m.drivelink || m.driveid,
-    posterUrl: m.posterurl || "",
-    heroUrl: m.herourl || "",
-    updatedAt: m.updatedat || Date.now(),
-  }));
-}
-
+    function loadMovies(){
+      try{
+        let raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw){
+          const old = localStorage.getItem(LEGACY_KEY);
+          if(old){
+            localStorage.setItem(STORAGE_KEY, old);
+            raw = old;
+          }
         }
         const arr = raw ? JSON.parse(raw) : [];
         return Array.isArray(arr) ? arr : [];
@@ -996,7 +971,7 @@ function svgPlaceholder(title="Khoii", w=1200, h=700){
     }
 
     function loadItems(){
-      const saved = await loadMovies();
+      const saved = loadMovies();
       items = (saved.length ? saved : fallback).map(toIndexItem);
       return items;
     }
@@ -1112,7 +1087,7 @@ function svgPlaceholder(title="Khoii", w=1200, h=700){
 
     window.addEventListener("storage", (e) => {
       if(e.key === STORAGE_KEY) refreshHome();
-
+    });
     document.addEventListener("visibilitychange", () => {
       if(!document.hidden) refreshHome();
     });
