@@ -27,6 +27,8 @@
         radial-gradient(900px 520px at 78% 12%, rgba(241,197,90,.12), transparent 58%),
         linear-gradient(180deg, var(--bg0), var(--bg1));
     }
+    a{color:inherit;text-decoration:none}
+
     .topbar{
       position:sticky; top:0; z-index:50;
       background: linear-gradient(180deg, rgba(10,11,16,.92), rgba(10,11,16,.75));
@@ -50,8 +52,38 @@
     }
     .brand .t1{font-weight:950; letter-spacing:.2px; line-height:1}
     .brand .t2{font-size:11px; color:var(--muted2); margin-top:2px}
+    .search{
+      flex: 1 1 auto;
+      display:flex; align-items:center; gap:10px;
+      padding:10px 12px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      min-width: 240px;
+      opacity:.8;
+    }
+    .search input{
+      width:100%;
+      border:none; outline:none;
+      background:transparent;
+      color:var(--text);
+      font-size:14px;
+    }
+    .menu{display:flex; align-items:center; gap:6px; flex: 0 0 auto;}
+    .mitem{
+      padding:10px 12px;
+      border-radius: 999px;
+      border:1px solid transparent;
+      color: rgba(233,237,246,.92);
+      font-weight:800;
+      font-size:13px;
+      opacity:.92;
+      cursor:pointer;
+      white-space:nowrap;
+      user-select:none;
+    }
     .member{
-      margin-left:auto;
+      margin-left:6px;
       display:inline-flex; align-items:center; gap:8px;
       padding:10px 12px;
       border-radius: 999px;
@@ -63,9 +95,20 @@
       user-select:none;
     }
     .member .dot{width:10px;height:10px;border-radius:999px;background: rgba(241,197,90,.9);box-shadow: 0 0 0 3px rgba(241,197,90,.14);}
+    @media (max-width: 980px){
+      .menu{display:none}
+      .brand{min-width:auto}
+    }
 
     .wrap{max-width:var(--max); margin:0 auto; padding:16px 18px 26px;}
-    .crumb{display:flex; align-items:center; gap:10px; margin:14px 0 12px; font-weight:900;}
+    @media (max-width:540px){ .wrap{padding:14px} }
+
+    .crumb{
+      display:flex; align-items:center; gap:10px;
+      margin:14px 0 12px;
+      color: rgba(233,237,246,.9);
+      font-weight:900;
+    }
     .back{
       width:40px;height:40px;border-radius:999px;
       display:flex;align-items:center;justify-content:center;
@@ -75,7 +118,19 @@
       user-select:none;
     }
     .back:hover{background: rgba(255,255,255,.10);}
-    .layout{display:grid; grid-template-columns: 1fr; gap:14px;}
+    .crumb .title{font-size:18px; letter-spacing:.2px; line-height:1.15;}
+    .crumb .sub{margin-top:3px;font-size:12px;color: var(--muted2);font-weight:800;}
+
+    .layout{
+      display:grid;
+      grid-template-columns: 1.6fr .9fr;
+      gap:14px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .layout{grid-template-columns:1fr;}
+    }
+
     .card{
       border-radius: var(--r24);
       border:1px solid rgba(255,255,255,.10);
@@ -96,26 +151,99 @@
       background: rgba(241,197,90,.10);
       font-weight:950;
       font-size:12px;
+      color: rgba(233,237,246,.95);
       white-space:nowrap;
     }
     .mini{color: var(--muted2); font-size:12px; font-weight:800; white-space:nowrap;}
-    .framewrap{background:#000; aspect-ratio: 16/9; width:100%; position:relative;}
-    iframe{position:absolute; inset:0; width:100%; height:100%; border:0; background:#000;}
+    .actions{display:flex; align-items:center; gap:10px;}
+    .iconbtn{
+      width:40px;height:40px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      font-weight:950;
+      user-select:none;
+    }
+    .iconbtn:hover{background: rgba(255,255,255,.10);}
+
+    .framewrap{
+      background:#000;
+      aspect-ratio: 16/9;
+      width:100%;
+      position:relative;
+    }
+    iframe{
+      position:absolute; inset:0;
+      width:100%; height:100%;
+      border:0;
+      background:#000;
+    }
+
+    .panel{
+      border-radius: var(--r20);
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      box-shadow: var(--shadow2);
+      overflow:hidden;
+      margin-top:14px;
+    }
+    .panel-head{
+      padding:12px 14px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+    }
+    .panel-head .h{font-weight:980; letter-spacing:.2px;}
+    .panel-head .note{color: var(--muted2); font-weight:900; font-size:12px;}
+    .panel-body{padding:12px 14px;}
+
+    .meta{display:flex; gap:10px; flex-wrap:wrap;}
+    .tag{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:6px 10px;
+      border-radius: 10px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      font-weight:900;
+      font-size:12px;
+      color: rgba(233,237,246,.92);
+    }
+    .tag.imdb{border-color: rgba(241,197,90,.35); box-shadow: 0 0 0 3px rgba(241,197,90,.08) inset;}
+    .desc{color: rgba(233,237,246,.84); line-height:1.6; font-size:13px;}
+
+    .side .card{border-radius: var(--r20);}
+    .sidehead{padding:14px 14px 0; font-weight:980; letter-spacing:.2px; font-size:18px;}
+    .sidelist{padding:12px 14px 14px; display:flex; flex-direction:column; gap:10px;}
+    .sitem{
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      padding:12px;
+      cursor:pointer;
+    }
+    .sitem:hover{background: rgba(255,255,255,.06);}
+    .sitem .t{font-weight:950; margin-bottom:6px;}
+    .sitem .m{color: var(--muted2); font-weight:800; font-size:12px;}
+
     .toast{
-      position:fixed; left:50%; bottom:18px; transform:translateX(-50%);
+      position:fixed;
+      left:50%;
+      bottom:18px;
+      transform:translateX(-50%);
       background: rgba(10,11,16,.92);
       border:1px solid rgba(255,255,255,.12);
       border-radius: 999px;
       padding:10px 14px;
       box-shadow: var(--shadow2);
+      color: rgba(233,237,246,.92);
       font-weight:900;
       font-size:13px;
       display:none;
+      z-index:120;
       max-width:min(92vw, 760px);
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
-      z-index:120;
     }
     .toast.show{display:block;}
   </style>
@@ -132,6 +260,18 @@
         </div>
       </div>
 
+      <div class="search" title="(Trang watch không cần tìm kiếm)">
+        <div>🔎</div>
+        <input placeholder="Tìm kiếm phim, diễn viên..." disabled />
+      </div>
+
+      <div class="menu">
+        <div class="mitem">Thể loại ▾</div>
+        <div class="mitem">Phim Lẻ</div>
+        <div class="mitem">Phim Bộ</div>
+        <div class="mitem">Quốc gia ▾</div>
+      </div>
+
       <div class="member" id="memberBtn" title="Mở trang Admin">
         <span class="dot"></span>
         <span>Thành viên</span>
@@ -143,19 +283,46 @@
     <div class="crumb">
       <div class="back" id="backBtn" title="Quay lại">←</div>
       <div style="min-width:0">
-        <div id="pageTitle">Đang tải…</div>
-        <div class="mini" id="pageSub">—</div>
+        <div class="title" id="pageTitle">Đang tải…</div>
+        <div class="sub" id="pageSub">—</div>
       </div>
     </div>
 
     <div class="layout">
-      <div class="card">
-        <div class="player-head">
-          <span class="badge" id="badge">Drive Player</span>
-          <span class="mini" id="mini">—</span>
+      <div>
+        <div class="card">
+          <div class="player-head">
+            <div class="left" style="min-width:0;display:flex;gap:10px;align-items:center">
+              <span class="badge" id="badgeEp">Tập 01</span>
+              <span class="mini" id="miniInfo">—</span>
+            </div>
+            <div class="actions">
+              <div class="iconbtn" id="favBtn" title="Yêu thích">♡</div>
+              <div class="iconbtn" id="infoBtn" title="Thông tin">i</div>
+            </div>
+          </div>
+
+          <div class="framewrap">
+            <iframe id="frame" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+          </div>
         </div>
-        <div class="framewrap">
-          <iframe id="frame" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div class="h">Nội dung</div>
+            <div class="note">Thông tin nhanh</div>
+          </div>
+          <div class="panel-body">
+            <div class="meta" id="metaTags"></div>
+            <div class="desc" id="desc">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="side">
+        <div class="card">
+          <div class="sidehead">Đề xuất</div>
+          <div class="sidelist" id="reco"></div>
         </div>
       </div>
     </div>
@@ -165,16 +332,26 @@
 
   <script>
     const LS_CACHE = "movieapp_data_cache_v1";
+    const LS_FAV   = "phimapp_favs_v1";
 
     const el = {
       homeBtn: document.getElementById("homeBtn"),
       memberBtn: document.getElementById("memberBtn"),
       backBtn: document.getElementById("backBtn"),
+
       pageTitle: document.getElementById("pageTitle"),
       pageSub: document.getElementById("pageSub"),
-      badge: document.getElementById("badge"),
-      mini: document.getElementById("mini"),
+      badgeEp: document.getElementById("badgeEp"),
+      miniInfo: document.getElementById("miniInfo"),
+
+      favBtn: document.getElementById("favBtn"),
+      infoBtn: document.getElementById("infoBtn"),
+
       frame: document.getElementById("frame"),
+      metaTags: document.getElementById("metaTags"),
+      desc: document.getElementById("desc"),
+
+      reco: document.getElementById("reco"),
       toast: document.getElementById("toast"),
     };
 
@@ -185,16 +362,50 @@
       toast._t = setTimeout(()=> el.toast.classList.remove("show"), 1400);
     }
 
+    function escapeHtml(s){
+      return String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#39;");
+    }
+
     function getParam(name){
       const u = new URL(location.href);
       return u.searchParams.get(name);
     }
 
+    function tryDecodeUrlOnce(s){
+      try { return decodeURIComponent(s); } catch { return s; }
+    }
+
     function extractDriveId(link){
-      const s = String(link || "");
-      let m = s.match(/\/file\/d\/([a-zA-Z0-9_-]+)/); if(m) return m[1];
-      m = s.match(/open\?id=([a-zA-Z0-9_-]+)/); if(m) return m[1];
-      m = s.match(/[?&]id=([a-zA-Z0-9_-]+)/); if(m) return m[1];
+      let s = String(link || "").trim();
+      if(!s) return "";
+
+      if(s.includes("l.facebook.com/l.php?")){
+        try{
+          const u = new URL(s);
+          const enc = u.searchParams.get("u");
+          if(enc) s = tryDecodeUrlOnce(enc);
+        }catch{}
+      }
+
+      try{
+        const u = new URL(s);
+        const maybe = u.searchParams.get("url") || u.searchParams.get("href") || u.searchParams.get("u");
+        if(maybe && maybe.includes("drive.google.com")){
+          s = tryDecodeUrlOnce(maybe);
+        }
+      }catch{}
+
+      let m = s.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+      if(m) return m[1];
+      m = s.match(/open\?id=([a-zA-Z0-9_-]+)/);
+      if(m) return m[1];
+      m = s.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+      if(m) return m[1];
       return "";
     }
 
@@ -217,53 +428,188 @@
       }catch{ return []; }
     }
 
-    function findItemById(id){
+    function loadFavs(){
+      try{
+        const raw = localStorage.getItem(LS_FAV);
+        const arr = JSON.parse(raw || "[]");
+        return new Set(Array.isArray(arr) ? arr : []);
+      }catch{ return new Set(); }
+    }
+    function saveFavs(set){
+      localStorage.setItem(LS_FAV, JSON.stringify([...set]));
+    }
+
+    const state = {
+      item: null,
+      all: [],
+      favs: new Set(),
+      activeEp: 1,
+    };
+
+    function setTitle(){
+      const it = state.item;
+      if(!it){
+        el.pageTitle.textContent = "Không tìm thấy phim";
+        el.pageSub.textContent = "Hãy mở từ trang chủ hoặc kiểm tra ?id= (row id).";
+        el.miniInfo.textContent = "—";
+        el.desc.textContent = "Không có dữ liệu để phát.";
+        return;
+      }
+      const year = it.year ? `(${it.year})` : "";
+      el.pageTitle.textContent = `Xem phim ${it.title || "—"} ${year}`.trim();
+      el.pageSub.textContent = it.kind ? `Loại: ${it.kind}` : "—";
+
+      const mini = [it.quality || "FHD", it.year || "—", it.country || "—", it.genre || ""]
+        .filter(Boolean).join(" • ");
+      el.miniInfo.textContent = mini || "—";
+    }
+
+    function renderMeta(){
+      const it = state.item;
+      const tags = [];
+      if(it && it.imdb) tags.push(`<span class="tag imdb">IMDb ${escapeHtml(it.imdb)}</span>`);
+      if(it && it.quality) tags.push(`<span class="tag">${escapeHtml(it.quality)}</span>`);
+      if(it && it.genre) tags.push(`<span class="tag">${escapeHtml(it.genre)}</span>`);
+      if(it && it.country) tags.push(`<span class="tag">${escapeHtml(it.country)}</span>`);
+      if(it && it.kind) tags.push(`<span class="tag">${escapeHtml(it.kind)}</span>`);
+      el.metaTags.innerHTML = tags.join("");
+
+      const d = (it && it.desc) ? String(it.desc) : "Chưa có mô tả (desc).";
+      el.desc.textContent = d;
+    }
+
+    function renderFav(){
+      const it = state.item;
+      if(!it) { el.favBtn.textContent = "♡"; return; }
+      el.favBtn.textContent = state.favs.has(it.id) ? "♥" : "♡";
+      el.favBtn.title = state.favs.has(it.id) ? "Bỏ yêu thích" : "Yêu thích";
+    }
+
+    function findItemByRowId(id){
       const all = readCache();
+      state.all = all;
       if(!id) return null;
       return all.find(x=>String(x.id)===String(id)) || null;
     }
 
-    function pickDriveId(item){
-      // ưu tiên: item.driveid -> parse từ item.url
-      if(item && item.driveid) return String(item.driveid).trim();
-      if(item && item.url){
-        const id = extractDriveId(item.url);
+    function pickDriveId(){
+      // ✅ ưu tiên query driveid (override)
+      const qDrive = getParam("driveid");
+      if(qDrive) return String(qDrive).trim();
+
+      // ✅ nếu có drivelink/url truyền thẳng
+      const qUrl = getParam("url");
+      if(qUrl){
+        const id = extractDriveId(qUrl);
+        if(id) return id;
+      }
+
+      const it = state.item;
+      if(it && it.driveid) return String(it.driveid).trim();
+
+      if(it && it.drivelink){
+        const id = extractDriveId(it.drivelink);
+        if(id) return id;
+      }
+
+      if(it && it.url){
+        const id = extractDriveId(it.url);
         if(id) return id;
       }
       return "";
     }
 
-    function loadPlayer(driveId){
+    function loadPlayer(){
+      const driveId = pickDriveId();
       if(!driveId){
         el.frame.src = "";
-        toast("Thiếu driveid video. Hãy nhập Watch URL ở Admin.");
+        toast("❌ Thiếu driveid: hãy nhập drivelink/driveid ở Admin.");
         return;
       }
       el.frame.src = toDrivePreview(driveId);
     }
 
-    function init(){
-      const movieId = getParam("id") || "";
-      const item = findItemById(movieId);
-
-      if(!item){
-        el.pageTitle.textContent = "Không tìm thấy phim";
-        el.pageSub.textContent = "Hãy mở từ trang chủ hoặc kiểm tra cache.";
-        el.mini.textContent = "—";
-        toast("Không tìm thấy item trong cache");
+    function renderReco(){
+      const list = (state.all || []).filter(x=> state.item && x.id !== state.item.id).slice(0, 6);
+      if(!list.length){
+        el.reco.innerHTML = `
+          <div class="sitem" style="cursor:default">
+            <div class="t">Chưa có đề xuất</div>
+            <div class="m">Hãy thêm nhiều phim hơn để hiện danh sách.</div>
+          </div>
+        `;
         return;
       }
+      el.reco.innerHTML = list.map(x=>`
+        <div class="sitem" data-id="${escapeHtml(x.id)}">
+          <div class="t">${escapeHtml(x.title || "—")}</div>
+          <div class="m">${escapeHtml([x.quality, x.year, x.country].filter(Boolean).join(" • "))}</div>
+        </div>
+      `).join("");
 
-      el.pageTitle.textContent = item.title ? `Xem phim: ${item.title}` : "Xem phim";
-      el.pageSub.textContent = [item.quality, item.year, item.country, item.genre].filter(Boolean).join(" • ") || "—";
+      [...el.reco.querySelectorAll(".sitem")].forEach(it=>{
+        it.addEventListener("click", ()=>{
+          const id = it.getAttribute("data-id");
+          if(!id) return;
+          location.href = `watch.html?id=${encodeURIComponent(id)}`;
+        });
+      });
+    }
 
-      const driveId = pickDriveId(item);
-      el.mini.textContent = driveId ? `driveid: ${driveId}` : "driveid: —";
-      loadPlayer(driveId);
+    function init(){
+      state.favs = loadFavs();
+
+      // ✅ row id
+      const rowId = getParam("id") || "";
+      state.item = findItemByRowId(rowId);
+
+      // fallback: nếu không có item nhưng có driveid/url => vẫn xem được
+      if(!state.item){
+        const d = pickDriveId();
+        if(d){
+          state.item = {
+            id: rowId || ("drive_" + d),
+            title: "Video Google Drive",
+            kind: "movie",
+            year: "",
+            quality: "FHD",
+            imdb: "",
+            country: "",
+            genre: "",
+            desc: "",
+            driveid: d,
+            drivelink: "",
+          };
+        }
+      }
+
+      el.badgeEp.textContent = `Tập ${String(state.activeEp).padStart(2,"0")}`;
+      setTitle();
+      renderMeta();
+      renderFav();
+      renderReco();
+      loadPlayer();
 
       el.homeBtn.addEventListener("click", ()=> location.href = "index.html");
       el.memberBtn.addEventListener("click", ()=> location.href = "test.html");
       el.backBtn.addEventListener("click", ()=> history.length > 1 ? history.back() : (location.href="index.html"));
+
+      el.favBtn.addEventListener("click", ()=>{
+        if(!state.item) return;
+        if(state.favs.has(state.item.id)) state.favs.delete(state.item.id);
+        else state.favs.add(state.item.id);
+        saveFavs(state.favs);
+        renderFav();
+        toast(state.favs.has(state.item.id) ? "Đã thêm yêu thích" : "Đã bỏ yêu thích");
+      });
+
+      el.infoBtn.addEventListener("click", ()=>{
+        const it = state.item;
+        if(!it){ toast("—"); return; }
+        toast(`RowID: ${it.id} • DriveID: ${pickDriveId() || "—"}`);
+      });
+
+      toast("Loaded watch");
     }
 
     init();
