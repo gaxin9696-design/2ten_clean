@@ -211,7 +211,35 @@
     function ok(msg){ return `✅ <span class="ok">${escapeHtml(msg)}</span>`; }
     function err(msg){ return `❌ <span class="err">${escapeHtml(msg)}</span>`; }
 
+    // ✅ FIX: tách drive file id từ link Google Drive
+    function extractDriveId(link){
+      const s = String(link || "");
+
+      // dạng: https://drive.google.com/file/d/<ID>/view
+      let m = s.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+      if(m) return m[1];
+
+      // dạng: https://drive.google.com/open?id=<ID>
+      m = s.match(/open\?id=([a-zA-Z0-9_-]+)/);
+      if(m) return m[1];
+
+      // dạng: ...?id=<ID>
+      m = s.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+      if(m) return m[1];
+
+      return "";
+    }
+
+    // ✅ FIX: thêm driveid vào item để không bị NOT NULL
     function normalizeItem(x){
+      const poster = safeText(x.poster ?? x.thumb ?? x.image ?? "");
+      const url    = safeText(x.url ?? x.link ?? x.watch ?? "");
+
+      // ưu tiên lấy driveid từ poster, nếu không có thì lấy từ url
+      const driveid = safeText(
+        x.driveid ?? x.drive_id ?? extractDriveId(poster) ?? extractDriveId(url)
+      );
+
       return {
         id: safeText(x.id ?? x.slug ?? crypto.randomUUID()),
         title: safeText(x.title ?? x.name ?? "Untitled"),
@@ -221,20 +249,13 @@
         imdb: safeText(x.imdb ?? x.rating ?? ""),
         country: safeText(x.country ?? x.nation ?? ""),
         genre: safeText(x.genre ?? x.categories ?? ""),
-        poster: safeText(x.poster ?? x.thumb ?? x.image ?? ""),
-        url: safeText(x.url ?? x.link ?? x.watch ?? ""),
+        poster,
+        url,
+        driveid, // ✅ bắt buộc (table đang NOT NULL)
       };
     }
 
     let supabaseClient = null;
-
-    async function ensureAdminLogin(){
-      if(!supabaseClient){ setLog(el.log2, err("Chưa init Supabase.")); return false; }
-      const { data: { session } } = await supabaseClient.auth.getSession();
-      if(session) return true;
-      setLog(el.log2, err("Chưa đăng nhập Supabase Auth (nếu table bật RLS)."));
-      return false;
-    }
 
     function getFormItem(){
       const raw = el.raw.value.trim();
@@ -320,12 +341,11 @@
         if(!supabaseClient){ setLog(el.log2, err("Chưa init Supabase.")); return; }
         const table = el.sbTable.value.trim() || "movies";
 
-        // optional check auth if needed
-        // await ensureAdminLogin();
-
-        const { data, error } = await supabaseClient.from(table).insert(item).select("*").single();
+        // ✅ FIX: insert đơn giản, không phụ thuộc select/single (tránh lỗi do RLS select)
+        const { error } = await supabaseClient.from(table).insert(item);
         if(error) throw error;
-        setLog(el.log2, ok(`Inserted to Supabase: ${data?.id || item.id}`));
+
+        setLog(el.log2, ok(`Inserted to Supabase: ${item.id}`));
       }catch(e){
         setLog(el.log2, err(e?.message || String(e)));
       }
