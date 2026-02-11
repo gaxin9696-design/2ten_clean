@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Watch • PhimApp</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Watch</title>
   <style>
     :root{
       --bg0:#0a0b10;
@@ -11,13 +11,15 @@
       --panel: rgba(255,255,255,.06);
       --panel2: rgba(255,255,255,.04);
       --stroke: rgba(255,255,255,.10);
+      --stroke2: rgba(255,255,255,.16);
       --text:#e9edf6;
       --muted:#a6b0c3;
       --muted2:#7f8aa6;
       --accent:#f1c55a;
+      --accent2:#60a5fa;
       --shadow: 0 18px 60px rgba(0,0,0,.45);
       --shadow2: 0 10px 30px rgba(0,0,0,.35);
-      --r16:16px; --r20:20px; --r24:24px;
+      --r12:12px; --r16:16px; --r20:20px; --r24:24px;
       --max: 1180px;
     }
     *{box-sizing:border-box}
@@ -32,10 +34,8 @@
         linear-gradient(180deg, var(--bg0), var(--bg1));
     }
     a{color:inherit;text-decoration:none}
-    .wrap{max-width:var(--max);margin:0 auto;padding:18px}
-    @media (max-width:540px){ .wrap{padding:14px} }
 
-    /* TOPBAR */
+    /* TOPBAR (giống style index) */
     .topbar{
       position:sticky; top:0; z-index:50;
       background: linear-gradient(180deg, rgba(10,11,16,.92), rgba(10,11,16,.75));
@@ -46,9 +46,9 @@
       max-width:var(--max);
       margin:0 auto;
       padding:12px 18px;
-      display:flex; align-items:center; gap:12px;
+      display:flex; align-items:center; gap:14px;
     }
-    .brand{display:flex; align-items:center; gap:10px; cursor:pointer; user-select:none;}
+    .brand{display:flex; align-items:center; gap:10px; min-width: 160px; cursor:pointer;}
     .logo{
       width:40px;height:40px;border-radius:14px;
       background:
@@ -56,96 +56,154 @@
         rgba(255,255,255,.06);
       border:1px solid rgba(255,255,255,.10);
       box-shadow: var(--shadow2);
-      flex:0 0 auto;
     }
     .brand .t1{font-weight:950; letter-spacing:.2px; line-height:1}
     .brand .t2{font-size:11px; color:var(--muted2); margin-top:2px}
 
-    .top-actions{margin-left:auto; display:flex; align-items:center; gap:8px; flex-wrap:wrap}
-    .pill{
-      padding:10px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.04);color:#e5e7eb;
-      font-size:13px;cursor:pointer;font-weight:900;
-      display:inline-flex;align-items:center;gap:8px;
+    .search{
+      flex: 1 1 auto;
+      display:flex; align-items:center; gap:10px;
+      padding:10px 12px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      min-width: 240px;
+      opacity:.8;
+    }
+    .search input{
+      width:100%;
+      border:none; outline:none;
+      background:transparent;
+      color:var(--text);
+      font-size:14px;
+    }
+    .menu{display:flex; align-items:center; gap:6px; flex: 0 0 auto;}
+    .mitem{
+      padding:10px 12px;
+      border-radius: 999px;
+      border:1px solid transparent;
+      color: rgba(233,237,246,.92);
+      font-weight:800;
+      font-size:13px;
+      opacity:.92;
+      cursor:pointer;
+      white-space:nowrap;
       user-select:none;
     }
-    .pill:hover{background:rgba(255,255,255,.08)}
+    .mitem:hover{border-color: rgba(255,255,255,.10); background: rgba(255,255,255,.03); opacity:1;}
+    .member{
+      margin-left:6px;
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 12px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      font-weight:900;
+      cursor:pointer;
+      white-space:nowrap;
+      user-select:none;
+    }
+    .member .dot{width:10px;height:10px;border-radius:999px;background: rgba(241,197,90,.9);box-shadow: 0 0 0 3px rgba(241,197,90,.14);}
+    @media (max-width: 980px){
+      .menu{display:none}
+      .brand{min-width:auto}
+    }
 
-    /* LAYOUT */
-    .grid{
+    /* PAGE */
+    .wrap{max-width:var(--max); margin:0 auto; padding:16px 18px 26px;}
+    @media (max-width:540px){ .wrap{padding:14px} }
+
+    .crumb{
+      display:flex; align-items:center; gap:10px;
+      margin:14px 0 12px;
+      color: rgba(233,237,246,.9);
+      font-weight:900;
+    }
+    .back{
+      width:40px;height:40px;border-radius:999px;
+      display:flex;align-items:center;justify-content:center;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      cursor:pointer;
+      user-select:none;
+    }
+    .back:hover{background: rgba(255,255,255,.10);}
+    .crumb .title{
+      font-size:18px;
+      letter-spacing:.2px;
+      line-height:1.15;
+    }
+    .crumb .sub{
+      margin-top:3px;
+      font-size:12px;
+      color: var(--muted2);
+      font-weight:800;
+    }
+
+    .layout{
       display:grid;
-      grid-template-columns: 1fr 360px;
+      grid-template-columns: 1.6fr .9fr;
       gap:14px;
-      margin-top:14px;
       align-items:start;
     }
-    @media (max-width: 980px){ .grid{grid-template-columns:1fr} }
+    @media (max-width: 980px){
+      .layout{grid-template-columns:1fr;}
+    }
 
+    /* PLAYER CARD */
     .card{
+      border-radius: var(--r24);
       border:1px solid rgba(255,255,255,.10);
       background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      border-radius: var(--r24);
-      box-shadow: var(--shadow);
+      box-shadow: var(--shadow2);
       overflow:hidden;
-      position:relative;
     }
-    .card::after{
-      content:"";
-      position:absolute; inset:0;
-      background: radial-gradient(1000px 520px at 70% 30%, rgba(255,255,255,.05), transparent 60%);
-      pointer-events:none;
+    .player-head{
+      padding:12px 14px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
     }
-
-    .head{
-      position:relative;
-      padding:14px 16px 10px;
-      border-bottom:1px solid rgba(255,255,255,.08);
-      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+    .player-head .left{
+      display:flex; align-items:center; gap:10px;
+      min-width: 0;
     }
-    .titlewrap{min-width:0}
-    .h1{
-      margin:0;
-      font-size:16px;
-      font-weight:950;
-      letter-spacing:.2px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .sub{
-      margin-top:6px;
-      display:flex; gap:8px; flex-wrap:wrap;
-      color:rgba(233,237,246,.78);
-      font-size:12px;
-    }
-    .tag{
+    .badge{
       display:inline-flex; align-items:center; justify-content:center;
-      padding:4px 8px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.20);
-      font-weight:900;
-      font-size:11px;
-      color: rgba(233,237,246,.92);
+      padding:6px 10px;
+      border-radius: 999px;
+      border:1px solid rgba(241,197,90,.30);
+      background: rgba(241,197,90,.10);
+      font-weight:950;
+      font-size:12px;
+      color: rgba(233,237,246,.95);
+      white-space:nowrap;
     }
-
-    .mini-actions{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; flex:0 0 auto;}
+    .mini{
+      color: var(--muted2);
+      font-size:12px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+    .actions{
+      display:flex; align-items:center; gap:10px;
+      flex:0 0 auto;
+    }
     .iconbtn{
       width:40px;height:40px;border-radius:999px;
       border:1px solid rgba(255,255,255,.12);
       background: rgba(255,255,255,.06);
       cursor:pointer;
-      display:flex; align-items:center; justify-content:center;
+      display:flex;align-items:center;justify-content:center;
       font-weight:950;
       user-select:none;
     }
     .iconbtn:hover{background: rgba(255,255,255,.10);}
 
-    .player{
-      position:relative;
-      width:100%;
-      aspect-ratio: 16/9;
+    .framewrap{
       background:#000;
+      aspect-ratio: 16/9;
+      width:100%;
+      position:relative;
     }
     iframe{
       position:absolute; inset:0;
@@ -154,38 +212,127 @@
       background:#000;
     }
 
-    /* SIDEBAR */
-    .side{
-      display:flex;
-      flex-direction:column;
-      gap:12px;
+    .below{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:14px;
+      margin-top:14px;
     }
-    .sidecard{
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.22);
+
+    /* EPISODE / SERVER */
+    .panel{
       border-radius: var(--r20);
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
       box-shadow: var(--shadow2);
       overflow:hidden;
     }
-    .sidehead{
-      padding:12px 12px 10px;
-      border-bottom:1px solid rgba(255,255,255,.08);
-      display:flex; align-items:center; justify-content:space-between; gap:8px;
+    .panel-head{
+      padding:12px 14px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
     }
-    .sidehead b{font-weight:950}
-    .sbody{padding:12px}
-    .poster{
-      width:100%;
-      aspect-ratio: 2/3;
+    .panel-head .h{
+      font-weight:980;
+      letter-spacing:.2px;
+    }
+    .panel-head .note{
+      color: var(--muted2);
+      font-weight:900;
+      font-size:12px;
+    }
+    .panel-body{padding:12px 14px;}
+
+    .serverbar{
+      display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .chip{
+      padding:8px 10px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      font-weight:950;
+      font-size:12px;
+      cursor:pointer;
+      user-select:none;
+    }
+    .chip.active{
+      border-color: rgba(241,197,90,.35);
+      background: rgba(241,197,90,.10);
+    }
+
+    .eps{
+      display:grid;
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+      gap:10px;
+    }
+    @media (max-width: 980px){ .eps{grid-template-columns: repeat(6, minmax(0, 1fr));} }
+    @media (max-width: 680px){ .eps{grid-template-columns: repeat(4, minmax(0, 1fr));} }
+
+    .epbtn{
+      padding:10px 0;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      text-align:center;
+      font-weight:950;
+      cursor:pointer;
+      user-select:none;
+    }
+    .epbtn:hover{background: rgba(255,255,255,.10);}
+    .epbtn.active{
+      border-color: rgba(241,197,90,.35);
+      background: rgba(241,197,90,.10);
+    }
+
+    /* INFO BLOCK */
+    .infogrid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:10px;
+    }
+    .meta{
+      display:flex; gap:10px; flex-wrap:wrap;
+    }
+    .tag{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:6px 10px;
+      border-radius: 10px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      font-weight:900;
+      font-size:12px;
+      color: rgba(233,237,246,.92);
+    }
+    .tag.imdb{border-color: rgba(241,197,90,.35); box-shadow: 0 0 0 3px rgba(241,197,90,.08) inset;}
+    .desc{
+      color: rgba(233,237,246,.84);
+      line-height:1.6;
+      font-size:13px;
+    }
+
+    /* SIDEBAR */
+    .side .card{border-radius: var(--r20);}
+    .sidehead{
+      padding:14px 14px 0;
+      font-weight:980;
+      letter-spacing:.2px;
+      font-size:18px;
+    }
+    .sidelist{padding:12px 14px 14px; display:flex; flex-direction:column; gap:10px;}
+    .sitem{
       border-radius: 16px;
       border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.05);
-      background-size: cover;
-      background-position: center;
-      overflow:hidden;
+      background: rgba(0,0,0,.18);
+      padding:12px;
+      cursor:pointer;
     }
-    .muted{color:rgba(233,237,246,.72);font-size:12px;line-height:1.5}
+    .sitem:hover{background: rgba(255,255,255,.06);}
+    .sitem .t{font-weight:950; margin-bottom:6px;}
+    .sitem .m{color: var(--muted2); font-weight:800; font-size:12px;}
 
+    /* TOAST */
     .toast{
       position:fixed;
       left:50%;
@@ -201,7 +348,7 @@
       font-size:13px;
       display:none;
       z-index:120;
-      max-width: calc(100% - 24px);
+      max-width:min(92vw, 760px);
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
@@ -209,99 +356,160 @@
     .toast.show{display:block;}
   </style>
 </head>
-<body>
 
+<body>
+  <!-- TOPBAR -->
   <div class="topbar">
     <div class="topbar-inner">
       <div class="brand" id="homeBtn" title="Về trang chủ">
         <div class="logo"></div>
         <div>
           <div class="t1">PhimApp</div>
-          <div class="t2">Xem phim • Google Drive stream</div>
+          <div class="t2">Xem phim • stream Google Drive</div>
         </div>
       </div>
 
-      <div class="top-actions">
-        <a class="pill" href="index.html">← Home</a>
+      <!-- search chỉ để giống layout mẫu (không cần hoạt động ở watch) -->
+      <div class="search" title="(Trang watch không cần tìm kiếm)">
+        <div>🔎</div>
+        <input placeholder="Tìm kiếm phim, diễn viên..." disabled />
+      </div>
+
+      <div class="menu">
+        <div class="mitem">Thể loại ▾</div>
+        <div class="mitem">Phim Lẻ</div>
+        <div class="mitem">Phim Bộ</div>
+        <div class="mitem">Quốc gia ▾</div>
+      </div>
+
+      <div class="member" id="memberBtn" title="Mở trang Admin">
+        <span class="dot"></span>
+        <span>Thành viên</span>
       </div>
     </div>
   </div>
 
   <div class="wrap">
-    <div class="grid">
+    <!-- crumb/title -->
+    <div class="crumb">
+      <div class="back" id="backBtn" title="Quay lại">←</div>
+      <div style="min-width:0">
+        <div class="title" id="pageTitle">Đang tải…</div>
+        <div class="sub" id="pageSub">—</div>
+      </div>
+    </div>
 
-      <!-- PLAYER -->
-      <section class="card">
-        <div class="head">
-          <div class="titlewrap">
-            <h1 class="h1" id="title">Đang tải...</h1>
-            <div class="sub">
-              <span class="tag" id="qualityTag" style="display:none;"></span>
-              <span class="tag" id="yearTag" style="display:none;"></span>
-              <span class="tag" id="countryTag" style="display:none;"></span>
-              <span class="tag" id="genreTag" style="display:none;"></span>
+    <div class="layout">
+      <!-- LEFT -->
+      <div>
+        <!-- player -->
+        <div class="card">
+          <div class="player-head">
+            <div class="left" style="min-width:0">
+              <span class="badge" id="badgeEp">Tập 01</span>
+              <span class="mini" id="miniInfo">HD • 2026 • JP</span>
+            </div>
+            <div class="actions">
+              <div class="iconbtn" id="favBtn" title="Yêu thích">♡</div>
+              <div class="iconbtn" id="infoBtn" title="Thông tin">i</div>
             </div>
           </div>
 
-          <div class="mini-actions">
-            <div class="iconbtn" id="reloadBtn" title="Reload player">⟲</div>
-            <div class="iconbtn" id="copyBtn" title="Copy link trang Watch">⧉</div>
+          <div class="framewrap">
+            <iframe id="frame" allow="autoplay; encrypted-media" allowfullscreen></iframe>
           </div>
         </div>
 
-        <div class="player">
-          <iframe id="frame" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-        </div>
-      </section>
-
-      <!-- SIDEBAR -->
-      <aside class="side">
-        <div class="sidecard">
-          <div class="sidehead">
-            <b>Poster</b>
-            <span class="tag">Drive</span>
+        <div class="below">
+          <!-- episodes -->
+          <div class="panel">
+            <div class="panel-head">
+              <div class="h">Tập phim</div>
+              <div class="note">Chọn tập để phát</div>
+            </div>
+            <div class="panel-body">
+              <div class="serverbar">
+                <div class="chip active" data-sv="main">Server • Drive</div>
+                <div class="chip" data-sv="alt">Server 2 (placeholder)</div>
+              </div>
+              <div class="eps" id="eps"></div>
+            </div>
           </div>
-          <div class="sbody">
-            <div class="poster" id="poster"></div>
-            <p class="muted" style="margin:10px 0 0">
-              Nếu video không chạy: hãy để file Drive ở chế độ chia sẻ <b>Anyone with the link</b>.
-            </p>
+
+          <!-- info -->
+          <div class="panel">
+            <div class="panel-head">
+              <div class="h">Nội dung</div>
+              <div class="note">Thông tin nhanh</div>
+            </div>
+            <div class="panel-body">
+              <div class="infogrid">
+                <div class="meta" id="metaTags"></div>
+                <div class="desc" id="desc">
+                  —
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </aside>
+      </div>
 
+      <!-- RIGHT -->
+      <div class="side">
+        <div class="card">
+          <div class="sidehead">Đề xuất</div>
+          <div class="sidelist" id="reco"></div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="toast" id="toast">Copied</div>
+  <div class="toast" id="toast">Loaded</div>
 
   <script>
-    const LS_CACHE = "movieapp_data_cache_v1";
+    // ====== CONFIG / KEYS ======
+    const LS_CACHE = "movieapp_data_cache_v1";   // cache bạn đã sync từ Supabase ở index
+    const LS_FAV   = "phimapp_favs_v1";
 
+    // ====== DOM ======
     const el = {
       homeBtn: document.getElementById("homeBtn"),
+      memberBtn: document.getElementById("memberBtn"),
+      backBtn: document.getElementById("backBtn"),
+
+      pageTitle: document.getElementById("pageTitle"),
+      pageSub: document.getElementById("pageSub"),
+      badgeEp: document.getElementById("badgeEp"),
+      miniInfo: document.getElementById("miniInfo"),
+
+      favBtn: document.getElementById("favBtn"),
+      infoBtn: document.getElementById("infoBtn"),
+
       frame: document.getElementById("frame"),
-      title: document.getElementById("title"),
-      poster: document.getElementById("poster"),
+      eps: document.getElementById("eps"),
 
-      qualityTag: document.getElementById("qualityTag"),
-      yearTag: document.getElementById("yearTag"),
-      countryTag: document.getElementById("countryTag"),
-      genreTag: document.getElementById("genreTag"),
+      metaTags: document.getElementById("metaTags"),
+      desc: document.getElementById("desc"),
 
-      reloadBtn: document.getElementById("reloadBtn"),
-      copyBtn: document.getElementById("copyBtn"),
-
+      reco: document.getElementById("reco"),
       toast: document.getElementById("toast"),
     };
 
-    const state = { driveid:"", previewUrl:"" };
-
+    // ====== helpers ======
     function toast(msg){
       el.toast.textContent = msg;
       el.toast.classList.add("show");
       clearTimeout(toast._t);
-      toast._t = setTimeout(()=> el.toast.classList.remove("show"), 1200);
+      toast._t = setTimeout(()=> el.toast.classList.remove("show"), 1400);
+    }
+
+    function escapeHtml(s){
+      return String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#39;");
     }
 
     function getParam(name){
@@ -309,130 +517,260 @@
       return u.searchParams.get(name);
     }
 
-    function extractDriveId(linkOrId){
-      const s = String(linkOrId || "").trim();
-      if(!s) return "";
-
-      if(!s.startsWith("http") && /^[a-zA-Z0-9_-]{10,}$/.test(s)) return s;
-
-      let m = s.match(/\/file\/d\/([a-zA-Z0-9_-]+)/); if(m) return m[1];
-      m = s.match(/[?&]id=([a-zA-Z0-9_-]+)/); if(m) return m[1];
-      m = s.match(/\/d\/([a-zA-Z0-9_-]+)/); if(m) return m[1];
-
+    function extractDriveId(link){
+      const s = String(link || "");
+      let m = s.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+      if(m) return m[1];
+      m = s.match(/open\?id=([a-zA-Z0-9_-]+)/);
+      if(m) return m[1];
+      m = s.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+      if(m) return m[1];
       return "";
     }
 
-    function toDrivePreview(id){
-      return id ? `https://drive.google.com/file/d/${encodeURIComponent(id)}/preview` : "";
-    }
-
-    function toDriveThumb(id){
-      return id ? `https://drive.google.com/uc?export=view&id=${encodeURIComponent(id)}` : "";
+    function toDrivePreview(idOrLink){
+      const raw = String(idOrLink || "").trim();
+      if(!raw) return "";
+      if(raw.startsWith("http")){
+        const id = extractDriveId(raw);
+        if(id) return `https://drive.google.com/file/d/${id}/preview`;
+        return "";
+      }
+      // assume raw is ID
+      return `https://drive.google.com/file/d/${raw}/preview`;
     }
 
     function readCache(){
-      const s = localStorage.getItem(LS_CACHE);
-      if(!s) return [];
       try{
-        const arr = JSON.parse(s);
+        const s = localStorage.getItem(LS_CACHE);
+        const arr = JSON.parse(s || "[]");
         return Array.isArray(arr) ? arr : [];
-      }catch{
-        return [];
-      }
+      }catch{ return []; }
     }
 
-    function findItemByVideoId(videoId){
-      const items = readCache();
-      const v = String(videoId || "");
-      if(!v) return null;
-
-      return items.find(x => {
-        // ưu tiên field driveid (video)
-        if(String(x.driveid || "") === v) return true;
-
-        // fallback: url chứa drive id
-        const fromUrl = extractDriveId(x.url || x.link || x.watch || "");
-        if(fromUrl && fromUrl === v) return true;
-
-        return false;
-      }) || null;
+    function loadFavs(){
+      try{
+        const raw = localStorage.getItem(LS_FAV);
+        const arr = JSON.parse(raw || "[]");
+        return new Set(Array.isArray(arr) ? arr : []);
+      }catch{ return new Set(); }
+    }
+    function saveFavs(set){
+      localStorage.setItem(LS_FAV, JSON.stringify([...set]));
     }
 
-    function setTag(elTag, val){
-      const s = String(val || "").trim();
-      if(!s){ elTag.style.display="none"; elTag.textContent=""; return; }
-      elTag.style.display="inline-flex";
-      elTag.textContent = s;
-    }
+    // ====== state ======
+    const state = {
+      item: null,
+      favs: new Set(),
+      server: "main",
+      // demo eps: nếu bạn chưa có field tập/driveid theo từng tập
+      episodes: Array.from({length: 12}, (_,i)=>({ ep:i+1 })),
+      activeEp: 1,
+      all: [],
+    };
 
-    function setPosterFromItem(item){
-      // poster: link drive ảnh -> chỉ set background image (không show link)
-      const posterId = extractDriveId(item?.poster || item?.thumb || item?.image || "");
-      el.poster.style.backgroundImage = posterId ? `url('${toDriveThumb(posterId)}')` : "";
-    }
-
-    function loadVideoById(videoId){
-      state.driveid = String(videoId || "").trim();
-      if(!state.driveid){
-        el.title.textContent = "Thiếu video id";
-        el.frame.src = "";
+    // ====== ui builders ======
+    function setTitle(){
+      const it = state.item;
+      if(!it){
+        el.pageTitle.textContent = "Không tìm thấy phim";
+        el.pageSub.textContent = "Hãy mở từ trang chủ hoặc kiểm tra id/driveid.";
+        el.miniInfo.textContent = "—";
+        el.desc.textContent = "Không có dữ liệu để phát. Bạn cần truyền ?id= hoặc ?driveid=.";
         return;
       }
+      const year = it.year ? `(${it.year})` : "";
+      el.pageTitle.textContent = `Xem phim ${it.title || "—"} ${year}`.trim();
+      el.pageSub.textContent = it.kind ? `Loại: ${it.kind}` : "—";
 
-      // set meta từ cache nếu có
-      const item = findItemByVideoId(state.driveid);
-
-      el.title.textContent = (item?.title || item?.name || "Đang xem").toString();
-      document.title = `Watch • ${(item?.title || item?.name || "PhimApp")}`;
-
-      setTag(el.qualityTag, item?.quality || "");
-      setTag(el.yearTag, item?.year || "");
-      setTag(el.countryTag, item?.country || "");
-      setTag(el.genreTag, item?.genre || (Array.isArray(item?.tags) ? item.tags.join(", ") : ""));
-
-      setPosterFromItem(item);
-
-      state.previewUrl = toDrivePreview(state.driveid);
-      el.frame.src = state.previewUrl;
+      const mini = [
+        it.quality || "HD",
+        it.year || "—",
+        it.country || "—",
+        it.genre || ""
+      ].filter(Boolean).join(" • ");
+      el.miniInfo.textContent = mini || "—";
     }
 
-    function buildWatchLink(){
-      const u = new URL(location.href);
-      u.searchParams.set("id", state.driveid || "");
-      u.searchParams.delete("url");
-      return u.toString();
+    function renderMeta(){
+      const it = state.item;
+      const tags = [];
+      if(it && it.imdb) tags.push(`<span class="tag imdb">IMDb ${escapeHtml(it.imdb)}</span>`);
+      if(it && it.quality) tags.push(`<span class="tag">${escapeHtml(it.quality)}</span>`);
+      if(it && it.genre) tags.push(`<span class="tag">${escapeHtml(it.genre)}</span>`);
+      if(it && it.country) tags.push(`<span class="tag">${escapeHtml(it.country)}</span>`);
+      if(it && it.kind) tags.push(`<span class="tag">${escapeHtml(it.kind)}</span>`);
+      el.metaTags.innerHTML = tags.join("");
+
+      // mô tả: nếu bạn chưa có field desc thì hiển thị placeholder gọn
+      const d = (it && (it.desc || it.description)) ? String(it.desc || it.description) :
+        "Trang watch chỉ cần sườn giao diện. Khi bạn thêm field mô tả (desc) trong DB, nội dung sẽ hiện ở đây.";
+      el.desc.textContent = d;
     }
 
-    // events
-    el.homeBtn.addEventListener("click", ()=> location.href = "index.html");
+    function renderFav(){
+      const it = state.item;
+      if(!it) { el.favBtn.textContent = "♡"; return; }
+      el.favBtn.textContent = state.favs.has(it.id) ? "♥" : "♡";
+      el.favBtn.title = state.favs.has(it.id) ? "Bỏ yêu thích" : "Yêu thích";
+    }
 
-    el.reloadBtn.addEventListener("click", ()=>{
-      if(!state.previewUrl){ toast("Chưa có video"); return; }
-      const cur = state.previewUrl;
-      el.frame.src = "";
-      setTimeout(()=> el.frame.src = cur, 50);
-      toast("Reloaded");
-    });
+    function renderEpisodes(){
+      el.badgeEp.textContent = `Tập ${String(state.activeEp).padStart(2,"0")}`;
 
-    el.copyBtn.addEventListener("click", async ()=>{
-      if(!state.driveid){ toast("Chưa có ID"); return; }
-      try{
-        await navigator.clipboard.writeText(buildWatchLink());
-        toast("Copied link Watch");
-      }catch{
-        toast("Clipboard bị chặn");
+      el.eps.innerHTML = state.episodes.map(e=>{
+        const active = e.ep === state.activeEp;
+        return `<div class="epbtn ${active ? "active":""}" data-ep="${e.ep}">${String(e.ep).padStart(2,"0")}</div>`;
+      }).join("");
+
+      [...el.eps.querySelectorAll(".epbtn")].forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          const ep = Number(btn.getAttribute("data-ep") || "1");
+          state.activeEp = ep || 1;
+          renderEpisodes();
+          // hiện tại 1 driveid cho cả phim (chưa có theo tập) => vẫn phát cùng video
+          loadPlayer();
+        });
+      });
+    }
+
+    function renderReco(){
+      // lấy vài item khác từ cache (không ảnh, chỉ text)
+      const list = (state.all || []).filter(x=> state.item && x.id !== state.item.id).slice(0, 6);
+      if(!list.length){
+        el.reco.innerHTML = `
+          <div class="sitem" style="cursor:default">
+            <div class="t">Chưa có đề xuất</div>
+            <div class="m">Hãy thêm nhiều phim hơn để hiện danh sách.</div>
+          </div>
+        `;
+        return;
       }
-    });
+      el.reco.innerHTML = list.map(x=>`
+        <div class="sitem" data-id="${escapeHtml(x.id)}">
+          <div class="t">${escapeHtml(x.title || "—")}</div>
+          <div class="m">${escapeHtml([x.quality, x.year, x.country].filter(Boolean).join(" • "))}</div>
+        </div>
+      `).join("");
 
-    // init
-    (function init(){
-      // hỗ trợ legacy: ?url=
-      const idParam = getParam("id");
-      const urlParam = getParam("url");
-      const driveid = extractDriveId(idParam || urlParam || "");
+      [...el.reco.querySelectorAll(".sitem")].forEach(it=>{
+        it.addEventListener("click", ()=>{
+          const id = it.getAttribute("data-id");
+          if(!id) return;
+          // điều hướng sang phim khác, giữ style như web mẫu
+          location.href = `watch.html?id=${encodeURIComponent(id)}`;
+        });
+      });
+    }
 
-      loadVideoById(driveid);
-    })();
+    // ====== player ======
+    function pickDriveId(){
+      // ưu tiên: query driveid -> query url -> item.driveid -> item.url (nếu chứa drive link)
+      const qDrive = getParam("driveid");
+      if(qDrive) return String(qDrive).trim();
+
+      const qUrl = getParam("url");
+      if(qUrl){
+        const id = extractDriveId(qUrl);
+        if(id) return id;
+      }
+
+      const it = state.item;
+      if(it && it.driveid) return String(it.driveid).trim();
+
+      if(it && it.url){
+        const id = extractDriveId(it.url);
+        if(id) return id;
+      }
+      return "";
+    }
+
+    function loadPlayer(){
+      const driveId = pickDriveId();
+      if(!driveId){
+        el.frame.src = "";
+        toast("Thiếu driveid: hãy mở từ trang chủ hoặc thêm driveid vào DB.");
+        return;
+      }
+      const src = toDrivePreview(driveId);
+      el.frame.src = src;
+    }
+
+    // ====== bootstrap item ======
+    function findItemById(id){
+      const all = readCache();
+      state.all = all;
+      if(!id) return null;
+      return all.find(x=>String(x.id)===String(id)) || null;
+    }
+
+    function init(){
+      state.favs = loadFavs();
+
+      // 1) lấy id từ query
+      const id = getParam("id") || "";
+      state.item = findItemById(id);
+
+      // 2) nếu không có item mà có driveid/url -> vẫn cho xem nhưng title placeholder
+      if(!state.item){
+        const d = pickDriveId();
+        if(d){
+          state.item = {
+            id: id || ("drive_" + d),
+            title: "Video Google Drive",
+            kind: "movie",
+            year: "",
+            quality: "HD",
+            imdb: "",
+            country: "",
+            genre: "",
+            driveid: d
+          };
+        }
+      }
+
+      // 3) render
+      setTitle();
+      renderMeta();
+      renderFav();
+      renderEpisodes();
+      renderReco();
+      loadPlayer();
+
+      // events
+      el.homeBtn.addEventListener("click", ()=> location.href = "index.html");
+      el.memberBtn.addEventListener("click", ()=> location.href = "test.html");
+      el.backBtn.addEventListener("click", ()=> history.length > 1 ? history.back() : (location.href="index.html"));
+
+      el.favBtn.addEventListener("click", ()=>{
+        if(!state.item) return;
+        if(state.favs.has(state.item.id)) state.favs.delete(state.item.id);
+        else state.favs.add(state.item.id);
+        saveFavs(state.favs);
+        renderFav();
+        toast(state.favs.has(state.item.id) ? "Đã thêm yêu thích" : "Đã bỏ yêu thích");
+      });
+
+      el.infoBtn.addEventListener("click", ()=>{
+        toast("Bạn có thể mở modal thông tin ở đây (nếu muốn).");
+      });
+
+      // server chips (chỉ UI)
+      document.querySelectorAll(".chip").forEach(ch=>{
+        ch.addEventListener("click", ()=>{
+          document.querySelectorAll(".chip").forEach(x=>x.classList.remove("active"));
+          ch.classList.add("active");
+          state.server = ch.getAttribute("data-sv") || "main";
+          toast(state.server==="main" ? "Server: Drive" : "Server 2 (placeholder)");
+          // hiện tại vẫn dùng driveid => không đổi nguồn
+        });
+      });
+
+      toast("Loaded watch");
+    }
+
+    init();
   </script>
 </body>
 </html>
