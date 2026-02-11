@@ -73,7 +73,7 @@
     <header>
       <div>
         <h1>Danh sách</h1>
-        <div class="muted" style="font-size:12px;margin-top:2px">List view + filter • Watch stream Drive</div>
+        <div class="muted" style="font-size:12px;margin-top:2px">List view + filter</div>
       </div>
       <a class="pill" href="index.html">← Home</a>
     </header>
@@ -134,40 +134,67 @@
         .replaceAll("'","&#39;");
     }
 
-    // ===== Drive helpers (FIX poster) =====
+    function tryDecodeUrlOnce(s){
+      try { return decodeURIComponent(s); } catch { return s; }
+    }
+
     function extractDriveId(link){
-      const s = String(link || "");
+      let s = String(link || "").trim();
+      if(!s) return "";
+
+      if(s.includes("l.facebook.com/l.php?")){
+        try{
+          const u = new URL(s);
+          const enc = u.searchParams.get("u");
+          if(enc) s = tryDecodeUrlOnce(enc);
+        }catch{}
+      }
+
+      try{
+        const u = new URL(s);
+        const maybe = u.searchParams.get("url") || u.searchParams.get("href") || u.searchParams.get("u");
+        if(maybe && maybe.includes("drive.google.com")){
+          s = tryDecodeUrlOnce(maybe);
+        }
+      }catch{}
+
       let m = s.match(/\/file\/d\/([a-zA-Z0-9_-]+)/); if(m) return m[1];
       m = s.match(/open\?id=([a-zA-Z0-9_-]+)/); if(m) return m[1];
       m = s.match(/[?&]id=([a-zA-Z0-9_-]+)/); if(m) return m[1];
       return "";
     }
-    function driveThumbUrl(id, size=1200){
+
+    function driveThumbUrl(id, size=500){
       return `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w${size}`;
     }
     function driveUcViewUrl(id){
       return `https://drive.google.com/uc?export=view&id=${encodeURIComponent(id)}`;
     }
-    function driveBgCss(id, size=1200){
-      return `url('${driveThumbUrl(id,size)}'), url('${driveUcViewUrl(id)}')`;
-    }
 
     function normalizeItem(x){
-      const posterLink = safeText(x.poster ?? "");
+      // ưu tiên schema mới nếu cache có
+      const posterLink = safeText(x.posterurl ?? x.poster ?? "");
       const posterId = extractDriveId(posterLink);
-      const poster_img = safeText(x.poster_img ?? (posterId ? driveBgCss(posterId, 1200) : ""));
+
+      const poster_img = safeText(
+        x.poster_img ??
+        (posterId ? `url('${driveThumbUrl(posterId, 500)}'), url('${driveUcViewUrl(posterId)}')` : "")
+      );
+
+      const driveid = safeText(x.driveid ?? "")
+        || extractDriveId(x.drivelink ?? "")
+        || extractDriveId(x.url ?? "");
 
       return {
         id: safeText(x.id ?? x.slug ?? crypto.randomUUID()),
         title: safeText(x.title ?? x.name ?? "Untitled"),
-        kind: safeText(x.kind ?? x.type ?? "movie"),
+        kind: safeText(x.kind ?? x.type ?? "anime"),
         year: safeText(x.year ?? ""),
         quality: safeText(x.quality ?? x.q ?? ""),
         country: safeText(x.country ?? x.nation ?? ""),
-        genre: safeText(x.genre ?? x.categories ?? ""),
-        poster: posterLink,
+        genre: safeText(x.genre ?? ""),
         poster_img,
-        driveid: safeText(x.driveid ?? "") || extractDriveId(x.url ?? ""),
+        driveid,
       };
     }
 
@@ -219,9 +246,9 @@
       });
     }
 
+    // ✅ Watch: dùng row id (nếu bạn muốn) hoặc driveid (fallback)
+    // Ở project này index đã dùng row id, nên list cũng dùng row id cho chuẩn:
     function watchHref(x){
-      if(!x.driveid) return "#";
-      // ✅ giống index: truyền movie id, watch tự lấy driveid trong cache
       return `watch.html?id=${encodeURIComponent(x.id)}`;
     }
 
@@ -231,9 +258,6 @@
         : "";
 
       const href = watchHref(x);
-      const watchBtn = x.driveid
-        ? `<a class="btn" href="${escapeHtml(href)}">▶ Watch</a>`
-        : `<span class="muted">Thiếu driveid</span>`;
 
       return `
         <tr>
@@ -248,7 +272,7 @@
           <td>${x.country ? `<span class="chip">${escapeHtml(x.country)}</span>` : `<span class="muted">—</span>`}</td>
           <td>${x.genre ? `<span class="chip">${escapeHtml(x.genre)}</span>` : `<span class="muted">—</span>`}</td>
           <td>${x.quality ? `<span class="chip">${escapeHtml(x.quality)}</span>` : `<span class="muted">—</span>`}</td>
-          <td>${watchBtn}</td>
+          <td><a class="btn" href="${escapeHtml(href)}">▶ Watch</a></td>
         </tr>
       `;
     }
@@ -282,7 +306,7 @@
       }
       if(!Array.isArray(data) || !data.length){
         data = [
-          { id:"demo1", title:"Demo Movie", kind:"movie", year:"2026", country:"VN", genre:"Action", quality:"FHD", poster:"", driveid:"" },
+          { id:"demo1", title:"Demo Movie", kind:"movie", year:"2026", country:"VN", genre:"Action", quality:"FHD", posterurl:"", drivelink:"", driveid:"" },
         ];
       }
 
