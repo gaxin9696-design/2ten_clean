@@ -475,6 +475,18 @@
   <div class="toast" id="toast">Saved</div>
 
   <script>
+    <script>
+  // ================== CONFIG ==================
+  // Nếu bạn dùng Supabase: điền URL + anon key + tên table
+  // Nếu bỏ trống: app sẽ dùng localStorage -> rồi fallback demo.
+  const SUPABASE_URL = "https://nzalaxolteaiafvuceqz.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56YWxheG9sdGVhaWFmdnVjZXF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyOTY2MjAsImV4cCI6MjA4NTg3MjYyMH0.0eIz6cfB4Dr_g5Wja70tZCMvVfUKoI5H4D8MJBP49Bg";
+  const SUPABASE_TABLE = "movies";
+
+  // cache/local keys
+  const LS_FAV = "phimapp_favs_v1";
+  const LS_CACHE = "movieapp_data_cache_v1";
+
     // ========== DATA (placeholder) ==========
     // Bạn có thể thay bằng data từ localStorage/Supabase sau.
     const DATA = [
