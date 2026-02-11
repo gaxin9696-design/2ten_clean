@@ -65,7 +65,6 @@
       padding:14px;
       color:#d1d5db;
       font-size:13px;line-height:1.45;
-      word-break: break-word;
     }
     .muted{color:var(--muted)}
     .k{color:#9ec1ff;font-weight:800}
@@ -149,18 +148,21 @@
             </div>
           </div>
 
-          <label>Poster URL</label>
+          <label>Poster URL (Drive file link)</label>
           <input id="poster" placeholder="https://drive.google.com/file/d/.../view">
 
-          <label>Watch URL</label>
-          <input id="url" placeholder="link Drive video hoặc facebook l.php?u=...">
+          <label>Banner URL (Drive file link) (optional)</label>
+          <input id="banner" placeholder="https://drive.google.com/file/d/.../view">
+
+          <label>Watch URL (Drive video link)</label>
+          <input id="url" placeholder="https://drive.google.com/file/d/.../view">
 
           <label>JSON raw (optional)</label>
-          <textarea id="raw" placeholder='{"id":"...","title":"..."}'></textarea>
+          <textarea id="raw" placeholder='{"title":"...","poster":"...","url":"..."}'></textarea>
 
           <div class="btns">
             <button class="btn good" id="saveLocal">Save → localStorage</button>
-            <button class="btn good" id="saveSb">Upsert → Supabase</button>
+            <button class="btn good" id="saveSb">Insert → Supabase</button>
             <button class="btn" id="preview">Preview JSON</button>
           </div>
         </div>
@@ -189,6 +191,7 @@
       country: document.getElementById("country"),
       genre: document.getElementById("genre"),
       poster: document.getElementById("poster"),
+      banner: document.getElementById("banner"),
       url: document.getElementById("url"),
       raw: document.getElementById("raw"),
       saveLocal: document.getElementById("saveLocal"),
@@ -212,49 +215,23 @@
     function ok(msg){ return `✅ <span class="ok">${escapeHtml(msg)}</span>`; }
     function err(msg){ return `❌ <span class="err">${escapeHtml(msg)}</span>`; }
 
-    // ✅ FIX: decode nhiều lớp + bắt fb l.php?u=... + nhiều dạng link Drive
+    // ✅ extract drive file id từ link Google Drive
     function extractDriveId(link){
-      let s = String(link || "").trim();
-      if(!s) return "";
-
-      for(let i=0;i<3;i++){
-        try{
-          const dec = decodeURIComponent(s);
-          if(dec === s) break;
-          s = dec;
-        }catch{ break; }
-      }
-
-      try{
-        const u = new URL(s);
-        const inner = u.searchParams.get("u") || u.searchParams.get("url") || "";
-        if(inner){
-          let t = inner;
-          for(let i=0;i<3;i++){
-            try{
-              const dec = decodeURIComponent(t);
-              if(dec === t) break;
-              t = dec;
-            }catch{ break; }
-          }
-          s = t;
-        }
-      }catch{}
-
+      const s = String(link || "");
       let m = s.match(/\/file\/d\/([a-zA-Z0-9_-]+)/); if(m) return m[1];
       m = s.match(/open\?id=([a-zA-Z0-9_-]+)/); if(m) return m[1];
       m = s.match(/[?&]id=([a-zA-Z0-9_-]+)/); if(m) return m[1];
-      m = s.match(/drive\.google\.com\/uc\?[^#]*\bid=([a-zA-Z0-9_-]+)/); if(m) return m[1];
       return "";
     }
 
+    // ✅ normalize item + auto driveid từ Watch URL
     function normalizeItem(x){
       const poster = safeText(x.poster ?? x.thumb ?? x.image ?? "");
+      const banner = safeText(x.banner ?? "");
       const url    = safeText(x.url ?? x.link ?? x.watch ?? "");
 
-      // ✅ driveid = VIDEO id (ưu tiên lấy từ Watch URL / FB redirect)
       const driveid = safeText(
-        x.driveid ?? x.drive_id ?? extractDriveId(url) ?? extractDriveId(poster)
+        x.driveid ?? x.drive_id ?? extractDriveId(url) ?? ""
       );
 
       return {
@@ -267,6 +244,7 @@
         country: safeText(x.country ?? x.nation ?? ""),
         genre: safeText(x.genre ?? x.categories ?? ""),
         poster,
+        banner,
         url,
         driveid
       };
@@ -288,6 +266,7 @@
         country: el.country.value,
         genre: el.genre.value,
         poster: el.poster.value,
+        banner: el.banner.value,
         url: el.url.value,
       });
     }
@@ -346,7 +325,7 @@
         else items.unshift(item);
 
         writeCache(items);
-        setLog(el.log2, ok(`Saved localStorage (total ${items.length}) • driveid=${item.driveid || "—"}`));
+        setLog(el.log2, ok(`Saved localStorage (total ${items.length})`));
       }catch(e){
         setLog(el.log2, err(e.message || String(e)));
       }
@@ -355,21 +334,14 @@
     el.saveSb.addEventListener("click", async ()=>{
       try{
         const item = getFormItem();
-        if(!item.driveid){
-          setLog(el.log2, err("Không lấy được driveid từ Watch URL. Hãy dán link Drive chuẩn hoặc link FB l.php?u=..."));
-          return;
-        }
         if(!supabaseClient){ setLog(el.log2, err("Chưa init Supabase.")); return; }
         const table = el.sbTable.value.trim() || "movies";
 
-        // ✅ FIX: Upsert theo id (update nếu đã tồn tại)
-        const { error } = await supabaseClient
-          .from(table)
-          .upsert(item, { onConflict: "id" });
-
+        // Insert đơn giản (tránh lỗi select khi RLS)
+        const { error } = await supabaseClient.from(table).insert(item);
         if(error) throw error;
 
-        setLog(el.log2, ok(`Upsert to Supabase: ${item.id} • driveid=${item.driveid}`));
+        setLog(el.log2, ok(`Inserted to Supabase: ${item.id}`));
       }catch(e){
         setLog(el.log2, err(e?.message || String(e)));
       }
