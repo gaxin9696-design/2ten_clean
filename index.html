@@ -483,7 +483,7 @@
     // fallback demo (nếu Supabase + cache rỗng)
     const DEMO = [
       { id:"movie1", type:"movie", title:"Demo Movie", sub:"Demo", imdb:"7.0", quality:"HD", year:"2026", part:"", ep:"",
-        tags:["Demo"], genre:"Demo", country:"VN", desc:"Demo data", poster:"", driveid:"" },
+        tags:["Demo"], genre:"Demo", country:"VN", desc:"Demo data", poster:"", poster_img:"", driveid:"" },
     ];
 
     const state = {
@@ -553,13 +553,42 @@
     }
 
     // ===== Drive helpers (poster/video) =====
+    // ✅ FIX: decode nhiều lớp + bắt fb l.php?u=... + nhiều dạng link Drive
     function extractDriveId(link){
-      const s = String(link || "");
+      let s = String(link || "").trim();
+      if(!s) return "";
+
+      for(let i=0;i<3;i++){
+        try{
+          const dec = decodeURIComponent(s);
+          if(dec === s) break;
+          s = dec;
+        }catch{ break; }
+      }
+
+      try{
+        const u = new URL(s);
+        const inner = u.searchParams.get("u") || u.searchParams.get("url") || "";
+        if(inner){
+          let t = inner;
+          for(let i=0;i<3;i++){
+            try{
+              const dec = decodeURIComponent(t);
+              if(dec === t) break;
+              t = dec;
+            }catch{ break; }
+          }
+          s = t;
+        }
+      }catch{}
+
       let m = s.match(/\/file\/d\/([a-zA-Z0-9_-]+)/); if(m) return m[1];
       m = s.match(/open\?id=([a-zA-Z0-9_-]+)/); if(m) return m[1];
       m = s.match(/[?&]id=([a-zA-Z0-9_-]+)/); if(m) return m[1];
+      m = s.match(/drive\.google\.com\/uc\?[^#]*\bid=([a-zA-Z0-9_-]+)/); if(m) return m[1];
       return "";
     }
+
     function driveImageUrl(id){
       return `https://drive.google.com/uc?export=view&id=${encodeURIComponent(id)}`;
     }
@@ -597,6 +626,11 @@
       const posterId = extractDriveId(posterLink);
       const poster_img = posterId ? driveImageUrl(posterId) : "";
 
+      // ✅ FIX: nếu driveid rỗng, thử parse từ row.url (watch url)
+      const driveid =
+        String(row.driveid ?? "").trim() ||
+        extractDriveId(row.url ?? "");
+
       return {
         id: String(row.id ?? ""),
         type,
@@ -613,7 +647,7 @@
         desc: "",
         poster: posterLink,
         poster_img,
-        driveid: String(row.driveid ?? ""), // VIDEO id (để stream)
+        driveid, // ✅ VIDEO id (để stream)
       };
     }
 
@@ -838,15 +872,17 @@
 
       document.addEventListener("click", ()=> closeDropdowns());
 
-      // ✅ STREAM: bấm xem ngay -> watch.html?id=driveid
+      // ✅ STREAM: bấm xem ngay -> watch.html?id=<movieId>
+      // (watch.html sẽ tự tìm driveid trong item)
       el.playBtn.addEventListener("click", ()=>{
         const x = getActive();
         if(!x) return;
+
         if(!x.driveid){
           toast("❌ Thiếu driveid (video). Hãy nhập Watch URL (link Drive video) ở Admin.");
           return;
         }
-        location.href = `watch.html?id=${encodeURIComponent(x.driveid)}`;
+        location.href = `watch.html?id=${encodeURIComponent(x.id)}`;
       });
 
       el.favBtn.addEventListener("click", ()=>{
