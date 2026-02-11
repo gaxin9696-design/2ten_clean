@@ -134,25 +134,53 @@
         .replaceAll("'","&#39;");
     }
 
-    // ===== Drive helpers =====
+    // ✅ FIX: decode nhiều lớp + bắt fb l.php?u=... + nhiều dạng link Drive
     function extractDriveId(link){
-      const s = String(link || "");
+      let s = String(link || "").trim();
+      if(!s) return "";
+
+      for(let i=0;i<3;i++){
+        try{
+          const dec = decodeURIComponent(s);
+          if(dec === s) break;
+          s = dec;
+        }catch{ break; }
+      }
+
+      try{
+        const u = new URL(s);
+        const inner = u.searchParams.get("u") || u.searchParams.get("url") || "";
+        if(inner){
+          let t = inner;
+          for(let i=0;i<3;i++){
+            try{
+              const dec = decodeURIComponent(t);
+              if(dec === t) break;
+              t = dec;
+            }catch{ break; }
+          }
+          s = t;
+        }
+      }catch{}
+
       let m = s.match(/\/file\/d\/([a-zA-Z0-9_-]+)/); if(m) return m[1];
       m = s.match(/open\?id=([a-zA-Z0-9_-]+)/); if(m) return m[1];
       m = s.match(/[?&]id=([a-zA-Z0-9_-]+)/); if(m) return m[1];
+      m = s.match(/drive\.google\.com\/uc\?[^#]*\bid=([a-zA-Z0-9_-]+)/); if(m) return m[1];
       return "";
     }
+
     function driveImageUrl(id){
       return `https://drive.google.com/uc?export=view&id=${encodeURIComponent(id)}`;
     }
 
-    // ===== Normalize cache row =====
-    // Cache của bạn (index.html) có thể là UI item: {id,type,title,year,quality,country,genre,poster,poster_img,driveid,...}
-    // Admin/Supabase item: {id,title,kind,year,quality,country,genre,poster,url,driveid}
     function normalizeItem(x){
       const posterLink = safeText(x.poster ?? "");
       const posterId = extractDriveId(posterLink);
       const poster_img = safeText(x.poster_img ?? (posterId ? driveImageUrl(posterId) : ""));
+
+      // ✅ nếu driveid rỗng thì thử parse từ url (watch url)
+      const driveid = safeText(x.driveid ?? "") || extractDriveId(x.url ?? "");
 
       return {
         id: safeText(x.id ?? x.slug ?? crypto.randomUUID()),
@@ -164,7 +192,7 @@
         genre: safeText(x.genre ?? x.categories ?? ""),
         poster: posterLink,
         poster_img,
-        driveid: safeText(x.driveid ?? ""), // ✅ VIDEO drive id để stream
+        driveid,
       };
     }
 
@@ -216,20 +244,13 @@
       });
     }
 
-    // ✅ Watch luôn stream: watch.html?id=driveid
-    function watchHref(x){
-      if(!x.driveid) return "#";
-      return `watch.html?id=${encodeURIComponent(x.driveid)}`;
-    }
-
     function rowHtml(x){
       const thumbStyle = x.poster_img
         ? `style="background-image:url('${escapeHtml(x.poster_img)}')"`
         : "";
 
-      const href = watchHref(x);
       const watchBtn = x.driveid
-        ? `<a class="btn" href="${escapeHtml(href)}">▶ Watch</a>`
+        ? `<a class="btn" href="watch.html?id=${encodeURIComponent(x.id)}">▶ Watch</a>`
         : `<span class="muted">Thiếu driveid</span>`;
 
       return `
