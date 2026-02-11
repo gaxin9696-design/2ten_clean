@@ -11,17 +11,13 @@
       --panel: rgba(255,255,255,.06);
       --panel2: rgba(255,255,255,.04);
       --stroke: rgba(255,255,255,.10);
-      --stroke2: rgba(255,255,255,.16);
       --text:#e9edf6;
       --muted:#a6b0c3;
       --muted2:#7f8aa6;
       --accent:#f1c55a;
-      --accent2:#60a5fa;
-      --good:#7cffb2;
-      --bad:#ff7c7c;
       --shadow: 0 18px 60px rgba(0,0,0,.45);
       --shadow2: 0 10px 30px rgba(0,0,0,.35);
-      --r12:12px; --r16:16px; --r20:20px; --r24:24px;
+      --r16:16px; --r20:20px; --r24:24px;
       --max: 1180px;
     }
     *{box-sizing:border-box}
@@ -74,14 +70,6 @@
       user-select:none;
     }
     .pill:hover{background:rgba(255,255,255,.08)}
-    .pill.primary{
-      border-color: rgba(241,197,90,.35);
-      background: rgba(241,197,90,.12);
-    }
-    .pill.danger{
-      border-color: rgba(255,124,124,.35);
-      background: rgba(255,124,124,.12);
-    }
 
     /* LAYOUT */
     .grid{
@@ -91,9 +79,7 @@
       margin-top:14px;
       align-items:start;
     }
-    @media (max-width: 980px){
-      .grid{grid-template-columns:1fr}
-    }
+    @media (max-width: 980px){ .grid{grid-template-columns:1fr} }
 
     .card{
       border:1px solid rgba(255,255,255,.10);
@@ -108,19 +94,6 @@
       position:absolute; inset:0;
       background: radial-gradient(1000px 520px at 70% 30%, rgba(255,255,255,.05), transparent 60%);
       pointer-events:none;
-    }
-
-    .player{
-      position:relative;
-      width:100%;
-      aspect-ratio: 16/9;
-      background:#000;
-    }
-    iframe{
-      position:absolute; inset:0;
-      width:100%; height:100%;
-      border:0;
-      background:#000;
     }
 
     .head{
@@ -140,10 +113,10 @@
       text-overflow:ellipsis;
     }
     .sub{
-      margin-top:4px;
+      margin-top:6px;
+      display:flex; gap:8px; flex-wrap:wrap;
       color:rgba(233,237,246,.78);
       font-size:12px;
-      display:flex; gap:8px; flex-wrap:wrap;
     }
     .tag{
       display:inline-flex; align-items:center; justify-content:center;
@@ -155,8 +128,7 @@
       font-size:11px;
       color: rgba(233,237,246,.92);
     }
-    .tag.ok{border-color: rgba(124,255,178,.25)}
-    .tag.bad{border-color: rgba(255,124,124,.25)}
+
     .mini-actions{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; flex:0 0 auto;}
     .iconbtn{
       width:40px;height:40px;border-radius:999px;
@@ -168,6 +140,19 @@
       user-select:none;
     }
     .iconbtn:hover{background: rgba(255,255,255,.10);}
+
+    .player{
+      position:relative;
+      width:100%;
+      aspect-ratio: 16/9;
+      background:#000;
+    }
+    iframe{
+      position:absolute; inset:0;
+      width:100%; height:100%;
+      border:0;
+      background:#000;
+    }
 
     /* SIDEBAR */
     .side{
@@ -199,40 +184,7 @@
       background-position: center;
       overflow:hidden;
     }
-    .line{height:10px;border-radius:999px;background: rgba(255,255,255,.08); margin-top:10px;}
-    .line.w80{width:80%}
-    .line.w60{width:60%}
-    .line.w40{width:40%}
-
-    .field{margin-top:10px}
-    label{display:block;font-size:12px;color:var(--muted);margin:10px 0 6px}
-    input{
-      width:100%;
-      padding:10px 12px;
-      border-radius: 14px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.04);
-      color: var(--text);
-      outline:none;
-      font-size:13px;
-    }
-    input:focus{
-      border-color: rgba(241,197,90,.45);
-      box-shadow: 0 0 0 4px rgba(241,197,90,.12);
-    }
-    .rowbtns{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-    .btn{
-      padding:10px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.06);
-      font-weight:950;font-size:13px;color:#e5e7eb;
-      cursor:pointer;
-      display:inline-flex;align-items:center;gap:8px;
-      user-select:none;
-    }
-    .btn:hover{background: rgba(255,255,255,.10);}
-    .btn.good{border-color: rgba(124,255,178,.35); background: rgba(124,255,178,.10);}
-    .btn.primary{border-color: rgba(241,197,90,.35); background: rgba(241,197,90,.12);}
-    .btn.bad{border-color: rgba(255,124,124,.35); background: rgba(255,124,124,.12);}
+    .muted{color:rgba(233,237,246,.72);font-size:12px;line-height:1.5}
 
     .toast{
       position:fixed;
@@ -271,7 +223,6 @@
 
       <div class="top-actions">
         <a class="pill" href="index.html">← Home</a>
-        <button class="pill primary" id="togglePanel">🎛️ Tuỳ chọn</button>
       </div>
     </div>
   </div>
@@ -279,21 +230,22 @@
   <div class="wrap">
     <div class="grid">
 
-      <!-- PLAYER CARD -->
+      <!-- PLAYER -->
       <section class="card">
         <div class="head">
           <div class="titlewrap">
             <h1 class="h1" id="title">Đang tải...</h1>
             <div class="sub">
-              <span class="tag ok" id="statusTag">READY</span>
-              <span class="tag" id="idTag">ID: —</span>
+              <span class="tag" id="qualityTag" style="display:none;"></span>
+              <span class="tag" id="yearTag" style="display:none;"></span>
+              <span class="tag" id="countryTag" style="display:none;"></span>
+              <span class="tag" id="genreTag" style="display:none;"></span>
             </div>
           </div>
 
           <div class="mini-actions">
             <div class="iconbtn" id="reloadBtn" title="Reload player">⟲</div>
-            <div class="iconbtn" id="openBtn" title="Mở Drive preview tab mới">↗</div>
-            <div class="iconbtn" id="copyBtn" title="Copy link Watch">⧉</div>
+            <div class="iconbtn" id="copyBtn" title="Copy link trang Watch">⧉</div>
           </div>
         </div>
 
@@ -307,35 +259,13 @@
         <div class="sidecard">
           <div class="sidehead">
             <b>Poster</b>
-            <span class="tag" id="posterTag">Drive</span>
+            <span class="tag">Drive</span>
           </div>
           <div class="sbody">
             <div class="poster" id="poster"></div>
-            <div class="line w80"></div>
-            <div class="line w60"></div>
-            <div class="line w40"></div>
-          </div>
-        </div>
-
-        <div class="sidecard" id="panel" style="display:none;">
-          <div class="sidehead">
-            <b>Tuỳ chọn</b>
-            <span class="tag">Admin</span>
-          </div>
-          <div class="sbody">
-            <div class="field">
-              <label>Drive link hoặc Drive ID (video)</label>
-              <input id="input" placeholder="VD: https://drive.google.com/file/d/ID/view hoặc chỉ ID">
-              <div class="rowbtns">
-                <button class="btn primary" id="loadBtn">▶ Load</button>
-                <button class="btn good" id="fromCacheBtn">🧠 Từ cache</button>
-                <button class="btn bad" id="clearBtn">🧹 Clear</button>
-              </div>
-              <div style="margin-top:10px;color:rgba(233,237,246,.78);font-size:12px;line-height:1.5">
-                • App sẽ đổi sang <b>Drive Preview</b> để stream trong iframe.<br>
-                • Nếu video bị chặn: kiểm tra <b>Share: Anyone with the link</b>.
-              </div>
-            </div>
+            <p class="muted" style="margin:10px 0 0">
+              Nếu video không chạy: hãy để file Drive ở chế độ chia sẻ <b>Anyone with the link</b>.
+            </p>
           </div>
         </div>
       </aside>
@@ -346,40 +276,27 @@
   <div class="toast" id="toast">Copied</div>
 
   <script>
-    // ====== CONFIG ======
     const LS_CACHE = "movieapp_data_cache_v1";
 
     const el = {
       homeBtn: document.getElementById("homeBtn"),
       frame: document.getElementById("frame"),
       title: document.getElementById("title"),
-      statusTag: document.getElementById("statusTag"),
-      idTag: document.getElementById("idTag"),
       poster: document.getElementById("poster"),
-      posterTag: document.getElementById("posterTag"),
+
+      qualityTag: document.getElementById("qualityTag"),
+      yearTag: document.getElementById("yearTag"),
+      countryTag: document.getElementById("countryTag"),
+      genreTag: document.getElementById("genreTag"),
 
       reloadBtn: document.getElementById("reloadBtn"),
-      openBtn: document.getElementById("openBtn"),
       copyBtn: document.getElementById("copyBtn"),
-
-      togglePanel: document.getElementById("togglePanel"),
-      panel: document.getElementById("panel"),
-      input: document.getElementById("input"),
-      loadBtn: document.getElementById("loadBtn"),
-      fromCacheBtn: document.getElementById("fromCacheBtn"),
-      clearBtn: document.getElementById("clearBtn"),
 
       toast: document.getElementById("toast"),
     };
 
-    const state = {
-      driveid: "",
-      previewUrl: "",
-      posterUrl: "",
-      itemTitle: "",
-    };
+    const state = { driveid:"", previewUrl:"" };
 
-    // ====== Utils ======
     function toast(msg){
       el.toast.textContent = msg;
       el.toast.classList.add("show");
@@ -396,10 +313,8 @@
       const s = String(linkOrId || "").trim();
       if(!s) return "";
 
-      // nếu là ID thuần (thường 20+ ký tự, có _-)
       if(!s.startsWith("http") && /^[a-zA-Z0-9_-]{10,}$/.test(s)) return s;
 
-      // link drive
       let m = s.match(/\/file\/d\/([a-zA-Z0-9_-]+)/); if(m) return m[1];
       m = s.match(/[?&]id=([a-zA-Z0-9_-]+)/); if(m) return m[1];
       m = s.match(/\/d\/([a-zA-Z0-9_-]+)/); if(m) return m[1];
@@ -408,13 +323,11 @@
     }
 
     function toDrivePreview(id){
-      if(!id) return "";
-      return `https://drive.google.com/file/d/${encodeURIComponent(id)}/preview`;
+      return id ? `https://drive.google.com/file/d/${encodeURIComponent(id)}/preview` : "";
     }
 
     function toDriveThumb(id){
-      if(!id) return "";
-      return `https://drive.google.com/uc?export=view&id=${encodeURIComponent(id)}`;
+      return id ? `https://drive.google.com/uc?export=view&id=${encodeURIComponent(id)}` : "";
     }
 
     function readCache(){
@@ -428,115 +341,70 @@
       }
     }
 
-    // cố gắng lấy title/poster từ cache theo driveid hoặc theo field driveid
-    function findItemInCacheByDriveId(driveid){
+    function findItemByVideoId(videoId){
       const items = readCache();
-      const s = String(driveid || "");
-      if(!s) return null;
+      const v = String(videoId || "");
+      if(!v) return null;
 
-      // items có thể là UI item hoặc DB row map
-      return items.find(x =>
-        String(x.driveid || "") === s ||
-        extractDriveId(x.url || "") === s ||
-        extractDriveId(x.poster || "") === s
-      ) || null;
+      return items.find(x => {
+        // ưu tiên field driveid (video)
+        if(String(x.driveid || "") === v) return true;
+
+        // fallback: url chứa drive id
+        const fromUrl = extractDriveId(x.url || x.link || x.watch || "");
+        if(fromUrl && fromUrl === v) return true;
+
+        return false;
+      }) || null;
     }
 
-    function setStatus(ok, text){
-      el.statusTag.textContent = text;
-      el.statusTag.classList.toggle("ok", ok);
-      el.statusTag.classList.toggle("bad", !ok);
-      el.statusTag.style.borderColor = ok ? "rgba(124,255,178,.25)" : "rgba(255,124,124,.25)";
+    function setTag(elTag, val){
+      const s = String(val || "").trim();
+      if(!s){ elTag.style.display="none"; elTag.textContent=""; return; }
+      elTag.style.display="inline-flex";
+      elTag.textContent = s;
     }
 
     function setPosterFromItem(item){
-      // poster có thể là link drive -> convert sang thumbnail
-      const posterId = extractDriveId(item?.poster || "");
-      const posterUrl = item?.poster_img || (posterId ? toDriveThumb(posterId) : "");
-      state.posterUrl = posterUrl || "";
-      el.poster.style.backgroundImage = state.posterUrl ? `url('${state.posterUrl}')` : "";
+      // poster: link drive ảnh -> chỉ set background image (không show link)
+      const posterId = extractDriveId(item?.poster || item?.thumb || item?.image || "");
+      el.poster.style.backgroundImage = posterId ? `url('${toDriveThumb(posterId)}')` : "";
     }
 
-    function setTitleFromItem(item){
-      state.itemTitle = String(item?.title || "").trim();
-      if(state.itemTitle){
-        el.title.textContent = state.itemTitle;
-        document.title = `Watch • ${state.itemTitle}`;
-      }else{
-        el.title.textContent = "Đang xem";
-        document.title = "Watch • PhimApp";
-      }
-    }
-
-    function loadByDriveId(driveid, autoFillMeta=true){
-      state.driveid = String(driveid || "").trim();
-      el.idTag.textContent = state.driveid ? `ID: ${state.driveid}` : "ID: —";
-
+    function loadVideoById(videoId){
+      state.driveid = String(videoId || "").trim();
       if(!state.driveid){
+        el.title.textContent = "Thiếu video id";
         el.frame.src = "";
-        setStatus(false, "NO ID");
-        toast("Thiếu Drive ID");
         return;
       }
+
+      // set meta từ cache nếu có
+      const item = findItemByVideoId(state.driveid);
+
+      el.title.textContent = (item?.title || item?.name || "Đang xem").toString();
+      document.title = `Watch • ${(item?.title || item?.name || "PhimApp")}`;
+
+      setTag(el.qualityTag, item?.quality || "");
+      setTag(el.yearTag, item?.year || "");
+      setTag(el.countryTag, item?.country || "");
+      setTag(el.genreTag, item?.genre || (Array.isArray(item?.tags) ? item.tags.join(", ") : ""));
+
+      setPosterFromItem(item);
 
       state.previewUrl = toDrivePreview(state.driveid);
       el.frame.src = state.previewUrl;
-      setStatus(true, "PLAYING");
-
-      // meta: title/poster từ cache nếu có
-      if(autoFillMeta){
-        const item = findItemInCacheByDriveId(state.driveid);
-        setTitleFromItem(item);
-        setPosterFromItem(item);
-      }
     }
 
-    function copyWatchLink(){
-      const url = new URL(location.href);
-      url.searchParams.set("id", state.driveid || "");
-      url.searchParams.delete("url");
-      return url.toString();
-    }
-
-    // ====== Events ======
-    el.homeBtn.addEventListener("click", ()=> location.href = "index.html");
-
-    el.togglePanel.addEventListener("click", ()=>{
-      const open = el.panel.style.display !== "none";
-      el.panel.style.display = open ? "none" : "block";
-      toast(open ? "Đã ẩn tuỳ chọn" : "Đã mở tuỳ chọn");
-    });
-
-    el.loadBtn.addEventListener("click", ()=>{
-      const id = extractDriveId(el.input.value);
-      loadByDriveId(id, true);
-
-      // update URL query
+    function buildWatchLink(){
       const u = new URL(location.href);
-      u.searchParams.set("id", id || "");
+      u.searchParams.set("id", state.driveid || "");
       u.searchParams.delete("url");
-      history.replaceState({}, "", u.toString());
-    });
+      return u.toString();
+    }
 
-    el.fromCacheBtn.addEventListener("click", ()=>{
-      const id = state.driveid || extractDriveId(el.input.value);
-      const item = findItemInCacheByDriveId(id);
-      if(!item){
-        toast("Không tìm thấy trong cache");
-        return;
-      }
-      // ưu tiên item.driveid nếu có
-      const realId = String(item.driveid || id || "");
-      el.input.value = realId;
-      setTitleFromItem(item);
-      setPosterFromItem(item);
-      toast("Đã lấy meta từ cache");
-    });
-
-    el.clearBtn.addEventListener("click", ()=>{
-      el.input.value = "";
-      toast("Cleared");
-    });
+    // events
+    el.homeBtn.addEventListener("click", ()=> location.href = "index.html");
 
     el.reloadBtn.addEventListener("click", ()=>{
       if(!state.previewUrl){ toast("Chưa có video"); return; }
@@ -546,35 +414,24 @@
       toast("Reloaded");
     });
 
-    el.openBtn.addEventListener("click", ()=>{
-      if(!state.previewUrl){ toast("Chưa có video"); return; }
-      window.open(state.previewUrl, "_blank", "noopener,noreferrer");
-    });
-
     el.copyBtn.addEventListener("click", async ()=>{
       if(!state.driveid){ toast("Chưa có ID"); return; }
       try{
-        await navigator.clipboard.writeText(copyWatchLink());
+        await navigator.clipboard.writeText(buildWatchLink());
         toast("Copied link Watch");
       }catch{
         toast("Clipboard bị chặn");
       }
     });
 
-    // ====== Init from query ======
+    // init
     (function init(){
-      // hỗ trợ cả ?id= và ?url= (legacy)
+      // hỗ trợ legacy: ?url=
       const idParam = getParam("id");
       const urlParam = getParam("url");
-
       const driveid = extractDriveId(idParam || urlParam || "");
-      if(driveid){
-        el.input.value = driveid;
-        loadByDriveId(driveid, true);
-      }else{
-        setStatus(false, "NO ID");
-        el.title.textContent = "Chưa có video";
-      }
+
+      loadVideoById(driveid);
     })();
   </script>
 </body>
