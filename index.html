@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>UI Skeleton (No banner/poster motion)</title>
+  <title>UI Skeleton (Load Supabase + Drive stream)</title>
   <style>
     :root{
       --bg0:#0a0b10;
@@ -49,7 +49,7 @@
       padding:12px 18px;
       display:flex; align-items:center; gap:14px;
     }
-    .brand{display:flex; align-items:center; gap:10px; min-width: 160px;}
+    .brand{display:flex; align-items:center; gap:10px; min-width: 160px; cursor:pointer;}
     .logo{
       width:40px;height:40px;border-radius:14px;
       background:
@@ -248,6 +248,8 @@
       color: rgba(233,237,246,.78);
       font-weight:950;
       letter-spacing:.2px;
+      background-size: cover;
+      background-position: center;
     }
     .preview-info{padding:12px 12px 14px; display:flex; flex-direction:column; gap:8px;}
     .line{height:10px; border-radius:999px; background: rgba(255,255,255,.08);}
@@ -284,11 +286,20 @@
       cursor:pointer;
       user-select:none;
       transition: .12s ease;
+      background-size:cover;
+      background-position:center;
     }
     .thumb:hover{border-color: rgba(255,255,255,.20); transform: translateY(-2px);}
     .thumb.active{
       border-color: rgba(241,197,90,.45);
       box-shadow: 0 0 0 4px rgba(241,197,90,.10) inset, 0 10px 24px rgba(0,0,0,.30);
+    }
+    .thumb::before{
+      content:"";
+      position:absolute; inset:0;
+      background: linear-gradient(180deg, rgba(0,0,0,.08), rgba(0,0,0,.55));
+      pointer-events:none;
+      opacity:.9;
     }
     .thumb .tlabel{
       position:absolute; left:8px; right:8px; bottom:8px;
@@ -301,6 +312,7 @@
       line-height:1.2;
       color: rgba(233,237,246,.95);
       display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+      z-index:2;
     }
     .thumb .fav{
       position:absolute; right:8px; top:8px;
@@ -310,6 +322,7 @@
       border:1px solid rgba(255,255,255,.12);
       font-size:14px;
       opacity:.95;
+      z-index:2;
     }
 
     .modal-backdrop{
@@ -375,7 +388,7 @@
         <div class="logo"></div>
         <div>
           <div class="t1">PhimApp</div>
-          <div class="t2">Khung sườn UI • load Supabase/localStorage</div>
+          <div class="t2">Load Supabase/localStorage • Stream Drive</div>
         </div>
       </div>
 
@@ -427,7 +440,7 @@
 
         <div class="hero-right">
           <div class="preview-box">
-            <div class="preview-media">PREVIEW (placeholder)</div>
+            <div class="preview-media" id="heroPoster">PREVIEW</div>
             <div class="preview-info">
               <div class="line w80"></div>
               <div class="line w60"></div>
@@ -467,28 +480,22 @@
     const LS_FAV = "phimapp_favs_v1";
     const LS_CACHE = "movieapp_data_cache_v1";
 
-    // ========== FALLBACK DEMO (nếu Supabase + cache rỗng) ==========
+    // fallback demo (nếu Supabase + cache rỗng)
     const DEMO = [
-      { id:"aono2", type:"series", title:"Ao no Orchestra 2nd Season", sub:"Blue Orchestra Season 2", imdb:"6.8", quality:"FHD", year:"2025", part:"Phần 2", ep:"Tập 18",
-        tags:["Chính Kịch","Hoạt Hình","Tình Cảm","Tâm Lý"], genre:"Hoạt Hình", country:"JP",
-        desc:"Vào mùa thu năm cuối cấp trung học cơ sở... (placeholder mô tả)"},
-      { id:"movie1", type:"movie", title:"The Demo Movie", sub:"Demo Movie 2026", imdb:"7.0", quality:"4K", year:"2026", part:"", ep:"",
-        tags:["Hành Động","Phiêu Lưu"], genre:"Hành Động", country:"US",
-        desc:"Phim demo để test UI."},
+      { id:"movie1", type:"movie", title:"Demo Movie", sub:"Demo", imdb:"7.0", quality:"HD", year:"2026", part:"", ep:"",
+        tags:["Demo"], genre:"Demo", country:"VN", desc:"Demo data", poster:"", driveid:"" },
     ];
 
-    // ========== STATE ==========
     const state = {
       DATA: [],
       q: "",
-      type: "all",       // all | movie | series
+      type: "all",
       genre: "",
       country: "",
       activeId: "",
       favs: new Set(),
     };
 
-    // ========== DOM ==========
     const el = {
       searchInput: document.getElementById("searchInput"),
       strip: document.getElementById("strip"),
@@ -498,6 +505,7 @@
       heroMetaTop: document.getElementById("heroMetaTop"),
       heroMetaTags: document.getElementById("heroMetaTags"),
       heroDesc: document.getElementById("heroDesc"),
+      heroPoster: document.getElementById("heroPoster"),
 
       playBtn: document.getElementById("playBtn"),
       favBtn: document.getElementById("favBtn"),
@@ -544,6 +552,18 @@
       return [...s].sort((a,b)=>a.localeCompare(b));
     }
 
+    // ===== Drive helpers (poster/video) =====
+    function extractDriveId(link){
+      const s = String(link || "");
+      let m = s.match(/\/file\/d\/([a-zA-Z0-9_-]+)/); if(m) return m[1];
+      m = s.match(/open\?id=([a-zA-Z0-9_-]+)/); if(m) return m[1];
+      m = s.match(/[?&]id=([a-zA-Z0-9_-]+)/); if(m) return m[1];
+      return "";
+    }
+    function driveImageUrl(id){
+      return `https://drive.google.com/uc?export=view&id=${encodeURIComponent(id)}`;
+    }
+
     function loadFavs(){
       try{
         const raw = localStorage.getItem(LS_FAV);
@@ -553,12 +573,10 @@
         state.favs = new Set();
       }
     }
-
     function saveFavs(){
       localStorage.setItem(LS_FAV, JSON.stringify([...state.favs]));
     }
 
-    // ====== Cache helpers ======
     function readCache(){
       const s = localStorage.getItem(LS_CACHE);
       if(!s) return [];
@@ -571,15 +589,19 @@
       localStorage.setItem(LS_CACHE, JSON.stringify(items));
     }
 
-    // ====== Map DB row -> UI item ======
+    // ===== Map DB row -> UI item (poster from Drive) =====
     function mapDbRowToUi(row){
-      // table movies: {id,title,kind,year,quality,imdb,country,genre,poster,url,driveid}
-      const type = (row.kind === "movie") ? "movie" : "series"; // bạn có thể đổi rule nếu muốn
+      const type = (row.kind === "movie") ? "movie" : "series";
+
+      const posterLink = String(row.poster ?? "");
+      const posterId = extractDriveId(posterLink);
+      const poster_img = posterId ? driveImageUrl(posterId) : "";
+
       return {
         id: String(row.id ?? ""),
         type,
         title: String(row.title ?? ""),
-        sub: "", // chưa có field => để trống
+        sub: "",
         imdb: String(row.imdb ?? ""),
         quality: String(row.quality ?? ""),
         year: String(row.year ?? ""),
@@ -588,10 +610,10 @@
         tags: row.genre ? [String(row.genre)] : [],
         genre: String(row.genre ?? ""),
         country: String(row.country ?? ""),
-        desc: "", // chưa có field => để trống
-        poster: String(row.poster ?? ""),
-        url: String(row.url ?? ""),
-        driveid: String(row.driveid ?? ""),
+        desc: "",
+        poster: posterLink,
+        poster_img,
+        driveid: String(row.driveid ?? ""), // VIDEO id (để stream)
       };
     }
 
@@ -599,14 +621,11 @@
       if(!SUPABASE_URL || !SUPABASE_ANON_KEY) return [];
       try{
         const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        // cần policy SELECT nếu RLS bật
         const { data, error } = await sb
           .from(SUPABASE_TABLE)
           .select("id,title,kind,year,quality,imdb,country,genre,poster,url,driveid")
           .order("id", { ascending: false })
           .limit(200);
-
         if(error) throw error;
         return (data || []).map(mapDbRowToUi);
       }catch(e){
@@ -616,25 +635,18 @@
     }
 
     async function bootstrapData(){
-      // 1) thử Supabase
       const fromDb = await loadFromSupabase();
       if(fromDb.length){
-        // sync cache để lần sau load nhanh/offline
         writeCache(fromDb);
         return { items: fromDb, source: "supabase" };
       }
-
-      // 2) fallback localStorage
       const fromCache = readCache();
       if(fromCache.length){
         return { items: fromCache, source: "localStorage" };
       }
-
-      // 3) fallback demo
       return { items: DEMO, source: "demo" };
     }
 
-    // ========== FILTERING ==========
     function filteredItems(){
       const q = state.q.trim().toLowerCase();
       return state.DATA.filter(x=>{
@@ -654,7 +666,6 @@
       return state.DATA.find(x=>x.id === state.activeId) || state.DATA[0];
     }
 
-    // ========== RENDER ==========
     function renderHero(){
       const x = getActive();
       if(!x){
@@ -664,6 +675,8 @@
         el.heroMetaTags.innerHTML = "";
         el.heroDesc.textContent = "";
         el.favBtn.textContent = "♡";
+        el.heroPoster.style.backgroundImage = "";
+        el.heroPoster.textContent = "NO PREVIEW";
         return;
       }
 
@@ -683,11 +696,18 @@
 
       el.favBtn.textContent = state.favs.has(x.id) ? "♥" : "♡";
       el.favBtn.title = state.favs.has(x.id) ? "Bỏ yêu thích" : "Yêu thích";
+
+      if(x.poster_img){
+        el.heroPoster.style.backgroundImage = `url('${x.poster_img}')`;
+        el.heroPoster.textContent = "";
+      }else{
+        el.heroPoster.style.backgroundImage = "";
+        el.heroPoster.textContent = "NO POSTER";
+      }
     }
 
     function renderStrip(){
       const items = filteredItems();
-
       if(items.length && !items.some(i=>i.id===state.activeId)){
         state.activeId = items[0].id;
       }
@@ -695,8 +715,13 @@
       el.strip.innerHTML = items.map(x=>{
         const isActive = x.id===state.activeId;
         const isFav = state.favs.has(x.id);
+
+        const bg = x.poster_img
+          ? `style="background-image:url('${escapeHtml(x.poster_img)}')"`
+          : "";
+
         return `
-          <div class="thumb ${isActive ? "active":""}" data-id="${escapeHtml(x.id)}" title="${escapeHtml(x.title)}">
+          <div class="thumb ${isActive ? "active":""}" data-id="${escapeHtml(x.id)}" title="${escapeHtml(x.title)}" ${bg}>
             <div class="fav" title="Yêu thích">${isFav ? "♥" : "♡"}</div>
             <div class="tlabel">${escapeHtml(x.title)}</div>
           </div>
@@ -761,7 +786,6 @@
       el.btnCountry.textContent = state.country ? `Quốc gia: ${state.country} ▾` : "Quốc gia ▾";
     }
 
-    // ========== DROPDOWN ==========
     function closeDropdowns(){
       el.ddGenre.classList.remove("open");
       el.ddCountry.classList.remove("open");
@@ -780,7 +804,6 @@
       return false;
     }
 
-    // ========== MODAL ==========
     function openModal(title, html){
       el.modalTitle.textContent = title;
       el.modalBody.innerHTML = html;
@@ -792,7 +815,6 @@
       el.modalBackdrop.setAttribute("aria-hidden","true");
     }
 
-    // ========== EVENTS ==========
     function bind(){
       el.searchInput.addEventListener("input", ()=>{
         state.q = el.searchInput.value;
@@ -816,12 +838,15 @@
 
       document.addEventListener("click", ()=> closeDropdowns());
 
+      // ✅ STREAM: bấm xem ngay -> watch.html?id=driveid
       el.playBtn.addEventListener("click", ()=>{
         const x = getActive();
         if(!x) return;
-        // nếu DB có url thì đi theo url, fallback theo id
-        if(x.url) location.href = x.url;
-        else location.href = `watch.html?url=${encodeURIComponent(x.id)}`;
+        if(!x.driveid){
+          toast("❌ Thiếu driveid (video). Hãy nhập Watch URL (link Drive video) ở Admin.");
+          return;
+        }
+        location.href = `watch.html?id=${encodeURIComponent(x.driveid)}`;
       });
 
       el.favBtn.addEventListener("click", ()=>{
@@ -851,7 +876,7 @@
             ${x.country ? `<span class="tag">${escapeHtml(x.country)}</span>`:""}
             <span class="tag">${escapeHtml(x.type)}</span>
           </div>
-          <div><b>Mô tả:</b><br>${escapeHtml(x.desc || "—")}</div>
+          <div><b>Drive Video ID:</b> ${escapeHtml(x.driveid || "—")}</div>
           <div style="margin-top:10px;color:rgba(233,237,246,.78)">
             <b>ID:</b> ${escapeHtml(x.id)}
           </div>
@@ -873,12 +898,11 @@
       });
     }
 
-    // ========== INIT ==========
     (async function init(){
       loadFavs();
 
       const boot = await bootstrapData();
-      state.DATA = boot.items;
+      state.DATA = boot.items || [];
       state.activeId = state.DATA[0]?.id || "";
 
       toast(`Loaded: ${boot.source} (${state.DATA.length})`);
