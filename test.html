@@ -539,7 +539,7 @@ function uid(){
     let movies = await loadMovies();
 
     async function render(){
-      movies = loadMovies();
+      movies = await loadMovies();
       el.list.innerHTML = "";
 
       if(movies.length === 0){
