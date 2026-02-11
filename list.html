@@ -134,53 +134,28 @@
         .replaceAll("'","&#39;");
     }
 
-    // ✅ FIX: decode nhiều lớp + bắt fb l.php?u=... + nhiều dạng link Drive
+    // ===== Drive helpers (FIX poster) =====
     function extractDriveId(link){
-      let s = String(link || "").trim();
-      if(!s) return "";
-
-      for(let i=0;i<3;i++){
-        try{
-          const dec = decodeURIComponent(s);
-          if(dec === s) break;
-          s = dec;
-        }catch{ break; }
-      }
-
-      try{
-        const u = new URL(s);
-        const inner = u.searchParams.get("u") || u.searchParams.get("url") || "";
-        if(inner){
-          let t = inner;
-          for(let i=0;i<3;i++){
-            try{
-              const dec = decodeURIComponent(t);
-              if(dec === t) break;
-              t = dec;
-            }catch{ break; }
-          }
-          s = t;
-        }
-      }catch{}
-
+      const s = String(link || "");
       let m = s.match(/\/file\/d\/([a-zA-Z0-9_-]+)/); if(m) return m[1];
       m = s.match(/open\?id=([a-zA-Z0-9_-]+)/); if(m) return m[1];
       m = s.match(/[?&]id=([a-zA-Z0-9_-]+)/); if(m) return m[1];
-      m = s.match(/drive\.google\.com\/uc\?[^#]*\bid=([a-zA-Z0-9_-]+)/); if(m) return m[1];
       return "";
     }
-
-    function driveImageUrl(id){
+    function driveThumbUrl(id, size=1200){
+      return `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w${size}`;
+    }
+    function driveUcViewUrl(id){
       return `https://drive.google.com/uc?export=view&id=${encodeURIComponent(id)}`;
+    }
+    function driveBgCss(id, size=1200){
+      return `url('${driveThumbUrl(id,size)}'), url('${driveUcViewUrl(id)}')`;
     }
 
     function normalizeItem(x){
       const posterLink = safeText(x.poster ?? "");
       const posterId = extractDriveId(posterLink);
-      const poster_img = safeText(x.poster_img ?? (posterId ? driveImageUrl(posterId) : ""));
-
-      // ✅ nếu driveid rỗng thì thử parse từ url (watch url)
-      const driveid = safeText(x.driveid ?? "") || extractDriveId(x.url ?? "");
+      const poster_img = safeText(x.poster_img ?? (posterId ? driveBgCss(posterId, 1200) : ""));
 
       return {
         id: safeText(x.id ?? x.slug ?? crypto.randomUUID()),
@@ -192,7 +167,7 @@
         genre: safeText(x.genre ?? x.categories ?? ""),
         poster: posterLink,
         poster_img,
-        driveid,
+        driveid: safeText(x.driveid ?? "") || extractDriveId(x.url ?? ""),
       };
     }
 
@@ -244,13 +219,20 @@
       });
     }
 
+    function watchHref(x){
+      if(!x.driveid) return "#";
+      // ✅ giống index: truyền movie id, watch tự lấy driveid trong cache
+      return `watch.html?id=${encodeURIComponent(x.id)}`;
+    }
+
     function rowHtml(x){
       const thumbStyle = x.poster_img
-        ? `style="background-image:url('${escapeHtml(x.poster_img)}')"`
+        ? `style="background-image:${escapeHtml(x.poster_img)}"`
         : "";
 
+      const href = watchHref(x);
       const watchBtn = x.driveid
-        ? `<a class="btn" href="watch.html?id=${encodeURIComponent(x.id)}">▶ Watch</a>`
+        ? `<a class="btn" href="${escapeHtml(href)}">▶ Watch</a>`
         : `<span class="muted">Thiếu driveid</span>`;
 
       return `
@@ -301,7 +283,6 @@
       if(!Array.isArray(data) || !data.length){
         data = [
           { id:"demo1", title:"Demo Movie", kind:"movie", year:"2026", country:"VN", genre:"Action", quality:"FHD", poster:"", driveid:"" },
-          { id:"demo2", title:"Demo Anime", kind:"anime", year:"2025", country:"JP", genre:"Fantasy", quality:"HD", poster:"", driveid:"" },
         ];
       }
 
