@@ -82,7 +82,6 @@
     .member-btn:hover{border-color:var(--line2)}
     .member-btn svg{opacity:.95}
 
-    /* ===== Layout ===== */
     .grid{
       margin-top:18px;
       display:grid;
@@ -99,7 +98,6 @@
       .grid{grid-template-columns: 1fr; }
     }
 
-    /* ===== Player card ===== */
     .card{
       border-radius: var(--radius);
       border:1px solid rgba(255,255,255,.10);
@@ -120,7 +118,6 @@
     .spinner{width:28px;height:28px;border-radius:999px;border:3px solid rgba(255,255,255,.22);border-top-color:rgba(255,255,255,.85);animation:rot 1s linear infinite}
     @keyframes rot{to{transform:rotate(360deg)}}
 
-    /* ===== Info block dưới player ===== */
     .info{
       padding:14px 14px 16px;
       border-top:1px solid rgba(255,255,255,.08);
@@ -176,11 +173,9 @@
       user-select:none;
     }
     .btn:hover{background: rgba(255,255,255,.10);}
-    .btn.primary{background: rgba(242,198,79,.16); border-color: rgba(242,198,79,.35); color: rgba(242,198,79, .98);}
     a{color:var(--accent); text-decoration:none}
     a:hover{text-decoration:underline}
 
-    /* ===== Episodes ===== */
     .episodes{
       margin-top:14px;
       padding:14px;
@@ -226,7 +221,6 @@
       font-weight:800;
     }
 
-    /* ===== Sidebar suggestions ===== */
     .sidebar .head{
       padding:14px 14px 10px;
       display:flex; align-items:center; justify-content:space-between;
@@ -288,14 +282,13 @@
       <button class="member-btn" onclick="location.href='test.html'">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M12 12a4.5 4.5 0 1 0-4.5-4.5A4.5 4.5 0 0 0 12 12Z" stroke="rgba(231,237,249,.9)" stroke-width="2" />
-          <path d="M20 21a8 8 0 1 0-16 0" stroke="rgba(231,237,249,.9)" stroke-width="2" stroke-linecap="round" />
+          <path d="M20 21a8 8.0 0 1 0-16 0" stroke="rgba(231,237,249,.9)" stroke-width="2" stroke-linecap="round" />
         </svg>
         <span>Thành viên</span>
       </button>
     </header>
 
     <div class="grid">
-      <!-- MAIN -->
       <main class="card">
         <div class="player-wrap">
           <div class="player-overlay" id="loading">
@@ -323,8 +316,6 @@
             <div class="actions">
               <div class="btn" id="btnLike">♥ Yêu thích</div>
               <div class="btn" id="btnEpisodes">Chuyển tập</div>
-
-              <!-- ✅ ĐÃ ẨN: Nút “Mở trên Drive” + ID -->
               <a class="btn" href="index.html">← Quay lại</a>
             </div>
           </div>
@@ -348,7 +339,6 @@
         </section>
       </main>
 
-      <!-- SIDEBAR -->
       <aside class="card sidebar">
         <div class="head">
           <b>Đề xuất</b>
@@ -363,13 +353,29 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // ===== Supabase =====
     const SUPABASE_URL = "https://nzalaxolteaiafvuceqz.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56YWxheG9sdGVhaWFmdnVjZXF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyOTY2MjAsImV4cCI6MjA4NTg3MjYyMH0.0eIz6cfB4Dr_g5Wja70tZCMvVfUKoI5H4D8MJBP49Bg";
 
     const sb = window.supabase?.createClient
       ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
       : null;
+
+    // ===== Level 2: ẩn driveId khỏi URL (lưu tạm sessionStorage) =====
+    const SESSION_DRIVE_KEY = "khoii_watch_drive_v1";
+    function setCurrentDriveId(id){
+      try { sessionStorage.setItem(SESSION_DRIVE_KEY, String(id || "")); } catch {}
+    }
+    function getCurrentDriveId(){
+      try { return sessionStorage.getItem(SESSION_DRIVE_KEY) || ""; } catch { return ""; }
+    }
+    window.goWatch = function(driveId, title){
+      const id = String(driveId || "").trim();
+      if (!id) return;
+      setCurrentDriveId(id);
+      const t = String(title || "").trim();
+      const url = t ? `watch.html?title=${encodeURIComponent(t)}` : "watch.html";
+      location.href = url;
+    };
 
     const DriveTool = (() => {
       const patterns = [
@@ -401,7 +407,7 @@
       }
       function normalize(input) {
         const id = extractId(input);
-        if (!id) return { ok:false, error:"Không tách được ID từ link Drive.", id:null, links:null };
+        if (!id) return { ok:false, error:"Không tách được ID.", id:null, links:null };
         return { ok:true, id, links:links(id) };
       }
       return { normalize };
@@ -422,6 +428,7 @@
       epHint: document.getElementById("epHint"),
       btnEpisodes: document.getElementById("btnEpisodes"),
       sugList: document.getElementById("sugList"),
+      btnLike: document.getElementById("btnLike"),
     };
 
     function escapeHtml(s) {
@@ -555,10 +562,6 @@
       } catch { return []; }
     }
 
-    function watchUrl(driveId, title) {
-      return `watch.html?drive=${encodeURIComponent(driveId)}&title=${encodeURIComponent(title || "")}`;
-    }
-
     function renderSuggestions(items) {
       if (!items || items.length === 0) {
         el.sugList.innerHTML = `<div class="empty">Chưa có đề xuất.</div>`;
@@ -568,8 +571,12 @@
         const k = it.kind === "movie" ? "Phim Lẻ" : it.kind === "series" ? "Phim Bộ" : "Anime";
         const meta = [k, it.year].filter(Boolean).join(" • ");
         const poster = it.posterurl || "";
+
+        const did = JSON.stringify(it.driveid || "");
+        const ttl = JSON.stringify(it.title || "");
+
         return `
-          <div class="sug" onclick="location.href='${watchUrl(it.driveid, it.title)}'">
+          <div class="sug" onclick="goWatch(${did}, ${ttl})">
             <div class="thumb">${poster ? `<img src="${escapeHtml(poster)}" alt="">` : ""}</div>
             <div>
               <div class="t">${escapeHtml(it.title || "—")}</div>
@@ -591,7 +598,11 @@
         const ep = r._ep || (i+1);
         const active = r.driveid === currentDriveId ? "active" : "";
         const t = `Tập ${pad2(ep)}`;
-        return `<div class="ep ${active}" onclick="location.href='${watchUrl(r.driveid, seriesTitle)}'">${escapeHtml(t)}</div>`;
+
+        const did = JSON.stringify(r.driveid || "");
+        const ttl = JSON.stringify(seriesTitle || "");
+
+        return `<div class="ep ${active}" onclick="goWatch(${did}, ${ttl})">${escapeHtml(t)}</div>`;
       }).join("");
     }
 
@@ -600,18 +611,25 @@
         if (ev.key === "Enter") applySearchKeyword(el.q.value);
       });
 
-      el.btnEpisodes.addEventListener("click", () => {
+      document.getElementById("btnEpisodes")?.addEventListener("click", () => {
         document.getElementById("episodesSection")?.scrollIntoView({behavior:"smooth", block:"start"});
       });
 
+      el.btnLike?.addEventListener("click", () => {
+        alert("Đã thêm vào yêu thích (demo).");
+      });
+
       const params = new URLSearchParams(location.search);
-      const driveParam = params.get("drive") || params.get("m") || "";
       const titleQ = (params.get("title") || "Xem phim").trim();
 
-      const r = DriveTool.normalize(driveParam);
+      // ưu tiên: drive trong URL -> sessionStorage
+      const driveParam = params.get("drive") || params.get("m") || "";
+      const driveCandidate = driveParam || getCurrentDriveId();
+
+      const r = DriveTool.normalize(driveCandidate);
       if (!r.ok) {
-        el.title.textContent = "Link không hợp lệ";
-        el.subtitle.textContent = "Vui lòng kiểm tra lại.";
+        el.title.textContent = "Không có phim để phát";
+        el.subtitle.textContent = "Thiếu link/ID hoặc không hợp lệ.";
         el.loading.style.display = "none";
         el.frame.src = "";
         renderBadges({ quality:"—" });
@@ -622,7 +640,14 @@
         return;
       }
 
-      // Player (vẫn cần để xem)
+      // lưu lại driveId cho lần sau
+      setCurrentDriveId(r.id);
+
+      // ✅ xóa drive khỏi URL, chỉ giữ title
+      const cleanUrl = titleQ ? `watch.html?title=${encodeURIComponent(titleQ)}` : "watch.html";
+      history.replaceState({}, "", cleanUrl);
+
+      // Player
       el.frame.src = r.links.preview;
 
       el.frame.addEventListener("load", () => { el.loading.style.display = "none"; });
@@ -636,6 +661,7 @@
       el.desc.textContent = "";
       setPoster("");
 
+      // Movie info
       const info = await fetchMovieByDriveId(r.id);
       const seriesTitle = (info?.title || titleQ || "Xem phim").trim();
       el.title.textContent = seriesTitle;
@@ -648,12 +674,14 @@
         el.desc.textContent = info.desc || "";
         setPoster(info.posterurl || "");
       } else {
-        el.subtitle.textContent = "Không tìm thấy dữ liệu phim trong kho (vẫn có thể xem nếu Drive hợp lệ).";
+        el.subtitle.textContent = "Không tìm thấy dữ liệu phim trong kho (vẫn xem được nếu Drive hợp lệ).";
       }
 
+      // Episodes
       const eps = await fetchEpisodesByTitle(seriesTitle, info?.kind || "anime");
       renderEpisodes(eps, r.id, seriesTitle);
 
+      // Suggestions
       const sug = await fetchSuggestions(r.id);
       renderSuggestions(sug);
     })();
