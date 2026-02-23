@@ -542,7 +542,14 @@ create index if not exists movies_genres_gin_idx on public.movies using gin (gen
       fixedPoster = DriveTool.thumb(videoId, 600);
     }
 
-    // hero: nếu user dán link/ID Drive => convert thumbnail; nếu trống => dùng thumb từ videoId
+    // Nếu user không nhập hero riêng, dùng poster làm hero để hiển thị đồng bộ.
+    if(!rawHero && fixedPoster){
+      fixedHero = fixedPoster;
+    }
+
+    // hero: nếu user dán link/ID Drive => convert thumbnail;
+    // nếu trống thì ưu tiên dùng poster (để hero/section khớp nhau),
+    // cuối cùng mới dùng thumb từ videoId.
     let fixedHero = rawHero;
     const heroId = DriveTool.extractId(rawHero);
     if(heroId){
