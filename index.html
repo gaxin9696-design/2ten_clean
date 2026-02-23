@@ -833,7 +833,7 @@
         desc: "Chưa có phim? Vào Admin để thêm phim Drive thật.",
         driveId: "YOUR_DRIVE_ID_HERE",
         posterUrl: svgPlaceholder("Khoii • Poster Demo", 500, 750),
-        heroUrl: svgPlaceholder("Khoii • Hero Demo", 1600, 900),
+        heroUrl: svgPlaceholder("Khoii • Hero Demo", 1000, 800),
         genres: ["Action", "Fantasy"],
         country: "Japan",
         updatedAt: Date.now()
@@ -864,7 +864,7 @@
         country: m.country || "",
         desc: m.desc || "",
         driveId,
-        hero: hero || svgPlaceholder("Khoii Hero", 1600, 900),
+        hero: hero || svgPlaceholder("Khoii Hero", 1000, 800),
         poster: poster || svgPlaceholder("Khoii Poster", 500, 750),
         kind: m.kind || "anime",
         updatedAt: Number(m.updatedAt || 0)
@@ -953,7 +953,7 @@
 
       el.heroContent?.classList.add("is-switching");
 
-      setImgWithFallback(nextEl, url, svgPlaceholder("Khoii Hero", 1600, 900));
+      setImgWithFallback(nextEl, url, svgPlaceholder("Khoii Hero", 1000, 800));
 
       // restart reveal anim
       nextEl.classList.remove("reveal");
@@ -1192,7 +1192,7 @@ function renderThumbs(list){
         el.heroGenres.innerHTML = "";
         el.heroDesc.textContent = "Hãy thử từ khóa khác hoặc xoá bộ lọc.";
 
-        setHeroImage(svgPlaceholder("No result", 1600, 900));
+        setHeroImage(svgPlaceholder("No result", , 9001600));
         renderThumbs([]);
         renderHeroPosters([]);
         el.heroDots.innerHTML = "";
