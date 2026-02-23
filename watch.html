@@ -682,13 +682,20 @@
     function getCurrentDriveId() {
       try { return sessionStorage.getItem(SESSION_DRIVE_KEY) || ""; } catch { return ""; }
     }
-    window.goWatch = function (driveId, title) {
+
+    // ✅ goWatch: giữ drive trong sessionStorage, URL khác nhau theo ep/season để chắc chắn reload
+    window.goWatch = function (driveId, title, ep, season) {
       const id = String(driveId || "").trim();
-      if (!id) return;
-      setCurrentDriveId(id);
+      if (id) setCurrentDriveId(id);
+
       const t = String(title || "").trim();
-      const url = t ? `watch.html?title=${encodeURIComponent(t)}` : "watch.html";
-      location.href = url;
+      const p = new URLSearchParams();
+      if (t) p.set("title", t);
+
+      if (season !== undefined && season !== null && season !== "") p.set("season", String(season));
+      if (ep !== undefined && ep !== null && ep !== "") p.set("ep", String(ep));
+
+      location.href = "watch.html" + (p.toString() ? "?" + p.toString() : "");
     };
 
     const DriveTool = (() => {
@@ -796,6 +803,7 @@
         .trim();
     }
 
+    // fallback nếu bạn quên nhập ep trong DB (khuyên: luôn nhập ep)
     function inferEpNumber(row, idx) {
       const s = `${row?.drivelink || ""} ${row?.title || ""}`.toLowerCase();
       const pats = [
@@ -821,7 +829,7 @@
       try {
         const { data, error } = await sb
           .from("movies")
-          .select("id,title,kind,year,quality,desc,genres,country,imdb,posterurl,herourl,driveid,drivelink,updatedat,created_at")
+          .select("id,title,kind,year,quality,desc,genres,country,imdb,posterurl,herourl,driveid,drivelink,updatedat,created_at,ep,eps,season")
           .eq("driveid", driveId)
           .limit(1);
         if (error) return null;
@@ -829,35 +837,49 @@
       } catch { return null; }
     }
 
+    // ✅ mở link kiểu watch.html?title=...&season=1&ep=2 (không cần sessionStorage)
+    async function fetchMovieByTitleEp(title, season, ep) {
+      if (!sb || !title || !season || !ep) return null;
+      try {
+        const { data, error } = await sb
+          .from("movies")
+          .select("id,title,kind,year,quality,desc,genres,country,imdb,posterurl,herourl,driveid,drivelink,updatedat,created_at,ep,eps,season")
+          .eq("title", title)
+          .eq("season", season)
+          .eq("ep", ep)
+          .limit(1);
+
+        if (error) return null;
+        return (data || [])[0] || null;
+      } catch { return null; }
+    }
+
+    // ✅ lấy list tập theo title/kind, sort theo season/ep
     async function fetchEpisodesByTitle(seriesTitle, kind) {
       if (!sb || !seriesTitle) return [];
       try {
-        let { data, error } = await sb
+        let q = sb
           .from("movies")
-          .select("id,title,driveid,drivelink,updatedat,created_at")
-          .eq("title", seriesTitle)
-          .eq("kind", kind || "anime")
+          .select("id,title,kind,driveid,drivelink,updatedat,created_at,ep,eps,season")
+          .eq("title", seriesTitle);
+
+        if (kind) q = q.eq("kind", kind);
+
+        const { data, error } = await q
+          .order("season", { ascending: true, nullsFirst: true })
+          .order("ep", { ascending: true, nullsFirst: true })
+          .order("created_at", { ascending: true })
           .limit(200);
 
-        if (error) data = null;
-
-        if (!data || data.length === 0) {
-          const base = baseTitleGuess(seriesTitle);
-          if (base && base !== seriesTitle) {
-            const r2 = await sb
-              .from("movies")
-              .select("id,title,driveid,drivelink,updatedat,created_at")
-              .ilike("title", base + "%")
-              .eq("kind", kind || "anime")
-              .limit(200);
-            if (!r2.error) data = r2.data || [];
-          }
-        }
+        if (error) return [];
 
         const rows = Array.isArray(data) ? data : [];
-        const enriched = rows.map((r, i) => ({ ...r, _ep: inferEpNumber(r, i) }));
-        enriched.sort((a, b) => (a._ep - b._ep) || String(a.created_at || "").localeCompare(String(b.created_at || "")));
-        return enriched;
+        return rows.map((r, i) => ({
+          ...r,
+          _season: Number.isFinite(r.season) ? r.season : 1,
+          _ep: Number.isFinite(r.ep) ? r.ep : inferEpNumber(r, i),
+          _eps: Number.isFinite(r.eps) ? r.eps : null,
+        }));
       } catch { return []; }
     }
 
@@ -889,8 +911,9 @@
         const did = JSON.stringify(it.driveid || "");
         const ttl = JSON.stringify(it.title || "");
 
+        // đề xuất: mở ep mặc định 1 (nếu là bộ)
         return `
-          <div class="sug" onclick="goWatch(${did}, ${ttl})">
+          <div class="sug" onclick="goWatch(${did}, ${ttl}, 1, 1)">
             <div class="thumb">${poster ? `<img src="${escapeHtml(poster)}" alt="">` : ""}</div>
             <div>
               <div class="t">${escapeHtml(it.title || "—")}</div>
@@ -901,22 +924,32 @@
       }).join("");
     }
 
-    function renderEpisodes(list, currentDriveId, seriesTitle) {
+    function renderEpisodes(list, currentDriveId, seriesTitle, currentEp, currentSeason) {
       if (!Array.isArray(list) || list.length === 0) {
-        el.epHint.textContent = "Chưa có danh sách tập (hãy thêm nhiều record cùng Title để hiện tập).";
+        el.epHint.textContent = "Chưa có danh sách tập.";
         el.epGrid.innerHTML = `<div class="empty" style="padding:0">Không có tập.</div>`;
         return;
       }
+
       el.epHint.textContent = `${list.length} tập`;
       el.epGrid.innerHTML = list.map((r, i) => {
         const ep = r._ep || (i + 1);
-        const active = r.driveid === currentDriveId ? "active" : "";
+        const season = r._season || 1;
+
+        const active =
+          (currentEp && currentSeason && ep === currentEp && season === currentSeason) ||
+          (r.driveid === currentDriveId)
+            ? "active"
+            : "";
+
         const t = `Tập ${pad2(ep)}`;
 
         const did = JSON.stringify(r.driveid || "");
         const ttl = JSON.stringify(seriesTitle || "");
+        const epJs = JSON.stringify(ep);
+        const ssJs = JSON.stringify(season);
 
-        return `<div class="ep ${active}" onclick="goWatch(${did}, ${ttl})">${escapeHtml(t)}</div>`;
+        return `<div class="ep ${active}" onclick="goWatch(${did}, ${ttl}, ${epJs}, ${ssJs})">${escapeHtml(t)}</div>`;
       }).join("");
     }
 
@@ -935,10 +968,17 @@
 
       const params = new URLSearchParams(location.search);
       const titleQ = (params.get("title") || "Xem phim").trim();
+      const epWanted = Number(params.get("ep") || "") || null;
+      const seasonWanted = Number(params.get("season") || "") || 1;
 
-      // ưu tiên: drive trong URL -> sessionStorage
+      // ưu tiên: drive trong URL -> nếu không có drive thì tìm theo title+season+ep -> fallback sessionStorage
       const driveParam = params.get("drive") || params.get("m") || "";
-      const driveCandidate = driveParam || getCurrentDriveId();
+      let driveCandidate = driveParam || getCurrentDriveId();
+
+      if (!driveCandidate && titleQ && epWanted) {
+        const row = await fetchMovieByTitleEp(titleQ, seasonWanted, epWanted);
+        if (row?.driveid) driveCandidate = row.driveid;
+      }
 
       const r = DriveTool.normalize(driveCandidate);
       if (!r.ok) {
@@ -950,20 +990,22 @@
         renderGenres([]);
         el.desc.textContent = "";
         renderSuggestions([]);
-        renderEpisodes([], "", titleQ);
+        renderEpisodes([], "", titleQ, epWanted, seasonWanted);
         return;
       }
 
       // lưu lại driveId cho lần sau
       setCurrentDriveId(r.id);
 
-      // ✅ xóa drive khỏi URL, chỉ giữ title
-      const cleanUrl = titleQ ? `watch.html?title=${encodeURIComponent(titleQ)}` : "watch.html";
-      history.replaceState({}, "", cleanUrl);
+      // ✅ xóa drive khỏi URL, nhưng giữ title + ep + season (để link tập là link thật)
+      const cleanParams = new URLSearchParams();
+      if (titleQ) cleanParams.set("title", titleQ);
+      if (seasonWanted) cleanParams.set("season", String(seasonWanted));
+      if (epWanted) cleanParams.set("ep", String(epWanted));
+      history.replaceState({}, "", "watch.html" + (cleanParams.toString() ? "?" + cleanParams.toString() : ""));
 
       // Player
       el.frame.src = r.links.preview;
-
       el.frame.addEventListener("load", () => { el.loading.style.display = "none"; });
       setTimeout(() => { el.loading.style.display = "none"; }, 6500);
 
@@ -992,11 +1034,22 @@
       }
 
       // Episodes
-      const eps = await fetchEpisodesByTitle(seriesTitle, info?.kind || "anime");
-      renderEpisodes(eps, r.id, seriesTitle);
+      const eps = await fetchEpisodesByTitle(seriesTitle, info?.kind || null);
+
+      // nếu URL có epWanted thì ép player sang đúng driveid tập đó (phòng trường hợp sessionStorage đang là tập khác)
+      if (epWanted && eps.length) {
+        const hit = eps.find(x => x._season === seasonWanted && x._ep === epWanted);
+        if (hit?.driveid && hit.driveid !== r.id) {
+          setCurrentDriveId(hit.driveid);
+          const rr = DriveTool.normalize(hit.driveid);
+          if (rr.ok) el.frame.src = rr.links.preview;
+        }
+      }
+
+      renderEpisodes(eps, getCurrentDriveId() || r.id, seriesTitle, epWanted, seasonWanted);
 
       // Suggestions
-      const sug = await fetchSuggestions(r.id);
+      const sug = await fetchSuggestions(getCurrentDriveId() || r.id);
       renderSuggestions(sug);
     })();
   </script>
