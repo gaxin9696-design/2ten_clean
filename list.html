@@ -1,3 +1,7 @@
+<!-- =========================
+     FILE: list.html (MERGED)
+     FIX: Phim bộ/anime chỉ hiện 1 card (không trùng theo tập)
+========================= -->
 <!doctype html>
 <html lang="vi">
 <head>
@@ -31,7 +35,6 @@
       overflow-x:hidden;
     }
 
-    /* tiny dots overlay (nhẹ giống web mẫu) */
     body::before{
       content:"";
       position:fixed; inset:0;
@@ -54,7 +57,6 @@
       padding:18px 22px 40px;
     }
 
-    /* ===== TOPBAR (đồng bộ index) ===== */
     .topbar{display:flex;align-items:center;gap:16px}
     .brand{display:flex;align-items:center;gap:10px;min-width:170px;cursor:pointer}
     .brand-logo{
@@ -178,7 +180,6 @@
     .member-btn:hover{border-color:var(--line2)}
     .member-btn svg{opacity:.95}
 
-    /* ===== PAGE HEAD ===== */
     .page-head{
       margin-top:18px;
       display:flex;
@@ -196,7 +197,6 @@
       color:var(--muted);
     }
 
-    /* ===== FILTER BAR ===== */
     .bar{
       margin-top:14px;
       display:flex;
@@ -249,7 +249,6 @@
     }
     .btn:hover{border-color:rgba(255,255,255,.20); background:rgba(255,255,255,.06)}
 
-    /* ===== GRID ===== */
     .grid{
       margin-top:16px;
       display:grid;
@@ -433,7 +432,6 @@
       filterYear: document.getElementById("filterYear"),
       loadMore: document.getElementById("loadMore"),
 
-      // header dropdowns
       dropGenre: document.getElementById("dropGenre"),
       dropCountry: document.getElementById("dropCountry"),
       btnDropGenre: document.getElementById("btnDropGenre"),
@@ -446,7 +444,7 @@
 
     const state = {
       tab: "all",
-      kind: null,      // anime/movie/series
+      kind: null,
       genre: "",
       country: "",
       year: "",
@@ -488,21 +486,85 @@
         .replaceAll("'","&#039;");
     }
 
+    // ✅ Gom phim bộ/anime theo tập -> 1 card đại diện (ep=1), updatedAt=max
+    function collapseEpisodicRows(rows) {
+      const out = [];
+      const map = new Map();
+
+      for (const r of (rows || [])) {
+        const kind = r.kind || "anime";
+        const episodic = (kind === "anime" || kind === "series");
+
+        if (!episodic) {
+          out.push({ ...r, openSeason: 1, openEp: 1 });
+          continue;
+        }
+
+        const season = Number(r.season || 1) || 1;
+        const title = String(r.title || "").trim();
+        const key = `${kind}||${season}||${title}`.toLowerCase();
+
+        let g = map.get(key);
+        if (!g) {
+          g = { kind, season, title, rows: [] };
+          map.set(key, g);
+        }
+        g.rows.push(r);
+      }
+
+      for (const g of map.values()) {
+        const arr = g.rows.slice();
+        arr.sort((a, b) => (Number(a.ep || 0) - Number(b.ep || 0)) || (Number(a.updatedAt || 0) - Number(b.updatedAt || 0)));
+
+        const rep = arr.find(x => Number(x.ep) === 1) || arr[0];
+
+        const maxUpdated = Math.max(...arr.map(x => Number(x.updatedAt || 0) || 0));
+        const maxEp = Math.max(...arr.map(x => Number(x.ep || 0) || 0));
+        const totalEps = arr.reduce((m, x) => Math.max(m, Number(x.eps || 0) || 0), 0) || (rep.eps || null);
+
+        const poster = arr.map(x => x.poster).find(Boolean) || rep.poster || "";
+        out.push({
+          ...rep,
+          title: g.title,
+          kind: g.kind,
+          season: g.season,
+          ep: (rep.ep ?? 1),
+          eps: totalEps,
+          poster,
+          updatedAt: maxUpdated,
+          openSeason: g.season,
+          openEp: 1,
+          _latestEp: maxEp,
+        });
+      }
+
+      out.sort((a, b) => (Number(b.updatedAt || 0) - Number(a.updatedAt || 0)));
+      return out;
+    }
+
+    function makeWatchHref(item){
+      const kind = item.kind || "anime";
+      const episodic = (kind === "anime" || kind === "series");
+      if (episodic) {
+        const season = Number(item.openSeason || item.season || 1) || 1;
+        const ep = Number(item.openEp || 1) || 1;
+        return `watch.html?title=${encodeURIComponent(item.title)}&season=${encodeURIComponent(season)}&ep=${encodeURIComponent(ep)}`;
+      }
+      return `watch.html?drive=${encodeURIComponent(item.driveId)}&title=${encodeURIComponent(item.title)}`;
+    }
+
     function parseParams(){
       const u = new URL(location.href);
       state.tab = u.searchParams.get("tab") || "all";
 
-      // optional deep link filters
       state.kind = u.searchParams.get("kind");
       state.genre = u.searchParams.get("genre") || "";
       state.country = u.searchParams.get("country") || "";
       state.year = u.searchParams.get("year") || "";
 
-      // optional search from URL (?q=...)
       const qParam = u.searchParams.get("q") || "";
       if(qParam) el.q.value = qParam;
 
-      // title by tab
       if(state.tab === "suggest") el.title.textContent = "Đề xuất hôm nay";
       else if(state.tab === "new") el.title.textContent = "Phim mới cập nhật";
       else if(state.tab === "anime") { el.title.textContent = "Anime nổi bật"; state.kind = state.kind || "anime"; }
@@ -516,7 +578,8 @@
       }
       const { data, error } = await supabase
         .from("movies")
-        .select("id,title,kind,year,quality,desc,driveid,drivelink,posterurl,herourl,updatedat,genres,country")
+        // ✅ thêm ep/eps/season + posterurl/herourl để gom đúng
+        .select("id,title,kind,year,quality,desc,driveid,drivelink,posterurl,herourl,updatedat,genres,country,ep,eps,season")
         .order("updatedat", { ascending: false });
 
       if(error){
@@ -525,7 +588,7 @@
         return;
       }
 
-      state.all = (data || []).map(r=>({
+      const raw = (data || []).map(r => ({
         id: r.id,
         title: r.title || "Không tên",
         kind: r.kind || "anime",
@@ -537,7 +600,15 @@
         genres: Array.isArray(r.genres) ? r.genres : [],
         country: r.country || "",
         updatedAt: Number(r.updatedat || 0),
+        ep: (r.ep === null || r.ep === undefined) ? null : Number(r.ep),
+        eps: (r.eps === null || r.eps === undefined) ? null : Number(r.eps),
+        season: (r.season === null || r.season === undefined) ? null : Number(r.season),
+        openSeason: Number(r.season || 1) || 1,
+        openEp: 1,
       }));
+
+      // ✅ gom phim bộ/anime thành 1 card
+      state.all = collapseEpisodicRows(raw);
     }
 
     function getUniqueSets(){
@@ -599,15 +670,12 @@
       });
     }
 
-    // ===== Header dropdown (giống menu Thể loại / Quốc gia) =====
     function buildHeaderMenus(genres, countries){
-      // genre
       el.genreGrid.innerHTML = [
         `<div class="drop-item"><a href="#" data-type="genre" data-value="" class="${state.genre ? "" : "on"}">Tất cả</a></div>`,
         ...genres.slice(0,60).map(g=>`<div class="drop-item"><a href="#" data-type="genre" data-value="${escapeHtml(g)}" class="${state.genre===g ? "on" : ""}">${escapeHtml(g)}</a></div>`)
       ].join("");
 
-      // country
       el.countryGrid.innerHTML = [
         `<div class="drop-item"><a href="#" data-type="country" data-value="" class="${state.country ? "" : "on"}">Tất cả</a></div>`,
         ...countries.slice(0,80).map(c=>`<div class="drop-item"><a href="#" data-type="country" data-value="${escapeHtml(c)}" class="${state.country===c ? "on" : ""}">${escapeHtml(c)}</a></div>`)
@@ -632,21 +700,17 @@
     }
 
     function updateNavActive(){
-      // kind
       el.navMovie.classList.toggle("active", state.kind === "movie");
       el.navSeries.classList.toggle("active", state.kind === "series");
 
-      // dropdown state
       el.btnDropGenre.classList.toggle("active", !!state.genre);
       el.btnDropCountry.classList.toggle("active", !!state.country);
     }
 
     function syncDropActive(){
-      // highlight genre
       el.genreGrid.querySelectorAll('a[data-type="genre"]').forEach(a=>{
         a.classList.toggle("on", (a.dataset.value || "") === (state.genre || ""));
       });
-      // highlight country
       el.countryGrid.querySelectorAll('a[data-type="country"]').forEach(a=>{
         a.classList.toggle("on", (a.dataset.value || "") === (state.country || ""));
       });
@@ -659,23 +723,19 @@
 
       let list = state.all.slice();
 
-      // tab effect
       if(state.tab === "anime") list = list.filter(x=>x.kind === "anime");
       if(state.tab === "new") list = list.slice().sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
-      if(state.tab === "suggest") list = list; // keep order, then user filters
+      if(state.tab === "suggest") list = list;
 
-      // filters
       if(state.kind) list = list.filter(x=>x.kind === state.kind);
       if(state.genre) list = list.filter(x=>(x.genres||[]).map(s=>String(s).toLowerCase()).includes(String(state.genre).toLowerCase()));
       if(state.country) list = list.filter(x=>String(x.country||"").toLowerCase() === String(state.country).toLowerCase());
       if(state.year) list = list.filter(x=>String(x.year||"") === String(state.year));
 
-      // search
       if(state.q){
         list = list.filter(x => (x.title||"").toLowerCase().includes(state.q));
       }
 
-      // sort
       if(state.sort === "new"){
         list.sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
       }else if(state.sort === "title"){
@@ -688,11 +748,9 @@
         });
       }
 
-      // paginate
       state.view = list;
       el.count.textContent = String(list.length);
 
-      // reset grid and render first page
       el.grid.innerHTML = "";
       state.page = 0;
       renderNextPage();
@@ -734,7 +792,7 @@
             alert("Phim này chưa có Drive ID.");
             return;
           }
-          location.href = `watch.html?drive=${encodeURIComponent(item.driveId)}&title=${encodeURIComponent(item.title)}`;
+          location.href = makeWatchHref(item);
         });
 
         el.grid.appendChild(c);
@@ -742,7 +800,6 @@
 
       state.page += 1;
 
-      // toggle load more
       const hasMore = state.page * state.pageSize < state.view.length;
       el.loadMore.style.display = hasMore ? "inline-block" : "none";
     }
@@ -777,7 +834,6 @@
       apply();
     });
 
-    // nav
     el.btnDropGenre.addEventListener("click", (ev)=>{ ev.preventDefault(); toggleDrop("genre"); });
     el.btnDropCountry.addEventListener("click", (ev)=>{ ev.preventDefault(); toggleDrop("country"); });
 
@@ -792,7 +848,6 @@
       apply();
     });
 
-    // close buttons
     document.querySelectorAll(".drop-close").forEach(btn=>{
       btn.addEventListener("click", (ev)=>{
         ev.preventDefault();
@@ -800,7 +855,6 @@
       });
     });
 
-    // menu selection (delegation)
     el.genreGrid.addEventListener("click", (ev)=>{
       const a = ev.target.closest("a[data-type='genre']");
       if(!a) return;
@@ -820,7 +874,6 @@
       closeDrops();
     });
 
-    // close when click outside
     document.addEventListener("click", (ev)=>{
       const inside = ev.target.closest(".drop");
       if(!inside) closeDrops();
@@ -835,7 +888,6 @@
       buildKindChips();
       buildDropdowns();
 
-      // apply URL presets to UI
       el.sort.value = "new";
       if(state.tab === "new") el.sort.value = "new";
       apply();
