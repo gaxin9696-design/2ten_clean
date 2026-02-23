@@ -411,6 +411,9 @@ using (auth.uid() = 'e812c719-d30e-4498-8807-50e9480853ef');
 
 -- 1) Add columns (safe)
 alter table public.movies
+  add column if not exists posterurl text,
+  add column if not exists herourl text,
+  add column if not exists imdb text,
   add column if not exists genres text[] not null default '{}'::text[],
   add column if not exists country text;
 
