@@ -727,35 +727,49 @@
 
     async function dbListMoviesPublic() {
       if (!supabase) return null;
+
+      // ✅ Select * để tránh lỗi khi DB của bạn đặt tên cột khác (poster vs posterurl, genre vs genres, ...)
       const { data, error } = await supabase
         .from("movies")
-        .select("id,title,kind,year,quality,desc,driveid,drivelink,posterurl,herourl,updatedat,genres,country,imdb")
-        .order("updatedat", { ascending: false });
+        .select("*");
 
       if (error) {
         console.warn("Supabase load error:", error);
         return null;
       }
 
-      return (data || []).map(row => ({
-        id: row.id,
-        title: row.title,
-        kind: row.kind,
-        year: row.year || "",
-        quality: row.quality || "FHD",
-        desc: row.desc || "",
-        imdb: row.imdb || "",
-        driveId: row.driveid,
-        driveLink: row.drivelink || "",
-        posterUrl: row.posterurl || "",
-        heroUrl: row.herourl || "",
-        genres: Array.isArray(row.genres) ? row.genres : [],
-        country: row.country || "",
-        updatedAt: Number(row.updatedat || 0)
-      }));
+      const list = (data || []).map(row => {
+        const genres =
+          Array.isArray(row.genres) ? row.genres :
+          (typeof row.genre === "string"
+            ? row.genre.split(",").map(s => s.trim()).filter(Boolean)
+            : []);
+
+        return {
+          id: row.id,
+          title: row.title,
+          kind: row.kind || row.type || "anime",
+          year: row.year || "",
+          quality: row.quality || "FHD",
+          desc: row.desc || row.description || row.overview || "",
+          imdb: row.imdb || "",
+          driveId: row.driveid || row.driveId || "",
+          driveLink: row.drivelink || row.driveLink || "",
+          // ưu tiên cột mới posterurl/herourl, fallback qua poster/hero nếu DB của bạn đang dùng tên cũ
+          posterUrl: row.posterurl || row.poster || row.poster_url || "",
+          heroUrl: row.herourl || row.hero || row.banner || row.hero_url || "",
+          genres,
+          country: row.country || "",
+          updatedAt: Number(row.updatedat ?? row.updated_at ?? row.updatedAt ?? 0)
+        };
+      });
+
+      // newest first (best-effort)
+      list.sort((a,b) => (b.updatedAt||0) - (a.updatedAt||0));
+      return list;
     }
 
-    // ================== LOCAL FALLBACK ==================
+// ================== LOCAL FALLBACK ==================
     const STORAGE_KEY = "khoii_drive_movies_v1";
     const LEGACY_KEY = "my_drive_movies_v2";
 
@@ -1168,7 +1182,7 @@ function renderThumbs(list){
     }
 
     function applyAllFilters(){
-      const q = (el.q.value || "").trim().toLowerCase();
+      const q = (el.q?.value || "").trim().toLowerCase();
 
       filtered = items.filter(x=>{
         const matchQ = !q || (x.title||"").toLowerCase().includes(q) || (x.subtitle||"").toLowerCase().includes(q);
@@ -1220,10 +1234,10 @@ activeIndex = 0;
     }
 
     // ===== events =====
-    el.prevBtn.addEventListener("click", prev);
-    el.nextBtn.addEventListener("click", next);
+    el.prevBtn?.addEventListener("click", prev);
+    el.nextBtn?.addEventListener("click", next);
 
-    el.btnPlay.addEventListener("click", ()=>{
+    el.btnPlay?.addEventListener("click", ()=>{
       const item = filtered[activeIndex];
       if (!item) return;
       if (!item.driveId || item.driveId === "YOUR_DRIVE_ID_HERE"){
@@ -1233,22 +1247,22 @@ activeIndex = 0;
       location.href = `watch.html?drive=${encodeURIComponent(item.driveId)}&title=${encodeURIComponent(item.title)}`;
     });
 
-    el.btnFav.addEventListener("click", ()=>{
+    el.btnFav?.addEventListener("click", ()=>{
       const item = filtered[activeIndex];
       if (!item) return;
       alert(`Đã thêm vào yêu thích (demo): ${item.title}`);
     });
 
-    el.btnInfo.addEventListener("click", ()=>{
+    el.btnInfo?.addEventListener("click", ()=>{
       const item = filtered[activeIndex];
       if (!item) return;
       const gs = (item.genres || []).join(", ");
       alert(`Thông tin (demo): ${item.title}\nIMDb: ${item.imdb || "—"}\nNăm: ${item.year} • ${item.quality}\nQuốc gia: ${item.country || "—"}\nThể loại: ${gs || "—"}`);
     });
 
-    el.q.addEventListener("input", applyAllFilters);
+    el.q?.addEventListener("input", applyAllFilters);
 
-    el.btnMore.addEventListener("click", ()=>{
+    el.btnMore?.addEventListener("click", ()=>{
       document.getElementById("rows")?.scrollIntoView({ behavior:"smooth", block:"start" });
     });
 
