@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="Khoii – Trang xem phim. Mở nhanh, xem mượt." />
+  <meta name="description" content="Khoii – Trang xem phim." />
   <meta name="robots" content="index,follow" />
   <meta name="theme-color" content="#0b1224" />
   <title>Khoii - Xem phim</title>
@@ -14,8 +14,7 @@
       --text:#e7edf9; --muted:rgba(231,237,249,.72);
       --line:rgba(255,255,255,.10); --line2:rgba(255,255,255,.16);
       --glass:rgba(18,24,36,.72); --glass2:rgba(18,24,36,.55);
-      --accent:#f2c64f;
-      --radius:22px;
+      --accent:#f2c64f; --radius:22px;
       --shadow:0 18px 65px rgba(0,0,0,.55);
     }
     *{box-sizing:border-box}
@@ -82,24 +81,11 @@
     .member-btn:hover{border-color:var(--line2)}
     .member-btn svg{opacity:.95}
 
-    /* ===== Layout giống phim30: main + sidebar ===== */
-    .grid{
-      margin-top:18px;
-      display:grid;
-      grid-template-columns: minmax(0, 1fr) 340px;
-      gap:18px;
-      align-items:start;
-    }
-    @media (max-width:1100px){
-      .grid{grid-template-columns: minmax(0, 1fr) 300px;}
-    }
-    @media (max-width:980px){
-      .nav{display:none}
-      .member-btn span{display:none}
-      .grid{grid-template-columns: 1fr; }
-    }
+    /* Layout main + sidebar */
+    .grid{margin-top:18px; display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:18px; align-items:start;}
+    @media (max-width:1100px){ .grid{grid-template-columns:minmax(0,1fr) 300px;} }
+    @media (max-width:980px){ .nav{display:none} .member-btn span{display:none} .grid{grid-template-columns:1fr;} }
 
-    /* ===== Player card ===== */
     .card{
       border-radius: var(--radius);
       border:1px solid rgba(255,255,255,.10);
@@ -107,11 +93,15 @@
       backdrop-filter: blur(14px);
       box-shadow: var(--shadow);
       overflow:hidden;
-      position:relative;
     }
+
+    /* Player */
     .player-wrap{position:relative; width:100%; background:#000;}
     .player-wrap::before{content:""; display:block; padding-top:56.25%;}
-    .player-wrap iframe{position:absolute; inset:0; width:100%; height:100%; border:0;}
+    .player-wrap video{
+      position:absolute; inset:0; width:100%; height:100%;
+      border:0; background:#000; display:block;
+    }
     .player-overlay{
       position:absolute; inset:0; display:grid; place-items:center;
       background: linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,.65));
@@ -120,144 +110,53 @@
     .spinner{width:28px;height:28px;border-radius:999px;border:3px solid rgba(255,255,255,.22);border-top-color:rgba(255,255,255,.85);animation:rot 1s linear infinite}
     @keyframes rot{to{transform:rotate(360deg)}}
 
-    /* ===== Info block dưới player ===== */
-    .info{
-      padding:14px 14px 16px;
-      border-top:1px solid rgba(255,255,255,.08);
-      display:grid;
-      grid-template-columns: 120px minmax(0, 1fr);
-      gap:14px;
-    }
-    @media (max-width:560px){
-      .info{grid-template-columns: 1fr; }
-    }
-    .poster{
-      width:120px; aspect-ratio: 2/3;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      overflow:hidden;
-      box-shadow:0 14px 40px rgba(0,0,0,.35);
-    }
+    /* Info */
+    .info{padding:14px 14px 16px; border-top:1px solid rgba(255,255,255,.08); display:grid; grid-template-columns:120px minmax(0,1fr); gap:14px;}
+    @media (max-width:560px){ .info{grid-template-columns:1fr;} }
+    .poster{width:120px; aspect-ratio:2/3; border-radius:14px; border:1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.06); overflow:hidden; box-shadow:0 14px 40px rgba(0,0,0,.35);}
     .poster img{width:100%; height:100%; object-fit:cover; display:block}
     .h1{margin:0; font-size:22px; letter-spacing:.2px; font-weight:900}
     .sub{margin-top:6px; color:var(--muted); font-size:13px;}
     .badges{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px;}
-    .badge{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:7px 10px; border-radius:10px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(18,24,36,.45);
-      color: rgba(231,237,249,.92);
-      font-size:13px;
-      backdrop-filter: blur(10px);
-    }
+    .badge{display:inline-flex; align-items:center; gap:8px; padding:7px 10px; border-radius:10px; border:1px solid rgba(255,255,255,.12); background: rgba(18,24,36,.45); color: rgba(231,237,249,.92); font-size:13px; backdrop-filter: blur(10px);}
     .badge.imdb{border-color: rgba(242,198,79,.75); background: rgba(242,198,79,.10);}
     .badge b{font-size:11px; letter-spacing:.6px; opacity:.9}
     .genres{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px;}
-    .genre{
-      padding:7px 10px; border-radius:999px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(18,24,36,.40);
-      color: rgba(231,237,249,.88);
-      font-size:13px;
-      backdrop-filter: blur(10px);
-    }
+    .genre{padding:7px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.12); background: rgba(18,24,36,.40); color: rgba(231,237,249,.88); font-size:13px; backdrop-filter: blur(10px);}
     .desc{margin:12px 0 0; color: rgba(231,237,249,.80); font-size:14px; line-height:1.55; max-width: 90ch;}
 
     .actions{margin-top:12px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
-    .btn{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:9px 12px; border-radius:12px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.06);
-      color: rgba(231,237,249,.92);
-      cursor:pointer;
-      user-select:none;
-    }
+    .btn{display:inline-flex; align-items:center; gap:8px; padding:9px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.06); color: rgba(231,237,249,.92); cursor:pointer; user-select:none;}
     .btn:hover{background: rgba(255,255,255,.10);}
     .btn.primary{background: rgba(242,198,79,.16); border-color: rgba(242,198,79,.35); color: rgba(242,198,79, .98);}
-    .meta-line{display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end; color: var(--muted); font-size:13px;}
-    .pill{padding:7px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.12); background: rgba(18,24,36,.35);}
     a{color:var(--accent); text-decoration:none}
     a:hover{text-decoration:underline}
 
-    /* ===== Episodes ===== */
-    .episodes{
-      margin-top:14px;
-      padding:14px;
-      border-top:1px solid rgba(255,255,255,.08);
-    }
+    /* Episodes */
+    .episodes{margin-top:14px; padding:14px; border-top:1px solid rgba(255,255,255,.08);}
     .episodes-head{display:flex; align-items:center; gap:10px; justify-content:space-between; flex-wrap:wrap;}
     .episodes-title{font-weight:900; letter-spacing:.2px}
     .server-row{display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:10px;}
     .server-label{color:var(--muted); font-size:13px; font-weight:700; margin-right:6px}
-    .server-pill{
-      padding:8px 10px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(18,24,36,.45);
-      color: rgba(231,237,249,.90);
-      font-size:13px;
-      cursor:pointer;
-    }
+    .server-pill{padding:8px 10px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background: rgba(18,24,36,.45); color: rgba(231,237,249,.90); font-size:13px;}
     .server-pill.active{border-color: rgba(242,198,79,.35); background: rgba(242,198,79,.10); color: rgba(242,198,79,.98);}
-    .ep-grid{
-      margin-top:12px;
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-    .ep{
-      min-width: 108px;
-      padding:12px 12px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(18,24,36,.35);
-      color: rgba(231,237,249,.90);
-      font-size:14px;
-      text-align:center;
-      cursor:pointer;
-      user-select:none;
-    }
+    .ep-grid{margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;}
+    .ep{min-width:108px; padding:12px 12px; border-radius:14px; border:1px solid rgba(255,255,255,.12); background: rgba(18,24,36,.35); color: rgba(231,237,249,.90); font-size:14px; text-align:center; cursor:pointer; user-select:none;}
     .ep:hover{background: rgba(255,255,255,.08);}
-    .ep.active{
-      border-color: rgba(242,198,79,.40);
-      background: rgba(242,198,79,.14);
-      color: rgba(242,198,79,.98);
-      font-weight:800;
-    }
+    .ep.active{border-color: rgba(242,198,79,.40); background: rgba(242,198,79,.14); color: rgba(242,198,79,.98); font-weight:800;}
 
-    /* ===== Sidebar suggestions ===== */
-    .sidebar .head{
-      padding:14px 14px 10px;
-      display:flex; align-items:center; justify-content:space-between;
-      border-bottom:1px solid rgba(255,255,255,.08);
-    }
+    /* Sidebar suggestions */
+    .sidebar .head{padding:14px 14px 10px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,.08);}
     .sidebar .head b{font-size:18px; letter-spacing:.2px}
     .sug-list{padding:10px 10px 14px; display:flex; flex-direction:column; gap:10px;}
-    .sug{
-      display:grid;
-      grid-template-columns: 54px minmax(0, 1fr);
-      gap:10px;
-      padding:10px;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.05);
-      cursor:pointer;
-    }
+    .sug{display:grid; grid-template-columns:54px minmax(0,1fr); gap:10px; padding:10px; border-radius:16px; border:1px solid rgba(255,255,255,.10); background: rgba(255,255,255,.05); cursor:pointer;}
     .sug:hover{background: rgba(255,255,255,.08);}
-    .sug .thumb{
-      width:54px; aspect-ratio: 2/3;
-      border-radius:10px;
-      overflow:hidden;
-      background: rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.10);
-    }
+    .sug .thumb{width:54px; aspect-ratio:2/3; border-radius:10px; overflow:hidden; background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.10);}
     .sug img{width:100%; height:100%; object-fit:cover; display:block}
     .sug .t{font-weight:850; font-size:14px; line-height:1.2; margin-top:2px}
     .sug .m{color: var(--muted); font-size:12px; margin-top:6px}
     .empty{color: var(--muted); font-size:13px; padding:14px;}
+    .err{margin-top:10px; color:#ffb4b4; font-size:13px; display:none}
   </style>
 </head>
 
@@ -303,15 +202,16 @@
           <div class="player-overlay" id="loading">
             <div style="display:flex;align-items:center;gap:10px">
               <div class="spinner"></div>
-              <div style="color:rgba(231,237,249,.88);font-weight:800">Đang tải player…</div>
+              <div style="color:rgba(231,237,249,.88);font-weight:800">Đang tải video…</div>
             </div>
           </div>
-          <iframe id="frame" allow="autoplay; fullscreen" allowfullscreen referrerpolicy="no-referrer"></iframe>
+          <video id="video" controls playsinline preload="metadata"></video>
         </div>
+        <div class="err" id="err"></div>
 
         <section class="info">
-          <div class="poster" id="posterBox" aria-label="Poster">
-            <img id="posterImg" alt="" style="display:none" />
+          <div class="poster" aria-label="Poster">
+            <img id="posterImg" alt="" />
           </div>
 
           <div>
@@ -325,11 +225,7 @@
             <div class="actions">
               <div class="btn" id="btnLike">♥ Yêu thích</div>
               <div class="btn" id="btnEpisodes">Chuyển tập</div>
-              <a class="btn primary" id="openDrive" target="_blank" rel="noreferrer">Mở trên Drive</a>
               <a class="btn" href="index.html">← Quay lại</a>
-              <div class="meta-line" style="margin-left:auto">
-                <span class="pill" id="fileId">ID: —</span>
-              </div>
             </div>
           </div>
         </section>
@@ -341,7 +237,7 @@
           </div>
           <div class="server-row">
             <span class="server-label">Server</span>
-            <span class="server-pill active" title="Google Drive"># Google Drive</span>
+            <span class="server-pill active" title="Supabase Storage"># Server 1</span>
           </div>
 
           <div class="episodes-head" style="margin-top:12px">
@@ -371,46 +267,10 @@
     const SUPABASE_URL = "https://nzalaxolteaiafvuceqz.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56YWxheG9sdGVhaWFmdnVjZXF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyOTY2MjAsImV4cCI6MjA4NTg3MjYyMH0.0eIz6cfB4Dr_g5Wja70tZCMvVfUKoI5H4D8MJBP49Bg";
 
-    // supabase-js CDN đã tạo global `supabase`, nên tránh đặt biến trùng tên
+    // supabase-js CDN có global `supabase`, nên tránh đặt biến trùng
     const sb = window.supabase?.createClient
       ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
       : null;
-
-    const DriveTool = (() => {
-      const patterns = [
-        /drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]{10,})/i,
-        /drive\.google\.com\/open\?id=([a-zA-Z0-9_-]{10,})/i,
-        /drive\.google\.com\/uc\?id=([a-zA-Z0-9_-]{10,})/i,
-        /drive\.google\.com\/uc\?export=download&id=([a-zA-Z0-9_-]{10,})/i,
-      ];
-      function extractId(input) {
-        const s = String(input || "").trim();
-        if (/^[a-zA-Z0-9_-]{10,}$/.test(s)) return s;
-        try {
-          const u = new URL(s);
-          const qid = u.searchParams.get("id");
-          if (qid && /^[a-zA-Z0-9_-]{10,}$/.test(qid)) return qid;
-        } catch {}
-        for (const re of patterns) {
-          const m = s.match(re);
-          if (m && m[1]) return m[1];
-        }
-        return null;
-      }
-      function links(id) {
-        return {
-          id,
-          preview: `https://drive.google.com/file/d/${encodeURIComponent(id)}/preview`,
-          view: `https://drive.google.com/file/d/${encodeURIComponent(id)}/view`,
-        };
-      }
-      function normalize(input) {
-        const id = extractId(input);
-        if (!id) return { ok:false, error:"Không tách được ID từ link Drive.", id:null, links:null };
-        return { ok:true, id, links:links(id) };
-      }
-      return { normalize };
-    })();
 
     const el = {
       q: document.getElementById("q"),
@@ -419,12 +279,10 @@
       badges: document.getElementById("badges"),
       genres: document.getElementById("genres"),
       desc: document.getElementById("desc"),
-      frame: document.getElementById("frame"),
-      loading: document.getElementById("loading"),
-      fileId: document.getElementById("fileId"),
-      openDrive: document.getElementById("openDrive"),
-      posterBox: document.getElementById("posterBox"),
       posterImg: document.getElementById("posterImg"),
+      video: document.getElementById("video"),
+      loading: document.getElementById("loading"),
+      err: document.getElementById("err"),
       epGrid: document.getElementById("epGrid"),
       epHint: document.getElementById("epHint"),
       btnEpisodes: document.getElementById("btnEpisodes"),
@@ -436,7 +294,11 @@
         .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
         .replaceAll('"',"&quot;").replaceAll("'","&#039;");
     }
-
+    function applySearchKeyword(q) {
+      const s = (q || "").trim();
+      if (!s) return;
+      location.href = `list.html?q=${encodeURIComponent(s)}`;
+    }
     function renderBadges(info) {
       const parts = [];
       if (info.imdb) parts.push(`<span class="badge imdb"><b>IMDb</b> ${escapeHtml(info.imdb)}</span>`);
@@ -449,126 +311,75 @@
       }
       el.badges.innerHTML = parts.join("");
     }
-
     function renderGenres(arr) {
       const gs = Array.isArray(arr) ? arr.filter(Boolean).slice(0, 16) : [];
       el.genres.innerHTML = gs.map(g => `<span class="genre">${escapeHtml(g)}</span>`).join("");
     }
-
-    function setPoster(url) {
-      const u = String(url || "").trim();
-      if (!u) {
-        el.posterImg.style.display = "none";
-        el.posterBox.style.background = "rgba(255,255,255,.06)";
-        return;
-      }
-      el.posterImg.src = u;
-      el.posterImg.alt = "Poster";
-      el.posterImg.style.display = "block";
-    }
-
-    function applySearchKeyword(q) {
-      const s = (q || "").trim();
-      if (!s) return;
-      location.href = `list.html?q=${encodeURIComponent(s)}`;
-    }
-
-    function baseTitleGuess(title) {
-      const t = String(title || "").trim();
-      if (!t) return "";
-      // bỏ " - 01", "tập 01", "ep 01" ở cuối
-      return t
-        .replace(/[\s_-]*(tập|tap|ep|episode)\s*\d{1,3}\s*$/i, "")
-        .replace(/[\s_-]*\d{1,3}\s*$/i, (m) => (m.length <= 4 ? "" : m)) // tránh xoá năm 2026
-        .trim();
-    }
-
-    function inferEpNumber(row, idx) {
-      const s = `${row?.drivelink || ""} ${row?.title || ""}`.toLowerCase();
-      const pats = [
-        /tập\s*(\d{1,3})/,
-        /\bep\s*(\d{1,3})/,
-        /\bepisode\s*(\d{1,3})/,
-        /[-_ ](\d{1,3})(?=\D|$)/,
-      ];
-      for (const re of pats) {
-        const m = s.match(re);
-        if (m && m[1]) {
-          const n = parseInt(m[1], 10);
-          if (Number.isFinite(n) && n > 0 && n < 1000) return n;
-        }
-      }
-      // fallback theo thứ tự query
-      return idx + 1;
-    }
-
     function pad2(n){ return String(n).padStart(2,"0"); }
 
-    async function fetchMovieByDriveId(driveId) {
+    function showErr(msg){
+      el.err.style.display = "block";
+      el.err.textContent = msg;
+    }
+
+    async function fetchMovieById(id) {
       if (!sb) return null;
       try {
         const { data, error } = await sb
           .from("movies")
-          .select("id,title,kind,year,quality,desc,genres,country,imdb,posterurl,herourl,driveid,drivelink,updatedat,created_at")
-          .eq("driveid", driveId)
+          .select("id,title,kind,year,quality,desc,genres,country,imdb,posterurl,herourl,videourl,ep,updatedat,created_at")
+          .eq("id", id)
           .limit(1);
         if (error) return null;
         return (data || [])[0] || null;
       } catch { return null; }
     }
 
-    async function fetchEpisodesByTitle(seriesTitle, kind, year) {
+    async function fetchEpisodesByTitle(seriesTitle, kind) {
       if (!sb || !seriesTitle) return [];
       try {
-        // ưu tiên exact title; nếu không ra thì dùng ilike base%
-        let { data, error } = await sb
+        const { data, error } = await sb
           .from("movies")
-          .select("id,title,driveid,drivelink,updatedat,created_at")
+          .select("id,title,ep")
           .eq("title", seriesTitle)
           .eq("kind", kind || "anime")
-          .limit(200);
-
-        if (error) data = null;
-
-        if (!data || data.length === 0) {
-          const base = baseTitleGuess(seriesTitle);
-          if (base && base !== seriesTitle) {
-            const r2 = await sb
-              .from("movies")
-              .select("id,title,driveid,drivelink,updatedat,created_at")
-              .ilike("title", base + "%")
-              .eq("kind", kind || "anime")
-              .limit(200);
-            if (!r2.error) data = r2.data || [];
-          }
-        }
-
-        const rows = Array.isArray(data) ? data : [];
-        // sort by inferred episode number
-        const enriched = rows.map((r, i) => ({...r, _ep: inferEpNumber(r, i)}));
-        enriched.sort((a,b) => (a._ep - b._ep) || String(a.created_at||"").localeCompare(String(b.created_at||"")));
-        return enriched;
+          .order("ep", { ascending: true, nullsLast: true })
+          .order("updatedat", { ascending: false })
+          .limit(300);
+        if (error) return [];
+        return data || [];
       } catch { return []; }
     }
 
-    async function fetchSuggestions(excludeDriveId) {
+    async function fetchSuggestions(excludeId) {
       if (!sb) return [];
       try {
-        let q = sb.from("movies")
-          .select("title,kind,year,posterurl,driveid,updatedat,created_at")
+        const { data, error } = await sb
+          .from("movies")
+          .select("id,title,kind,year,posterurl")
+          .order("updatedat", { ascending:false })
           .limit(10);
-
-        // order: updatedat desc, fallback created_at desc
-        q = q.order("updatedat", { ascending:false, nullsFirst:false }).order("created_at", { ascending:false });
-
-        const { data, error } = await q;
         if (error) return [];
-        return (data || []).filter(x => x.driveid !== excludeDriveId).slice(0, 8);
+        return (data || []).filter(x => x.id !== excludeId).slice(0, 8);
       } catch { return []; }
     }
 
-    function watchUrl(driveId, title) {
-      return `watch.html?drive=${encodeURIComponent(driveId)}&title=${encodeURIComponent(title || "")}`;
+    function watchUrlById(id) {
+      return `watch.html?id=${encodeURIComponent(id)}`;
+    }
+
+    function renderEpisodes(list, currentId) {
+      if (!Array.isArray(list) || list.length === 0) {
+        el.epHint.textContent = "Chưa có danh sách tập (hãy thêm nhiều record cùng Title và có cột ep).";
+        el.epGrid.innerHTML = `<div class="empty" style="padding:0">Không có tập.</div>`;
+        return;
+      }
+      el.epHint.textContent = `${list.length} tập`;
+      el.epGrid.innerHTML = list.map((r, i) => {
+        const ep = Number.isFinite(Number(r.ep)) && Number(r.ep) > 0 ? Number(r.ep) : (i+1);
+        const active = r.id === currentId ? "active" : "";
+        return `<div class="ep ${active}" onclick="location.href='${watchUrlById(r.id)}'">Tập ${pad2(ep)}</div>`;
+      }).join("");
     }
 
     function renderSuggestions(items) {
@@ -581,7 +392,7 @@
         const meta = [k, it.year].filter(Boolean).join(" • ");
         const poster = it.posterurl || "";
         return `
-          <div class="sug" onclick="location.href='${watchUrl(it.driveid, it.title)}'">
+          <div class="sug" onclick="location.href='${watchUrlById(it.id)}'">
             <div class="thumb">${poster ? `<img src="${escapeHtml(poster)}" alt="">` : ""}</div>
             <div>
               <div class="t">${escapeHtml(it.title || "—")}</div>
@@ -592,92 +403,68 @@
       }).join("");
     }
 
-    function renderEpisodes(list, currentDriveId, seriesTitle) {
-      if (!Array.isArray(list) || list.length === 0) {
-        el.epHint.textContent = "Chưa có danh sách tập (hãy thêm nhiều record cùng Title để hiện tập).";
-        el.epGrid.innerHTML = `<div class="empty" style="padding:0">Không có tập.</div>`;
-        return;
-      }
-      el.epHint.textContent = `${list.length} tập`;
-      el.epGrid.innerHTML = list.map((r, i) => {
-        const ep = r._ep || (i+1);
-        const active = r.driveid === currentDriveId ? "active" : "";
-        const t = `Tập ${pad2(ep)}`;
-        return `<div class="ep ${active}" onclick="location.href='${watchUrl(r.driveid, seriesTitle)}'">${escapeHtml(t)}</div>`;
-      }).join("");
-    }
-
     (async () => {
-      // search input: enter => list
       el.q.addEventListener("keydown", (ev) => {
         if (ev.key === "Enter") applySearchKeyword(el.q.value);
       });
-
       el.btnEpisodes.addEventListener("click", () => {
         document.getElementById("episodesSection")?.scrollIntoView({behavior:"smooth", block:"start"});
       });
 
-      const params = new URLSearchParams(location.search);
-      const driveParam = params.get("drive") || params.get("m") || "";
-      const titleQ = (params.get("title") || "Xem phim").trim();
-
-      const r = DriveTool.normalize(driveParam);
-      if (!r.ok) {
-        el.title.textContent = "Link Drive không hợp lệ";
-        el.subtitle.textContent = "Vui lòng kiểm tra lại đường dẫn.";
-        el.fileId.textContent = "ID: —";
+      const id = (new URLSearchParams(location.search).get("id") || "").trim();
+      if (!id) {
         el.loading.style.display = "none";
-        el.frame.src = "";
-        renderBadges({ quality:"—" });
-        renderGenres([]);
-        el.desc.textContent = "";
-        renderSuggestions([]);
-        renderEpisodes([], "", titleQ);
+        el.title.textContent = "Thiếu ID phim";
+        el.subtitle.textContent = "Quay lại trang chủ và bấm xem phim.";
+        showErr("Link watch cần dạng: watch.html?id=<uuid>");
         return;
       }
 
-      // Player
-      el.fileId.textContent = "ID: " + r.id;
-      el.frame.src = r.links.preview;
-      el.openDrive.href = r.links.view;
-
-      // Loading overlay off when iframe loads
-      el.frame.addEventListener("load", () => {
+      // Player events
+      el.video.addEventListener("loadeddata", () => { el.loading.style.display = "none"; });
+      el.video.addEventListener("error", () => {
         el.loading.style.display = "none";
+        showErr("Không phát được video. Kiểm tra videourl hoặc quyền public của file trong Storage.");
       });
-      // safety: hide after a bit (Drive sometimes delays load event)
-      setTimeout(() => { el.loading.style.display = "none"; }, 6500);
 
-      // Default UI
-      el.title.textContent = titleQ;
-      el.subtitle.textContent = "Đang tải thông tin…";
-      renderBadges({ quality:"FHD", kind:"anime" });
-      renderGenres([]);
-      el.desc.textContent = "";
-      setPoster("");
-
-      // Fetch current movie info
-      const info = await fetchMovieByDriveId(r.id);
-      const seriesTitle = (info?.title || titleQ || "Xem phim").trim();
-      el.title.textContent = seriesTitle;
-      document.title = seriesTitle + " - Khoii";
-
-      if (info) {
-        el.subtitle.textContent = info.kind === "movie" ? "Phim Lẻ" : info.kind === "series" ? "Phim Bộ" : "Anime";
-        renderBadges(info);
-        renderGenres(info.genres);
-        el.desc.textContent = info.desc || "";
-        setPoster(info.posterurl || "");
-      } else {
-        el.subtitle.textContent = "Không tìm thấy dữ liệu phim trong kho (vẫn có thể xem nếu Drive hợp lệ).";
+      // Fetch data
+      const info = await fetchMovieById(id);
+      if (!info) {
+        el.loading.style.display = "none";
+        el.title.textContent = "Không tìm thấy phim";
+        el.subtitle.textContent = "Kiểm tra lại ID hoặc RLS policy đọc public.";
+        showErr("Không lấy được dữ liệu từ Supabase.");
+        renderSuggestions([]);
+        renderEpisodes([], id);
+        return;
       }
 
-      // Episodes (dựa trên các record cùng Title)
-      const eps = await fetchEpisodesByTitle(seriesTitle, info?.kind || "anime", info?.year || "");
-      renderEpisodes(eps, r.id, seriesTitle);
+      const seriesTitle = (info.title || "Xem phim").trim();
+      document.title = seriesTitle + " - Khoii";
+
+      el.title.textContent = seriesTitle;
+      el.subtitle.textContent = info.kind === "movie" ? "Phim Lẻ" : info.kind === "series" ? "Phim Bộ" : "Anime";
+      renderBadges(info);
+      renderGenres(info.genres);
+      el.desc.textContent = info.desc || "";
+      el.posterImg.src = info.posterurl || "";
+      el.posterImg.alt = seriesTitle;
+
+      // Set video src (Supabase Storage public URL)
+      const vurl = (info.videourl || "").trim();
+      if (!vurl) {
+        el.loading.style.display = "none";
+        showErr("Phim này chưa có videourl. Hãy upload video lên Supabase Storage và lưu public URL vào cột videourl.");
+      } else {
+        el.video.src = vurl;
+      }
+
+      // Episodes (same title)
+      const eps = await fetchEpisodesByTitle(seriesTitle, info.kind || "anime");
+      renderEpisodes(eps, id);
 
       // Suggestions
-      const sug = await fetchSuggestions(r.id);
+      const sug = await fetchSuggestions(id);
       renderSuggestions(sug);
     })();
   </script>
