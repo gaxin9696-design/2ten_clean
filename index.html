@@ -843,7 +843,9 @@
     function toIndexItem(m) {
       const driveId = m.driveId || DriveTool.extractId(m.driveLink) || "";
       const poster = m.posterUrl || (driveId ? DriveTool.thumb(driveId, 600) : "");
-      const hero = m.heroUrl || (driveId ? DriveTool.thumb(driveId, 1400) : poster);
+      // Ưu tiên heroUrl; nếu không có thì dùng poster để hero/section khớp nhau;
+      // cuối cùng mới fallback sang thumbnail từ video (thường là 1 frame ngẫu nhiên).
+      const hero = m.heroUrl || poster || (driveId ? DriveTool.thumb(driveId, 1400) : "");
 
       const kindLabel =
         m.kind === "movie" ? "Phim Lẻ" :
