@@ -1,375 +1,263 @@
 <!doctype html>
 <html lang="vi">
-
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-
   <meta name="description" content="Khoii – Trang xem phim. Mở nhanh, xem mượt." />
   <meta name="robots" content="index,follow" />
   <meta name="theme-color" content="#0b1224" />
-  <link rel="icon" href="/favicon.ico" />
-
   <title>Khoii - Xem phim</title>
 
   <style>
-    :root {
-      --bg0: #0b0f17;
-      --bg1: #0b1224;
-      --text: #e7edf9;
-      --muted: rgba(231, 237, 249, .72);
-      --line: rgba(255, 255, 255, .10);
-      --line2: rgba(255, 255, 255, .16);
-      --glass: rgba(18, 24, 36, .72);
-      --glass2: rgba(18, 24, 36, .55);
-      --accent: #f2c64f;
-      --radius: 22px;
-      --shadow: 0 18px 65px rgba(0, 0, 0, .55);
+    :root{
+      --bg0:#0b0f17; --bg1:#0b1224;
+      --text:#e7edf9; --muted:rgba(231,237,249,.72);
+      --line:rgba(255,255,255,.10); --line2:rgba(255,255,255,.16);
+      --glass:rgba(18,24,36,.72); --glass2:rgba(18,24,36,.55);
+      --accent:#f2c64f;
+      --radius:22px;
+      --shadow:0 18px 65px rgba(0,0,0,.55);
     }
-
-    * {
-      box-sizing: border-box
-    }
-
-    html,
-    body {
-      height: 100%
-    }
-
-    body {
-      margin: 0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      color: var(--text);
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
       background:
-        radial-gradient(1200px 500px at 20% -10%, rgba(99, 102, 241, .18), transparent 55%),
-        radial-gradient(900px 420px at 85% 10%, rgba(245, 158, 11, .10), transparent 55%),
+        radial-gradient(1200px 500px at 20% -10%, rgba(99,102,241,.18), transparent 55%),
+        radial-gradient(900px 420px at 85% 10%, rgba(245,158,11,.10), transparent 55%),
         linear-gradient(180deg, var(--bg0), var(--bg1));
-      overflow-x: hidden;
+      overflow-x:hidden;
     }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
+    body::before{
+      content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
       background-image:
-        radial-gradient(circle, rgba(255, 255, 255, .22) 1px, transparent 1.2px),
-        radial-gradient(circle, rgba(255, 255, 255, .14) 1px, transparent 1.25px);
-      background-size: 7px 7px, 14px 14px;
-      background-position: 0 0, 3px 3px;
-      opacity: .10;
+        radial-gradient(circle, rgba(255,255,255,.22) 1px, transparent 1.2px),
+        radial-gradient(circle, rgba(255,255,255,.14) 1px, transparent 1.25px);
+      background-size:7px 7px, 14px 14px;
+      background-position:0 0, 3px 3px;
+      opacity:.10;
       mix-blend-mode: overlay;
       filter: blur(.15px);
     }
 
-    .container {
-      position: relative;
-      z-index: 1;
-      max-width: 1320px;
-      margin: 0 auto;
-      padding: 18px 22px 40px;
-    }
-
-    /* ===== TOPBAR (đồng bộ index) ===== */
-    .topbar {
-      display: flex;
-      align-items: center;
-      gap: 16px
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 170px;
-      cursor: pointer
-    }
-
-    .brand-logo {
-      width: 44px;
-      height: 34px;
-      border-radius: 10px;
-      display: grid;
-      place-items: center;
-      font-weight: 900;
-      letter-spacing: .6px;
-      color: #0b1224;
+    .container{position:relative; z-index:1; max-width:1320px; margin:0 auto; padding:18px 22px 40px;}
+    .topbar{display:flex; align-items:center; gap:16px;}
+    .brand{display:flex; align-items:center; gap:10px; min-width:170px; cursor:pointer}
+    .brand-logo{
+      width:44px;height:34px;border-radius:10px;display:grid;place-items:center;
+      font-weight:900;letter-spacing:.6px;color:#0b1224;
       background:
-        radial-gradient(18px 18px at 30% 35%, rgba(255, 255, 255, .22), transparent 60%),
-        linear-gradient(135deg, #f59e0b, #fb7185);
-      box-shadow: 0 10px 25px rgba(245, 158, 11, .22);
-      position: relative;
-      overflow: hidden;
-      user-select: none;
+        radial-gradient(18px 18px at 30% 35%, rgba(255,255,255,.22), transparent 60%),
+        linear-gradient(135deg,#f59e0b,#fb7185);
+      box-shadow:0 10px 25px rgba(245,158,11,.22);
+      position:relative; overflow:hidden; user-select:none;
     }
+    .brand-logo:before{content:""; position:absolute; inset:0; background:conic-gradient(from 220deg, rgba(0,0,0,.35), transparent 40%, rgba(0,0,0,.28)); mix-blend-mode:overlay;}
+    .brand-logo span{position:relative; z-index:1}
+    .brand-name{font-weight:900; letter-spacing:.3px; font-size:18px; line-height:1.1}
+    .brand-sub{font-size:11px; color:rgba(231,237,249,.55); margin-top:2px}
 
-    .brand-logo:before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: conic-gradient(from 220deg, rgba(0, 0, 0, .35), transparent 40%, rgba(0, 0, 0, .28));
-      mix-blend-mode: overlay;
-    }
-
-    .brand-logo span {
-      position: relative;
-      z-index: 1
-    }
-
-    .brand-name {
-      font-weight: 900;
-      letter-spacing: .3px;
-      font-size: 18px;
-      line-height: 1.1
-    }
-
-    .brand-sub {
-      font-size: 11px;
-      color: rgba(231, 237, 249, .55);
-      margin-top: 2px
-    }
-
-    .search {
-      flex: 1;
-      max-width: 620px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 14px;
-      border-radius: 12px;
-      background: var(--glass);
-      border: 1px solid rgba(255, 255, 255, .12);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, .30);
+    .search{
+      flex:1; max-width:620px; display:flex; align-items:center; gap:10px;
+      padding:10px 14px; border-radius:12px;
+      background:var(--glass); border:1px solid rgba(255,255,255,.12);
+      box-shadow:0 10px 30px rgba(0,0,0,.30);
       backdrop-filter: blur(14px);
     }
+    .search input{width:100%; border:0; outline:0; background:transparent; color:var(--text); font-size:14px;}
+    .search input::placeholder{color:rgba(231,237,249,.50)}
+    .nav{display:flex; align-items:center; gap:14px; margin-left:6px}
+    .nav a{color:rgba(231,237,249,.88); text-decoration:none; font-size:14px; display:inline-flex; align-items:center; gap:6px; padding:8px 10px; border-radius:10px;}
+    .nav a:hover{background:rgba(255,255,255,.06)}
+    .member-btn{
+      margin-left:auto; display:inline-flex; align-items:center; gap:10px;
+      padding:10px 14px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:var(--glass2); color:var(--text);
+      cursor:pointer; backdrop-filter: blur(14px);
+      box-shadow:0 10px 30px rgba(0,0,0,.24);
+    }
+    .member-btn:hover{border-color:var(--line2)}
+    .member-btn svg{opacity:.95}
 
-    .search input {
-      width: 100%;
-      border: 0;
-      outline: 0;
-      background: transparent;
-      color: var(--text);
-      font-size: 14px;
+    /* ===== Layout giống phim30: main + sidebar ===== */
+    .grid{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap:18px;
+      align-items:start;
+    }
+    @media (max-width:1100px){
+      .grid{grid-template-columns: minmax(0, 1fr) 300px;}
+    }
+    @media (max-width:980px){
+      .nav{display:none}
+      .member-btn span{display:none}
+      .grid{grid-template-columns: 1fr; }
     }
 
-    .search input::placeholder {
-      color: rgba(231, 237, 249, .50)
-    }
-
-    .nav {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-left: 6px
-    }
-
-    .nav a {
-      color: rgba(231, 237, 249, .88);
-      text-decoration: none;
-      font-size: 14px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 10px;
-      border-radius: 10px;
-    }
-
-    .nav a:hover {
-      background: rgba(255, 255, 255, .06)
-    }
-
-    .nav a.active {
-      border: 1px solid rgba(242, 198, 79, .35);
-      background: rgba(242, 198, 79, .10);
-    }
-
-    .member-btn {
-      margin-left: auto;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 14px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, .12);
-      background: var(--glass2);
-      color: var(--text);
-      cursor: pointer;
-      backdrop-filter: blur(14px);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, .24);
-    }
-
-    .member-btn:hover {
-      border-color: var(--line2)
-    }
-
-    .member-btn svg {
-      opacity: .95
-    }
-
-    /* ===== WATCH CARD ===== */
-    .watch-card {
-      margin-top: 18px;
+    /* ===== Player card ===== */
+    .card{
       border-radius: var(--radius);
-      border: 1px solid rgba(255, 255, 255, .10);
-      background: rgba(10, 14, 22, .55);
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(10,14,22,.55);
       backdrop-filter: blur(14px);
       box-shadow: var(--shadow);
-      overflow: hidden;
-      position: relative;
+      overflow:hidden;
+      position:relative;
     }
-
-    .watch-card::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-      background-image:
-        radial-gradient(circle, rgba(255, 255, 255, .12) 1px, transparent 1.5px),
-        radial-gradient(circle, rgba(255, 255, 255, .08) 1px, transparent 1.5px);
-      background-size: 10px 10px, 20px 20px;
-      background-position: 0 0, 5px 5px;
-      opacity: .20;
-      mix-blend-mode: overlay;
-      -webkit-mask-image: linear-gradient(180deg, #000 0 70%, transparent 100%);
-      mask-image: linear-gradient(180deg, #000 0 70%, transparent 100%);
+    .player-wrap{position:relative; width:100%; background:#000;}
+    .player-wrap::before{content:""; display:block; padding-top:56.25%;}
+    .player-wrap iframe{position:absolute; inset:0; width:100%; height:100%; border:0;}
+    .player-overlay{
+      position:absolute; inset:0; display:grid; place-items:center;
+      background: linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,.65));
+      z-index:2;
     }
+    .spinner{width:28px;height:28px;border-radius:999px;border:3px solid rgba(255,255,255,.22);border-top-color:rgba(255,255,255,.85);animation:rot 1s linear infinite}
+    @keyframes rot{to{transform:rotate(360deg)}}
 
-    .watch-head {
-      position: relative;
-      z-index: 1;
-      padding: 18px 18px 12px;
-      display: flex;
-      gap: 14px;
-      align-items: flex-start;
-      justify-content: space-between;
-      flex-wrap: wrap;
+    /* ===== Info block dưới player ===== */
+    .info{
+      padding:14px 14px 16px;
+      border-top:1px solid rgba(255,255,255,.08);
+      display:grid;
+      grid-template-columns: 120px minmax(0, 1fr);
+      gap:14px;
     }
-
-    .title-wrap {
-      min-width: 260px;
-      flex: 1
+    @media (max-width:560px){
+      .info{grid-template-columns: 1fr; }
     }
-
-    h1 {
-      margin: 0;
-      font-size: 26px;
-      letter-spacing: .2px;
+    .poster{
+      width:120px; aspect-ratio: 2/3;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      overflow:hidden;
+      box-shadow:0 14px 40px rgba(0,0,0,.35);
     }
-
-    .subtitle {
-      margin-top: 6px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .badges,
-    .genres {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 10px
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 10px;
-      border-radius: 10px;
-      border: 1px solid rgba(255, 255, 255, .12);
-      background: rgba(18, 24, 36, .45);
-      color: rgba(231, 237, 249, .92);
-      font-size: 13px;
+    .poster img{width:100%; height:100%; object-fit:cover; display:block}
+    .h1{margin:0; font-size:22px; letter-spacing:.2px; font-weight:900}
+    .sub{margin-top:6px; color:var(--muted); font-size:13px;}
+    .badges{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px;}
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:7px 10px; border-radius:10px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(18,24,36,.45);
+      color: rgba(231,237,249,.92);
+      font-size:13px;
       backdrop-filter: blur(10px);
     }
-
-    .badge.imdb {
-      border-color: rgba(242, 198, 79, .75);
-      background: rgba(242, 198, 79, .10)
-    }
-
-    .badge b {
-      font-size: 11px;
-      letter-spacing: .6px;
-      opacity: .9
-    }
-
-    .genre {
-      padding: 7px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, .12);
-      background: rgba(18, 24, 36, .40);
-      color: rgba(231, 237, 249, .88);
-      font-size: 13px;
+    .badge.imdb{border-color: rgba(242,198,79,.75); background: rgba(242,198,79,.10);}
+    .badge b{font-size:11px; letter-spacing:.6px; opacity:.9}
+    .genres{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px;}
+    .genre{
+      padding:7px 10px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(18,24,36,.40);
+      color: rgba(231,237,249,.88);
+      font-size:13px;
       backdrop-filter: blur(10px);
     }
+    .desc{margin:12px 0 0; color: rgba(231,237,249,.80); font-size:14px; line-height:1.55; max-width: 90ch;}
 
-    .desc {
-      margin: 12px 0 0;
-      color: rgba(231, 237, 249, .80);
-      font-size: 14px;
-      line-height: 1.55;
-      max-width: 80ch;
+    .actions{margin-top:12px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+    .btn{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:9px 12px; border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: rgba(231,237,249,.92);
+      cursor:pointer;
+      user-select:none;
+    }
+    .btn:hover{background: rgba(255,255,255,.10);}
+    .btn.primary{background: rgba(242,198,79,.16); border-color: rgba(242,198,79,.35); color: rgba(242,198,79, .98);}
+    .meta-line{display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end; color: var(--muted); font-size:13px;}
+    .pill{padding:7px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.12); background: rgba(18,24,36,.35);}
+    a{color:var(--accent); text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    /* ===== Episodes ===== */
+    .episodes{
+      margin-top:14px;
+      padding:14px;
+      border-top:1px solid rgba(255,255,255,.08);
+    }
+    .episodes-head{display:flex; align-items:center; gap:10px; justify-content:space-between; flex-wrap:wrap;}
+    .episodes-title{font-weight:900; letter-spacing:.2px}
+    .server-row{display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:10px;}
+    .server-label{color:var(--muted); font-size:13px; font-weight:700; margin-right:6px}
+    .server-pill{
+      padding:8px 10px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(18,24,36,.45);
+      color: rgba(231,237,249,.90);
+      font-size:13px;
+      cursor:pointer;
+    }
+    .server-pill.active{border-color: rgba(242,198,79,.35); background: rgba(242,198,79,.10); color: rgba(242,198,79,.98);}
+    .ep-grid{
+      margin-top:12px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .ep{
+      min-width: 108px;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(18,24,36,.35);
+      color: rgba(231,237,249,.90);
+      font-size:14px;
+      text-align:center;
+      cursor:pointer;
+      user-select:none;
+    }
+    .ep:hover{background: rgba(255,255,255,.08);}
+    .ep.active{
+      border-color: rgba(242,198,79,.40);
+      background: rgba(242,198,79,.14);
+      color: rgba(242,198,79,.98);
+      font-weight:800;
     }
 
-    .links {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
-      color: var(--muted);
-      justify-content: flex-end;
+    /* ===== Sidebar suggestions ===== */
+    .sidebar .head{
+      padding:14px 14px 10px;
+      display:flex; align-items:center; justify-content:space-between;
+      border-bottom:1px solid rgba(255,255,255,.08);
     }
-
-    .pill {
-      padding: 7px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, .12);
-      background: rgba(18, 24, 36, .35);
+    .sidebar .head b{font-size:18px; letter-spacing:.2px}
+    .sug-list{padding:10px 10px 14px; display:flex; flex-direction:column; gap:10px;}
+    .sug{
+      display:grid;
+      grid-template-columns: 54px minmax(0, 1fr);
+      gap:10px;
+      padding:10px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      cursor:pointer;
     }
-
-    a {
-      color: var(--accent);
-      text-decoration: none
+    .sug:hover{background: rgba(255,255,255,.08);}
+    .sug .thumb{
+      width:54px; aspect-ratio: 2/3;
+      border-radius:10px;
+      overflow:hidden;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
     }
-
-    a:hover {
-      text-decoration: underline
-    }
-
-    .player {
-      position: relative;
-      width: 100%;
-      padding-top: 56.25%;
-      background: #000;
-      border-top: 1px solid rgba(255, 255, 255, .08);
-    }
-
-    iframe {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      border: 0
-    }
-
-    @media (max-width:980px) {
-      .nav {
-        display: none
-      }
-
-      .member-btn span {
-        display: none
-      }
-    }
-
-    @media (max-width:760px) {
-      h1 {
-        font-size: 22px
-      }
-    }
+    .sug img{width:100%; height:100%; object-fit:cover; display:block}
+    .sug .t{font-weight:850; font-size:14px; line-height:1.2; margin-top:2px}
+    .sug .m{color: var(--muted); font-size:12px; margin-top:6px}
+    .empty{color: var(--muted); font-size:13px; padding:14px;}
   </style>
 </head>
 
@@ -408,37 +296,83 @@
       </button>
     </header>
 
-    <section class="watch-card" aria-label="Xem phim">
-      <div class="watch-head">
-        <div class="title-wrap">
-          <h1 id="title">Đang tải…</h1>
-          <div id="subtitle" class="subtitle">—</div>
-
-          <div id="badges" class="badges" aria-label="Thông tin nhanh"></div>
-          <div id="genres" class="genres" aria-label="Thể loại"></div>
-          <p id="desc" class="desc"></p>
+    <div class="grid">
+      <!-- MAIN -->
+      <main class="card">
+        <div class="player-wrap">
+          <div class="player-overlay" id="loading">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="spinner"></div>
+              <div style="color:rgba(231,237,249,.88);font-weight:800">Đang tải player…</div>
+            </div>
+          </div>
+          <iframe id="frame" allow="autoplay; fullscreen" allowfullscreen referrerpolicy="no-referrer"></iframe>
         </div>
 
-        <div class="links">
-          <span class="pill" id="fileId">ID: —</span>
-          <a id="openDrive" target="_blank" rel="noreferrer">Mở trên Drive</a>
-          <span>•</span>
-          <a id="backLink" href="index.html">← Quay lại</a>
-        </div>
-      </div>
+        <section class="info">
+          <div class="poster" id="posterBox" aria-label="Poster">
+            <img id="posterImg" alt="" style="display:none" />
+          </div>
 
-      <div class="player">
-        <iframe id="frame" allow="autoplay; fullscreen"></iframe>
-      </div>
-    </section>
+          <div>
+            <h1 class="h1" id="title">Đang tải…</h1>
+            <div class="sub" id="subtitle">—</div>
+
+            <div class="badges" id="badges" aria-label="Thông tin nhanh"></div>
+            <div class="genres" id="genres" aria-label="Thể loại"></div>
+            <p class="desc" id="desc"></p>
+
+            <div class="actions">
+              <div class="btn" id="btnLike">♥ Yêu thích</div>
+              <div class="btn" id="btnEpisodes">Chuyển tập</div>
+              <a class="btn primary" id="openDrive" target="_blank" rel="noreferrer">Mở trên Drive</a>
+              <a class="btn" href="index.html">← Quay lại</a>
+              <div class="meta-line" style="margin-left:auto">
+                <span class="pill" id="fileId">ID: —</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="episodes" id="episodesSection">
+          <div class="episodes-head">
+            <div class="episodes-title">Server</div>
+            <div style="color:var(--muted);font-size:13px">Chọn tập để xem</div>
+          </div>
+          <div class="server-row">
+            <span class="server-label">Server</span>
+            <span class="server-pill active" title="Google Drive"># Google Drive</span>
+          </div>
+
+          <div class="episodes-head" style="margin-top:12px">
+            <div class="episodes-title">Tập phim</div>
+            <div style="color:var(--muted);font-size:13px" id="epHint"></div>
+          </div>
+          <div class="ep-grid" id="epGrid"></div>
+        </section>
+      </main>
+
+      <!-- SIDEBAR -->
+      <aside class="card sidebar">
+        <div class="head">
+          <b>Đề xuất</b>
+          <a href="index.html" style="font-size:13px;color:var(--muted)">Xem tất cả</a>
+        </div>
+        <div class="sug-list" id="sugList">
+          <div class="empty">Đang tải…</div>
+        </div>
+      </aside>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // ===== Supabase (để lấy info phim theo driveid nếu có) =====
+    // ===== Supabase =====
     const SUPABASE_URL = "https://nzalaxolteaiafvuceqz.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56YWxheG9sdGVhaWFmdnVjZXF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyOTY2MjAsImV4cCI6MjA4NTg3MjYyMH0.0eIz6cfB4Dr_g5Wja70tZCMvVfUKoI5H4D8MJBP49Bg";
-    const supabase = window.supabase?.createClient
+
+    // supabase-js CDN đã tạo global `supabase`, nên tránh đặt biến trùng tên
+    const sb = window.supabase?.createClient
       ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
       : null;
 
@@ -456,7 +390,7 @@
           const u = new URL(s);
           const qid = u.searchParams.get("id");
           if (qid && /^[a-zA-Z0-9_-]{10,}$/.test(qid)) return qid;
-        } catch { }
+        } catch {}
         for (const re of patterns) {
           const m = s.match(re);
           if (m && m[1]) return m[1];
@@ -466,38 +400,41 @@
       function links(id) {
         return {
           id,
-          preview: `https://drive.google.com/file/d/${id}/preview`,
-          view: `https://drive.google.com/file/d/${id}/view`,
+          preview: `https://drive.google.com/file/d/${encodeURIComponent(id)}/preview`,
+          view: `https://drive.google.com/file/d/${encodeURIComponent(id)}/view`,
         };
       }
       function normalize(input) {
         const id = extractId(input);
-        if (!id) return { ok: false, error: "Không tách được ID từ link Drive.", id: null, links: null };
-        return { ok: true, id, links: links(id) };
+        if (!id) return { ok:false, error:"Không tách được ID từ link Drive.", id:null, links:null };
+        return { ok:true, id, links:links(id) };
       }
       return { normalize };
     })();
 
     const el = {
+      q: document.getElementById("q"),
       title: document.getElementById("title"),
       subtitle: document.getElementById("subtitle"),
       badges: document.getElementById("badges"),
       genres: document.getElementById("genres"),
       desc: document.getElementById("desc"),
       frame: document.getElementById("frame"),
+      loading: document.getElementById("loading"),
       fileId: document.getElementById("fileId"),
       openDrive: document.getElementById("openDrive"),
-      backLink: document.getElementById("backLink"),
-      q: document.getElementById("q"),
+      posterBox: document.getElementById("posterBox"),
+      posterImg: document.getElementById("posterImg"),
+      epGrid: document.getElementById("epGrid"),
+      epHint: document.getElementById("epHint"),
+      btnEpisodes: document.getElementById("btnEpisodes"),
+      sugList: document.getElementById("sugList"),
     };
 
     function escapeHtml(s) {
       return String(s ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+        .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;").replaceAll("'","&#039;");
     }
 
     function renderBadges(info) {
@@ -514,26 +451,20 @@
     }
 
     function renderGenres(arr) {
-      const gs = Array.isArray(arr) ? arr.filter(Boolean).slice(0, 12) : [];
+      const gs = Array.isArray(arr) ? arr.filter(Boolean).slice(0, 16) : [];
       el.genres.innerHTML = gs.map(g => `<span class="genre">${escapeHtml(g)}</span>`).join("");
     }
 
-    async function fetchMovieByDriveId(driveId) {
-      if (!supabase) return null;
-      try {
-        const { data, error } = await supabase
-          .from("movies")
-          .select("title,kind,year,quality,desc,genres,country")
-          .eq("driveid", driveId)
-          .order("updatedat", { ascending: false })
-          .limit(1);
-
-        if (error) return null;
-        const row = (data || [])[0];
-        return row || null;
-      } catch {
-        return null;
+    function setPoster(url) {
+      const u = String(url || "").trim();
+      if (!u) {
+        el.posterImg.style.display = "none";
+        el.posterBox.style.background = "rgba(255,255,255,.06)";
+        return;
       }
+      el.posterImg.src = u;
+      el.posterImg.alt = "Poster";
+      el.posterImg.style.display = "block";
     }
 
     function applySearchKeyword(q) {
@@ -542,56 +473,213 @@
       location.href = `list.html?q=${encodeURIComponent(s)}`;
     }
 
-    (async () => {
-      const params = new URLSearchParams(location.search);
-      const drive = params.get("drive") || params.get("m") || "";
-      const titleQ = params.get("title") || "Xem phim";
+    function baseTitleGuess(title) {
+      const t = String(title || "").trim();
+      if (!t) return "";
+      // bỏ " - 01", "tập 01", "ep 01" ở cuối
+      return t
+        .replace(/[\s_-]*(tập|tap|ep|episode)\s*\d{1,3}\s*$/i, "")
+        .replace(/[\s_-]*\d{1,3}\s*$/i, (m) => (m.length <= 4 ? "" : m)) // tránh xoá năm 2026
+        .trim();
+    }
 
-      // search input: enter to go list
+    function inferEpNumber(row, idx) {
+      const s = `${row?.drivelink || ""} ${row?.title || ""}`.toLowerCase();
+      const pats = [
+        /tập\s*(\d{1,3})/,
+        /\bep\s*(\d{1,3})/,
+        /\bepisode\s*(\d{1,3})/,
+        /[-_ ](\d{1,3})(?=\D|$)/,
+      ];
+      for (const re of pats) {
+        const m = s.match(re);
+        if (m && m[1]) {
+          const n = parseInt(m[1], 10);
+          if (Number.isFinite(n) && n > 0 && n < 1000) return n;
+        }
+      }
+      // fallback theo thứ tự query
+      return idx + 1;
+    }
+
+    function pad2(n){ return String(n).padStart(2,"0"); }
+
+    async function fetchMovieByDriveId(driveId) {
+      if (!sb) return null;
+      try {
+        const { data, error } = await sb
+          .from("movies")
+          .select("id,title,kind,year,quality,desc,genres,country,imdb,posterurl,herourl,driveid,drivelink,updatedat,created_at")
+          .eq("driveid", driveId)
+          .limit(1);
+        if (error) return null;
+        return (data || [])[0] || null;
+      } catch { return null; }
+    }
+
+    async function fetchEpisodesByTitle(seriesTitle, kind, year) {
+      if (!sb || !seriesTitle) return [];
+      try {
+        // ưu tiên exact title; nếu không ra thì dùng ilike base%
+        let { data, error } = await sb
+          .from("movies")
+          .select("id,title,driveid,drivelink,updatedat,created_at")
+          .eq("title", seriesTitle)
+          .eq("kind", kind || "anime")
+          .limit(200);
+
+        if (error) data = null;
+
+        if (!data || data.length === 0) {
+          const base = baseTitleGuess(seriesTitle);
+          if (base && base !== seriesTitle) {
+            const r2 = await sb
+              .from("movies")
+              .select("id,title,driveid,drivelink,updatedat,created_at")
+              .ilike("title", base + "%")
+              .eq("kind", kind || "anime")
+              .limit(200);
+            if (!r2.error) data = r2.data || [];
+          }
+        }
+
+        const rows = Array.isArray(data) ? data : [];
+        // sort by inferred episode number
+        const enriched = rows.map((r, i) => ({...r, _ep: inferEpNumber(r, i)}));
+        enriched.sort((a,b) => (a._ep - b._ep) || String(a.created_at||"").localeCompare(String(b.created_at||"")));
+        return enriched;
+      } catch { return []; }
+    }
+
+    async function fetchSuggestions(excludeDriveId) {
+      if (!sb) return [];
+      try {
+        let q = sb.from("movies")
+          .select("title,kind,year,posterurl,driveid,updatedat,created_at")
+          .limit(10);
+
+        // order: updatedat desc, fallback created_at desc
+        q = q.order("updatedat", { ascending:false, nullsFirst:false }).order("created_at", { ascending:false });
+
+        const { data, error } = await q;
+        if (error) return [];
+        return (data || []).filter(x => x.driveid !== excludeDriveId).slice(0, 8);
+      } catch { return []; }
+    }
+
+    function watchUrl(driveId, title) {
+      return `watch.html?drive=${encodeURIComponent(driveId)}&title=${encodeURIComponent(title || "")}`;
+    }
+
+    function renderSuggestions(items) {
+      if (!items || items.length === 0) {
+        el.sugList.innerHTML = `<div class="empty">Chưa có đề xuất.</div>`;
+        return;
+      }
+      el.sugList.innerHTML = items.map(it => {
+        const k = it.kind === "movie" ? "Phim Lẻ" : it.kind === "series" ? "Phim Bộ" : "Anime";
+        const meta = [k, it.year].filter(Boolean).join(" • ");
+        const poster = it.posterurl || "";
+        return `
+          <div class="sug" onclick="location.href='${watchUrl(it.driveid, it.title)}'">
+            <div class="thumb">${poster ? `<img src="${escapeHtml(poster)}" alt="">` : ""}</div>
+            <div>
+              <div class="t">${escapeHtml(it.title || "—")}</div>
+              <div class="m">${escapeHtml(meta)}</div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderEpisodes(list, currentDriveId, seriesTitle) {
+      if (!Array.isArray(list) || list.length === 0) {
+        el.epHint.textContent = "Chưa có danh sách tập (hãy thêm nhiều record cùng Title để hiện tập).";
+        el.epGrid.innerHTML = `<div class="empty" style="padding:0">Không có tập.</div>`;
+        return;
+      }
+      el.epHint.textContent = `${list.length} tập`;
+      el.epGrid.innerHTML = list.map((r, i) => {
+        const ep = r._ep || (i+1);
+        const active = r.driveid === currentDriveId ? "active" : "";
+        const t = `Tập ${pad2(ep)}`;
+        return `<div class="ep ${active}" onclick="location.href='${watchUrl(r.driveid, seriesTitle)}'">${escapeHtml(t)}</div>`;
+      }).join("");
+    }
+
+    (async () => {
+      // search input: enter => list
       el.q.addEventListener("keydown", (ev) => {
         if (ev.key === "Enter") applySearchKeyword(el.q.value);
       });
 
-      const r = DriveTool.normalize(drive);
+      el.btnEpisodes.addEventListener("click", () => {
+        document.getElementById("episodesSection")?.scrollIntoView({behavior:"smooth", block:"start"});
+      });
 
+      const params = new URLSearchParams(location.search);
+      const driveParam = params.get("drive") || params.get("m") || "";
+      const titleQ = (params.get("title") || "Xem phim").trim();
+
+      const r = DriveTool.normalize(driveParam);
       if (!r.ok) {
         el.title.textContent = "Link Drive không hợp lệ";
         el.subtitle.textContent = "Vui lòng kiểm tra lại đường dẫn.";
         el.fileId.textContent = "ID: —";
+        el.loading.style.display = "none";
         el.frame.src = "";
-        el.openDrive.href = "index.html";
-        renderBadges({ quality: "—" });
+        renderBadges({ quality:"—" });
         renderGenres([]);
         el.desc.textContent = "";
+        renderSuggestions([]);
+        renderEpisodes([], "", titleQ);
         return;
       }
 
+      // Player
       el.fileId.textContent = "ID: " + r.id;
       el.frame.src = r.links.preview;
       el.openDrive.href = r.links.view;
 
-      // default UI
+      // Loading overlay off when iframe loads
+      el.frame.addEventListener("load", () => {
+        el.loading.style.display = "none";
+      });
+      // safety: hide after a bit (Drive sometimes delays load event)
+      setTimeout(() => { el.loading.style.display = "none"; }, 6500);
+
+      // Default UI
       el.title.textContent = titleQ;
       el.subtitle.textContent = "Đang tải thông tin…";
-      renderBadges({ quality: "FHD" });
+      renderBadges({ quality:"FHD", kind:"anime" });
       renderGenres([]);
       el.desc.textContent = "";
+      setPoster("");
 
+      // Fetch current movie info
       const info = await fetchMovieByDriveId(r.id);
+      const seriesTitle = (info?.title || titleQ || "Xem phim").trim();
+      el.title.textContent = seriesTitle;
+      document.title = seriesTitle + " - Khoii";
+
       if (info) {
-        const t = info.title || titleQ;
-        el.title.textContent = t;
         el.subtitle.textContent = info.kind === "movie" ? "Phim Lẻ" : info.kind === "series" ? "Phim Bộ" : "Anime";
         renderBadges(info);
         renderGenres(info.genres);
         el.desc.textContent = info.desc || "";
-        document.title = t + " - Khoii";
+        setPoster(info.posterurl || "");
       } else {
         el.subtitle.textContent = "Không tìm thấy dữ liệu phim trong kho (vẫn có thể xem nếu Drive hợp lệ).";
-        document.title = titleQ + " - Khoii";
       }
+
+      // Episodes (dựa trên các record cùng Title)
+      const eps = await fetchEpisodesByTitle(seriesTitle, info?.kind || "anime", info?.year || "");
+      renderEpisodes(eps, r.id, seriesTitle);
+
+      // Suggestions
+      const sug = await fetchSuggestions(r.id);
+      renderSuggestions(sug);
     })();
   </script>
 </body>
-
 </html>
