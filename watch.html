@@ -325,12 +325,8 @@
             <div class="actions">
               <div class="btn" id="btnLike">♥ Yêu thích</div>
               <div class="btn" id="btnEpisodes">Chuyển tập</div>
-              <a class="btn primary" id="openDrive" target="_blank" rel="noreferrer">Mở trên Drive</a>
               <a class="btn" href="index.html">← Quay lại</a>
-              <div class="meta-line" style="margin-left:auto">
-                <span class="pill" id="fileId">ID: —</span>
               </div>
-            </div>
           </div>
         </section>
 
@@ -341,7 +337,7 @@
           </div>
           <div class="server-row">
             <span class="server-label">Server</span>
-            <span class="server-pill active" title="Google Drive"># Google Drive</span>
+            <span class="server-pill active" title="Server 1"># Server 1</span>
           </div>
 
           <div class="episodes-head" style="margin-top:12px">
@@ -421,9 +417,7 @@
       desc: document.getElementById("desc"),
       frame: document.getElementById("frame"),
       loading: document.getElementById("loading"),
-      fileId: document.getElementById("fileId"),
-      openDrive: document.getElementById("openDrive"),
-      posterBox: document.getElementById("posterBox"),
+                  posterBox: document.getElementById("posterBox"),
       posterImg: document.getElementById("posterImg"),
       epGrid: document.getElementById("epGrid"),
       epHint: document.getElementById("epHint"),
@@ -625,7 +619,6 @@
       if (!r.ok) {
         el.title.textContent = "Link Drive không hợp lệ";
         el.subtitle.textContent = "Vui lòng kiểm tra lại đường dẫn.";
-        el.fileId.textContent = "ID: —";
         el.loading.style.display = "none";
         el.frame.src = "";
         renderBadges({ quality:"—" });
@@ -636,12 +629,7 @@
         return;
       }
 
-      // Player
-      el.fileId.textContent = "ID: " + r.id;
-      el.frame.src = r.links.preview;
-      el.openDrive.href = r.links.view;
-
-      // Loading overlay off when iframe loads
+      // Player      el.frame.src = r.links.preview;      // Loading overlay off when iframe loads
       el.frame.addEventListener("load", () => {
         el.loading.style.display = "none";
       });
