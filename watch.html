@@ -82,7 +82,7 @@
     .member-btn:hover{border-color:var(--line2)}
     .member-btn svg{opacity:.95}
 
-    /* ===== Layout giống phim30: main + sidebar ===== */
+    /* ===== Layout ===== */
     .grid{
       margin-top:18px;
       display:grid;
@@ -177,8 +177,6 @@
     }
     .btn:hover{background: rgba(255,255,255,.10);}
     .btn.primary{background: rgba(242,198,79,.16); border-color: rgba(242,198,79,.35); color: rgba(242,198,79, .98);}
-    .meta-line{display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end; color: var(--muted); font-size:13px;}
-    .pill{padding:7px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.12); background: rgba(18,24,36,.35);}
     a{color:var(--accent); text-decoration:none}
     a:hover{text-decoration:underline}
 
@@ -325,11 +323,9 @@
             <div class="actions">
               <div class="btn" id="btnLike">♥ Yêu thích</div>
               <div class="btn" id="btnEpisodes">Chuyển tập</div>
-              <a class="btn primary" id="openDrive" target="_blank" rel="noreferrer">Mở trên Drive</a>
+
+              <!-- ✅ ĐÃ ẨN: Nút “Mở trên Drive” + ID -->
               <a class="btn" href="index.html">← Quay lại</a>
-              <div class="meta-line" style="margin-left:auto">
-                <span class="pill" id="fileId">ID: —</span>
-              </div>
             </div>
           </div>
         </section>
@@ -371,7 +367,6 @@
     const SUPABASE_URL = "https://nzalaxolteaiafvuceqz.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56YWxheG9sdGVhaWFmdnVjZXF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyOTY2MjAsImV4cCI6MjA4NTg3MjYyMH0.0eIz6cfB4Dr_g5Wja70tZCMvVfUKoI5H4D8MJBP49Bg";
 
-    // supabase-js CDN đã tạo global `supabase`, nên tránh đặt biến trùng tên
     const sb = window.supabase?.createClient
       ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
       : null;
@@ -421,8 +416,6 @@
       desc: document.getElementById("desc"),
       frame: document.getElementById("frame"),
       loading: document.getElementById("loading"),
-      fileId: document.getElementById("fileId"),
-      openDrive: document.getElementById("openDrive"),
       posterBox: document.getElementById("posterBox"),
       posterImg: document.getElementById("posterImg"),
       epGrid: document.getElementById("epGrid"),
@@ -476,10 +469,9 @@
     function baseTitleGuess(title) {
       const t = String(title || "").trim();
       if (!t) return "";
-      // bỏ " - 01", "tập 01", "ep 01" ở cuối
       return t
         .replace(/[\s_-]*(tập|tap|ep|episode)\s*\d{1,3}\s*$/i, "")
-        .replace(/[\s_-]*\d{1,3}\s*$/i, (m) => (m.length <= 4 ? "" : m)) // tránh xoá năm 2026
+        .replace(/[\s_-]*\d{1,3}\s*$/i, (m) => (m.length <= 4 ? "" : m))
         .trim();
     }
 
@@ -498,7 +490,6 @@
           if (Number.isFinite(n) && n > 0 && n < 1000) return n;
         }
       }
-      // fallback theo thứ tự query
       return idx + 1;
     }
 
@@ -517,10 +508,9 @@
       } catch { return null; }
     }
 
-    async function fetchEpisodesByTitle(seriesTitle, kind, year) {
+    async function fetchEpisodesByTitle(seriesTitle, kind) {
       if (!sb || !seriesTitle) return [];
       try {
-        // ưu tiên exact title; nếu không ra thì dùng ilike base%
         let { data, error } = await sb
           .from("movies")
           .select("id,title,driveid,drivelink,updatedat,created_at")
@@ -544,7 +534,6 @@
         }
 
         const rows = Array.isArray(data) ? data : [];
-        // sort by inferred episode number
         const enriched = rows.map((r, i) => ({...r, _ep: inferEpNumber(r, i)}));
         enriched.sort((a,b) => (a._ep - b._ep) || String(a.created_at||"").localeCompare(String(b.created_at||"")));
         return enriched;
@@ -558,7 +547,6 @@
           .select("title,kind,year,posterurl,driveid,updatedat,created_at")
           .limit(10);
 
-        // order: updatedat desc, fallback created_at desc
         q = q.order("updatedat", { ascending:false, nullsFirst:false }).order("created_at", { ascending:false });
 
         const { data, error } = await q;
@@ -608,7 +596,6 @@
     }
 
     (async () => {
-      // search input: enter => list
       el.q.addEventListener("keydown", (ev) => {
         if (ev.key === "Enter") applySearchKeyword(el.q.value);
       });
@@ -623,9 +610,8 @@
 
       const r = DriveTool.normalize(driveParam);
       if (!r.ok) {
-        el.title.textContent = "Link Drive không hợp lệ";
-        el.subtitle.textContent = "Vui lòng kiểm tra lại đường dẫn.";
-        el.fileId.textContent = "ID: —";
+        el.title.textContent = "Link không hợp lệ";
+        el.subtitle.textContent = "Vui lòng kiểm tra lại.";
         el.loading.style.display = "none";
         el.frame.src = "";
         renderBadges({ quality:"—" });
@@ -636,16 +622,10 @@
         return;
       }
 
-      // Player
-      el.fileId.textContent = "ID: " + r.id;
+      // Player (vẫn cần để xem)
       el.frame.src = r.links.preview;
-      el.openDrive.href = r.links.view;
 
-      // Loading overlay off when iframe loads
-      el.frame.addEventListener("load", () => {
-        el.loading.style.display = "none";
-      });
-      // safety: hide after a bit (Drive sometimes delays load event)
+      el.frame.addEventListener("load", () => { el.loading.style.display = "none"; });
       setTimeout(() => { el.loading.style.display = "none"; }, 6500);
 
       // Default UI
@@ -656,7 +636,6 @@
       el.desc.textContent = "";
       setPoster("");
 
-      // Fetch current movie info
       const info = await fetchMovieByDriveId(r.id);
       const seriesTitle = (info?.title || titleQ || "Xem phim").trim();
       el.title.textContent = seriesTitle;
@@ -672,11 +651,9 @@
         el.subtitle.textContent = "Không tìm thấy dữ liệu phim trong kho (vẫn có thể xem nếu Drive hợp lệ).";
       }
 
-      // Episodes (dựa trên các record cùng Title)
-      const eps = await fetchEpisodesByTitle(seriesTitle, info?.kind || "anime", info?.year || "");
+      const eps = await fetchEpisodesByTitle(seriesTitle, info?.kind || "anime");
       renderEpisodes(eps, r.id, seriesTitle);
 
-      // Suggestions
       const sug = await fetchSuggestions(r.id);
       renderSuggestions(sug);
     })();
