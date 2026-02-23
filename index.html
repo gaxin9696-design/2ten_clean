@@ -1,6 +1,6 @@
 <!-- =========================
-     FILE: index.html (FULL COPY)
-     FIX: Banner không bị cắt phần trên (object-position: top)
+     FILE: index.html (MERGED)
+     FIX: Phim bộ/anime chỉ hiện 1 card (không trùng theo tập)
 ========================= -->
 <!doctype html>
 <html lang="vi">
@@ -168,7 +168,7 @@
       position:absolute;inset:0;left:auto;
       width:64%;height:100%;
       object-fit:cover;
-      object-position: 50% 12%; /* top-ish: 0% = sát top; 12% đỡ "dính trần" */
+      object-position: 50% 12%;
       transform:scale(1.04);
       filter:saturate(1.05) contrast(1.03) brightness(.96);
       background:#0b0f17;
@@ -180,8 +180,6 @@
       will-change:opacity, filter, transform;
     }
     .hero-media.on{opacity:1}
-
-    /* blur->clear khi đổi banner */
     .hero-media.reveal{animation:heroReveal .55s ease both}
     @keyframes heroReveal{
       from{opacity:0;filter:blur(16px) saturate(1.05) contrast(1.03) brightness(.96);transform:scale(1.08)}
@@ -324,7 +322,7 @@
     .dot:hover{transform:translateY(-1px)}
     .dot.on{background:rgba(242,198,79,.85);border-color:rgba(242,198,79,.35)}
 
-    /* ===== THUMB STRIP (dưới hero, giống mẫu) ===== */
+    /* ===== THUMB STRIP ===== */
     .thumb-row{
       position:absolute;left:22px;right:22px;bottom:16px;
       z-index:4;border-radius:16px;
@@ -486,7 +484,7 @@
 
       .hero-media{
         width:100%;height:52%;top:0;left:0;right:0;
-        object-position: 50% 10%; /* ✅ mobile cũng ưu tiên phần trên */
+        object-position: 50% 10%;
       }
 
       .hero::before{
@@ -509,13 +507,12 @@
       .card .img{height:220px}
     }
 
-    /* === FIX: hạ vị trí cụm nút trong hero (Play / Fav / Info) === */
     @media (max-width:980px){
       .hero-content{min-height:unset;}
       .actions{margin-top:16px;}
     }
 
-    /* ===== Hero posters (giống web mẫu) ===== */
+    /* ===== Hero posters ===== */
     .hero-posters{
       position:absolute;
       left:26px; right:26px;
@@ -721,7 +718,8 @@
       if (!sb) return null;
       const { data, error } = await sb
         .from("movies")
-        .select("id,title,kind,year,quality,desc,driveid,drivelink,posterurl,herourl,updatedat,genres,country,imdb")
+        // ✅ thêm ep/eps/season để gom phim bộ
+        .select("id,title,kind,year,quality,desc,driveid,drivelink,posterurl,herourl,updatedat,genres,country,imdb,ep,eps,season")
         .order("updatedat", { ascending: false });
 
       if (error) {
@@ -743,7 +741,10 @@
         heroUrl: row.herourl || "",
         genres: Array.isArray(row.genres) ? row.genres : [],
         country: row.country || "",
-        updatedAt: Number(row.updatedat || 0)
+        updatedAt: Number(row.updatedat || 0),
+        ep: (row.ep === null || row.ep === undefined) ? null : Number(row.ep),
+        eps: (row.eps === null || row.eps === undefined) ? null : Number(row.eps),
+        season: (row.season === null || row.season === undefined) ? null : Number(row.season),
       }));
     }
 
@@ -827,9 +828,70 @@
         heroUrl: svgPlaceholder("Khoii • Hero Demo", 1600, 800),
         genres: ["Action", "Fantasy"],
         country: "Japan",
-        updatedAt: Date.now()
+        updatedAt: Date.now(),
+        ep: 1, eps: 1, season: 1,
       }
     ];
+
+    // ✅ Gom phim bộ/anime theo tập -> 1 card đại diện (ep=1), updatedAt=max
+    function collapseEpisodicRows(rows) {
+      const out = [];
+      const map = new Map();
+
+      for (const r of (rows || [])) {
+        const kind = r.kind || "anime";
+        const episodic = (kind === "anime" || kind === "series");
+
+        if (!episodic) {
+          out.push({ ...r, openSeason: 1, openEp: 1 });
+          continue;
+        }
+
+        const season = Number(r.season || 1) || 1;
+        const title = String(r.title || "").trim();
+        const key = `${kind}||${season}||${title}`.toLowerCase();
+
+        let g = map.get(key);
+        if (!g) {
+          g = { kind, season, title, rows: [] };
+          map.set(key, g);
+        }
+        g.rows.push(r);
+      }
+
+      for (const g of map.values()) {
+        const arr = g.rows.slice();
+
+        arr.sort((a, b) => (Number(a.ep || 0) - Number(b.ep || 0)) || (Number(a.updatedAt || 0) - Number(b.updatedAt || 0)));
+
+        const rep = arr.find(x => Number(x.ep) === 1) || arr[0];
+
+        const maxUpdated = Math.max(...arr.map(x => Number(x.updatedAt || 0) || 0));
+        const maxEp = Math.max(...arr.map(x => Number(x.ep || 0) || 0));
+        const totalEps = arr.reduce((m, x) => Math.max(m, Number(x.eps || 0) || 0), 0) || (rep.eps || null);
+
+        const posterUrl = arr.map(x => x.posterUrl).find(Boolean) || rep.posterUrl || "";
+        const heroUrl = arr.map(x => x.heroUrl).find(Boolean) || rep.heroUrl || posterUrl || "";
+
+        out.push({
+          ...rep,
+          title: g.title,
+          kind: g.kind,
+          season: g.season,
+          ep: (rep.ep ?? 1),
+          eps: totalEps,
+          posterUrl,
+          heroUrl,
+          updatedAt: maxUpdated,
+          openSeason: g.season,
+          openEp: 1,
+          _latestEp: maxEp,
+        });
+      }
+
+      out.sort((a, b) => (Number(b.updatedAt || 0) - Number(a.updatedAt || 0)));
+      return out;
+    }
 
     function toIndexItem(m) {
       const driveId = m.driveId || DriveTool.extractId(m.driveLink) || "";
@@ -856,8 +918,23 @@
         hero: hero || svgPlaceholder("Khoii Hero", 1600, 800),
         poster: poster || svgPlaceholder("Khoii Poster", 500, 750),
         kind: m.kind || "anime",
-        updatedAt: Number(m.updatedAt || 0)
+        updatedAt: Number(m.updatedAt || 0),
+
+        // ✅ để mở watch theo title/season/ep (phim bộ)
+        openSeason: Number(m.openSeason || m.season || 1) || 1,
+        openEp: Number(m.openEp || 1) || 1,
       };
+    }
+
+    function makeWatchHref(item) {
+      const kind = item.kind || "anime";
+      const episodic = (kind === "anime" || kind === "series");
+      if (episodic) {
+        const season = Number(item.openSeason || 1) || 1;
+        const ep = Number(item.openEp || 1) || 1;
+        return `watch.html?title=${encodeURIComponent(item.title)}&season=${encodeURIComponent(season)}&ep=${encodeURIComponent(ep)}`;
+      }
+      return `watch.html?drive=${encodeURIComponent(item.driveId)}&title=${encodeURIComponent(item.title)}`;
     }
 
     const el = {
@@ -1075,7 +1152,7 @@
             alert("Phim này chưa có Drive ID. Vào Admin để thêm phim Drive thật.");
             return;
           }
-          location.href = `watch.html?drive=${encodeURIComponent(item.driveId)}&title=${encodeURIComponent(item.title)}`;
+          location.href = makeWatchHref(item);
         });
 
         container.appendChild(c);
@@ -1083,8 +1160,12 @@
     }
 
     async function loadItems(){
-      const db = await dbListMoviesPublic();
-      const saved = (db && db.length) ? db : loadMovies();
+      const dbRaw = await dbListMoviesPublic();
+      const savedRaw = (dbRaw && dbRaw.length) ? dbRaw : loadMovies();
+
+      // ✅ chỉ gom khi dùng Supabase (dbRaw)
+      const saved = (dbRaw && dbRaw.length) ? collapseEpisodicRows(savedRaw) : savedRaw;
+
       items = (saved.length ? saved : fallback).map(toIndexItem);
       return items;
     }
@@ -1176,7 +1257,7 @@
         el.heroGenres.innerHTML = "";
         el.heroDesc.textContent = "Hãy thử từ khóa khác hoặc xoá bộ lọc.";
 
-        setHeroImage(svgPlaceholder("No result", 1600, 900)); /* ✅ fix lỗi cú pháp */
+        setHeroImage(svgPlaceholder("No result", 1600, 900));
         renderThumbs([]);
         renderHeroPosters([]);
         el.heroDots.innerHTML = "";
@@ -1217,7 +1298,7 @@
         alert("Phim này chưa có Drive ID. Vào Admin để thêm phim Drive thật.");
         return;
       }
-      location.href = `watch.html?drive=${encodeURIComponent(item.driveId)}&title=${encodeURIComponent(item.title)}`;
+      location.href = makeWatchHref(item);
     });
 
     el.btnFav.addEventListener("click", ()=>{
