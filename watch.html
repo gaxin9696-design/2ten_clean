@@ -24,14 +24,8 @@
       --shadow: 0 18px 65px rgba(0, 0, 0, .55);
     }
 
-    * {
-      box-sizing: border-box
-    }
-
-    html,
-    body {
-      height: 100%
-    }
+    * { box-sizing: border-box }
+    html, body { height: 100% }
 
     body {
       margin: 0;
@@ -69,135 +63,68 @@
       padding: 18px 22px 40px;
     }
 
-    .topbar {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
+    .topbar { display: flex; align-items: center; gap: 16px; }
 
     .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 170px;
-      cursor: pointer
+      display: flex; align-items: center; gap: 10px;
+      min-width: 170px; cursor: pointer
     }
 
     .brand-logo {
-      width: 44px;
-      height: 34px;
-      border-radius: 10px;
-      display: grid;
-      place-items: center;
-      font-weight: 900;
-      letter-spacing: .6px;
-      color: #0b1224;
+      width: 44px; height: 34px; border-radius: 10px;
+      display: grid; place-items: center;
+      font-weight: 900; letter-spacing: .6px; color: #0b1224;
       background:
         radial-gradient(18px 18px at 30% 35%, rgba(255, 255, 255, .22), transparent 60%),
         linear-gradient(135deg, #f59e0b, #fb7185);
       box-shadow: 0 10px 25px rgba(245, 158, 11, .22);
-      position: relative;
-      overflow: hidden;
-      user-select: none;
+      position: relative; overflow: hidden; user-select: none;
     }
-
     .brand-logo:before {
-      content: "";
-      position: absolute;
-      inset: 0;
+      content: ""; position: absolute; inset: 0;
       background: conic-gradient(from 220deg, rgba(0, 0, 0, .35), transparent 40%, rgba(0, 0, 0, .28));
       mix-blend-mode: overlay;
     }
-
-    .brand-logo span {
-      position: relative;
-      z-index: 1
-    }
-
-    .brand-name {
-      font-weight: 900;
-      letter-spacing: .3px;
-      font-size: 18px;
-      line-height: 1.1
-    }
-
-    .brand-sub {
-      font-size: 11px;
-      color: rgba(231, 237, 249, .55);
-      margin-top: 2px
-    }
+    .brand-logo span { position: relative; z-index: 1 }
+    .brand-name { font-weight: 900; letter-spacing: .3px; font-size: 18px; line-height: 1.1 }
+    .brand-sub { font-size: 11px; color: rgba(231, 237, 249, .55); margin-top: 2px }
 
     .search {
-      flex: 1;
-      max-width: 620px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 14px;
-      border-radius: 12px;
+      flex: 1; max-width: 620px;
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; border-radius: 12px;
       background: var(--glass);
       border: 1px solid rgba(255, 255, 255, .12);
       box-shadow: 0 10px 30px rgba(0, 0, 0, .30);
       backdrop-filter: blur(14px);
     }
-
     .search input {
-      width: 100%;
-      border: 0;
-      outline: 0;
-      background: transparent;
-      color: var(--text);
-      font-size: 14px;
+      width: 100%; border: 0; outline: 0; background: transparent;
+      color: var(--text); font-size: 14px;
     }
+    .search input::placeholder { color: rgba(231, 237, 249, .50) }
 
-    .search input::placeholder {
-      color: rgba(231, 237, 249, .50)
-    }
-
-    .nav {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-left: 6px
-    }
-
+    .nav { display: flex; align-items: center; gap: 14px; margin-left: 6px }
     .nav a {
       color: rgba(231, 237, 249, .88);
-      text-decoration: none;
-      font-size: 14px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 10px;
-      border-radius: 10px;
+      text-decoration: none; font-size: 14px;
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 10px; border-radius: 10px;
     }
-
-    .nav a:hover {
-      background: rgba(255, 255, 255, .06)
-    }
+    .nav a:hover { background: rgba(255, 255, 255, .06) }
 
     .member-btn {
       margin-left: auto;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 14px;
-      border-radius: 999px;
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 10px 14px; border-radius: 999px;
       border: 1px solid rgba(255, 255, 255, .12);
       background: var(--glass2);
-      color: var(--text);
-      cursor: pointer;
+      color: var(--text); cursor: pointer;
       backdrop-filter: blur(14px);
       box-shadow: 0 10px 30px rgba(0, 0, 0, .24);
     }
-
-    .member-btn:hover {
-      border-color: var(--line2)
-    }
-
-    .member-btn svg {
-      opacity: .95
-    }
+    .member-btn:hover { border-color: var(--line2) }
+    .member-btn svg { opacity: .95 }
 
     .grid {
       margin-top: 18px;
@@ -206,25 +133,11 @@
       gap: 18px;
       align-items: start;
     }
-
-    @media (max-width:1100px) {
-      .grid {
-        grid-template-columns: minmax(0, 1fr) 300px;
-      }
-    }
-
+    @media (max-width:1100px) { .grid { grid-template-columns: minmax(0, 1fr) 300px; } }
     @media (max-width:980px) {
-      .nav {
-        display: none
-      }
-
-      .member-btn span {
-        display: none
-      }
-
-      .grid {
-        grid-template-columns: 1fr;
-      }
+      .nav { display: none }
+      .member-btn span { display: none }
+      .grid { grid-template-columns: 1fr; }
     }
 
     .card {
@@ -237,81 +150,35 @@
       position: relative;
     }
 
-    .player-wrap {
-      position: relative;
-      width: 100%;
-      background: #000;
-    }
-
-    .player-wrap::before {
-      content: "";
-      display: block;
-      padding-top: 56.25%;
-    }
-
-    .player-wrap iframe {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      border: 0;
-    }
+    .player-wrap { position: relative; width: 100%; background: #000; }
+    .player-wrap::before { content: ""; display: block; padding-top: 56.25%; }
+    .player-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 
     .player-overlay {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      place-items: center;
+      position: absolute; inset: 0;
+      display: grid; place-items: center;
       background: linear-gradient(180deg, rgba(0, 0, 0, .25), rgba(0, 0, 0, .65));
       z-index: 2;
     }
 
     .spinner {
-      width: 28px;
-      height: 28px;
-      border-radius: 999px;
+      width: 28px; height: 28px; border-radius: 999px;
       border: 3px solid rgba(255, 255, 255, .22);
       border-top-color: rgba(255, 255, 255, .85);
       animation: rot 1s linear infinite
     }
+    @keyframes rot { to { transform: rotate(360deg) } }
 
-    @keyframes rot {
-      to {
-        transform: rotate(360deg)
-      }
-    }
-
-    /* =========================================================
-       ✅ FIX: Ẩn icon ↗ “mở trong Google Drive” ở góc phải trên
-       - Không thể can thiệp CSS bên trong iframe Drive
-       - Giải pháp: đè 1 lớp mask che + chặn click đúng vị trí icon
-    ========================================================= */
-    .drive-ui-mask {
-      position: absolute;
-      top: 0;
-      right: 0;
-      z-index: 3;
-
-      /* kích thước che icon (bạn có thể tăng/giảm nếu cần) */
-      width: 104px;
-      height: 88px;
-
-      /* che icon bằng nền tối (đảm bảo icon không còn nhìn thấy) */
-      background: rgba(0, 0, 0, .98);
-
-      /* bo góc cho “mềm” hơn */
+    /* ✅ Ẩn icon ↗ của Drive (che + chặn bấm) */
+    .drive-ui-mask{
+      position:absolute; top:0; right:0; z-index:3;
+      width:104px; height:88px;
+      background: rgba(0,0,0,.98);
       border-bottom-left-radius: 14px;
-
-      /* chặn click/tap vào icon */
-      pointer-events: auto;
+      pointer-events:auto;
     }
-
-    @media (max-width:560px) {
-      .drive-ui-mask {
-        width: 116px;
-        height: 96px;
-        border-bottom-left-radius: 16px;
-      }
+    @media (max-width:560px){
+      .drive-ui-mask{ width:116px; height:96px; border-bottom-left-radius:16px; }
     }
 
     .info {
@@ -321,12 +188,7 @@
       grid-template-columns: 120px minmax(0, 1fr);
       gap: 14px;
     }
-
-    @media (max-width:560px) {
-      .info {
-        grid-template-columns: 1fr;
-      }
-    }
+    @media (max-width:560px) { .info { grid-template-columns: 1fr; } }
 
     .poster {
       width: 120px;
@@ -337,68 +199,27 @@
       overflow: hidden;
       box-shadow: 0 14px 40px rgba(0, 0, 0, .35);
     }
+    .poster img { width: 100%; height: 100%; object-fit: cover; display: block }
 
-    .poster img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block
-    }
+    .h1 { margin: 0; font-size: 22px; letter-spacing: .2px; font-weight: 900 }
+    .sub { margin-top: 6px; color: var(--muted); font-size: 13px; }
 
-    .h1 {
-      margin: 0;
-      font-size: 22px;
-      letter-spacing: .2px;
-      font-weight: 900
-    }
-
-    .sub {
-      margin-top: 6px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .badges {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
+    .badges { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
     .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 10px;
-      border-radius: 10px;
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 7px 10px; border-radius: 10px;
       border: 1px solid rgba(255, 255, 255, .12);
       background: rgba(18, 24, 36, .45);
       color: rgba(231, 237, 249, .92);
       font-size: 13px;
       backdrop-filter: blur(10px);
     }
+    .badge.imdb { border-color: rgba(242, 198, 79, .75); background: rgba(242, 198, 79, .10); }
+    .badge b { font-size: 11px; letter-spacing: .6px; opacity: .9 }
 
-    .badge.imdb {
-      border-color: rgba(242, 198, 79, .75);
-      background: rgba(242, 198, 79, .10);
-    }
-
-    .badge b {
-      font-size: 11px;
-      letter-spacing: .6px;
-      opacity: .9
-    }
-
-    .genres {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
+    .genres { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
     .genre {
-      padding: 7px 10px;
-      border-radius: 999px;
+      padding: 7px 10px; border-radius: 999px;
       border: 1px solid rgba(255, 255, 255, .12);
       background: rgba(18, 24, 36, .40);
       color: rgba(231, 237, 249, .88);
@@ -414,20 +235,10 @@
       max-width: 90ch;
     }
 
-    .actions {
-      margin-top: 12px;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
+    .actions { margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
     .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 9px 12px;
-      border-radius: 12px;
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 9px 12px; border-radius: 12px;
       border: 1px solid rgba(255, 255, 255, .12);
       background: rgba(255, 255, 255, .06);
       color: rgba(231, 237, 249, .92);
@@ -435,57 +246,19 @@
       user-select: none;
       touch-action: manipulation;
     }
+    .btn:hover { background: rgba(255, 255, 255, .10); }
 
-    .btn:hover {
-      background: rgba(255, 255, 255, .10);
-    }
+    a { color: var(--accent); text-decoration: none }
+    a:hover { text-decoration: underline }
 
-    a {
-      color: var(--accent);
-      text-decoration: none
-    }
+    .episodes { margin-top: 14px; padding: 14px; border-top: 1px solid rgba(255, 255, 255, .08); }
+    .episodes-head { display: flex; align-items: center; gap: 10px; justify-content: space-between; flex-wrap: wrap; }
+    .episodes-title { font-weight: 900; letter-spacing: .2px }
 
-    a:hover {
-      text-decoration: underline
-    }
-
-    .episodes {
-      margin-top: 14px;
-      padding: 14px;
-      border-top: 1px solid rgba(255, 255, 255, .08);
-    }
-
-    .episodes-head {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      justify-content: space-between;
-      flex-wrap: wrap;
-    }
-
-    .episodes-title {
-      font-weight: 900;
-      letter-spacing: .2px
-    }
-
-    .server-row {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
-
-    .server-label {
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 700;
-      margin-right: 6px
-    }
-
+    .server-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+    .server-label { color: var(--muted); font-size: 13px; font-weight: 700; margin-right: 6px }
     .server-pill {
-      padding: 8px 10px;
-      border-radius: 12px;
+      padding: 8px 10px; border-radius: 12px;
       border: 1px solid rgba(255, 255, 255, .12);
       background: rgba(18, 24, 36, .45);
       color: rgba(231, 237, 249, .90);
@@ -493,24 +266,12 @@
       cursor: pointer;
       touch-action: manipulation;
     }
+    .server-pill.active { border-color: rgba(242, 198, 79, .35); background: rgba(242, 198, 79, .10); color: rgba(242, 198, 79, .98); }
 
-    .server-pill.active {
-      border-color: rgba(242, 198, 79, .35);
-      background: rgba(242, 198, 79, .10);
-      color: rgba(242, 198, 79, .98);
-    }
-
-    .ep-grid {
-      margin-top: 12px;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
+    .ep-grid { margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap; }
     .ep {
       min-width: 108px;
-      padding: 12px 12px;
-      border-radius: 14px;
+      padding: 12px 12px; border-radius: 14px;
       border: 1px solid rgba(255, 255, 255, .12);
       background: rgba(18, 24, 36, .35);
       color: rgba(231, 237, 249, .90);
@@ -520,38 +281,23 @@
       user-select: none;
       touch-action: manipulation;
     }
-
-    .ep:hover {
-      background: rgba(255, 255, 255, .08);
-    }
-
+    .ep:hover { background: rgba(255, 255, 255, .08); }
     .ep.active {
       border-color: rgba(242, 198, 79, .40);
       background: rgba(242, 198, 79, .14);
       color: rgba(242, 198, 79, .98);
       font-weight: 800;
     }
+    .ep.disabled { opacity: .55; cursor: not-allowed; }
 
     .sidebar .head {
       padding: 14px 14px 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      display: flex; align-items: center; justify-content: space-between;
       border-bottom: 1px solid rgba(255, 255, 255, .08);
     }
+    .sidebar .head b { font-size: 18px; letter-spacing: .2px }
 
-    .sidebar .head b {
-      font-size: 18px;
-      letter-spacing: .2px
-    }
-
-    .sug-list {
-      padding: 10px 10px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
+    .sug-list { padding: 10px 10px 14px; display: flex; flex-direction: column; gap: 10px; }
     .sug {
       display: grid;
       grid-template-columns: 54px minmax(0, 1fr);
@@ -563,11 +309,7 @@
       cursor: pointer;
       touch-action: manipulation;
     }
-
-    .sug:hover {
-      background: rgba(255, 255, 255, .08);
-    }
-
+    .sug:hover { background: rgba(255, 255, 255, .08); }
     .sug .thumb {
       width: 54px;
       aspect-ratio: 2/3;
@@ -576,32 +318,11 @@
       background: rgba(255, 255, 255, .06);
       border: 1px solid rgba(255, 255, 255, .10);
     }
+    .sug img { width: 100%; height: 100%; object-fit: cover; display: block }
+    .sug .t { font-weight: 850; font-size: 14px; line-height: 1.2; margin-top: 2px }
+    .sug .m { color: var(--muted); font-size: 12px; margin-top: 6px }
 
-    .sug img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block
-    }
-
-    .sug .t {
-      font-weight: 850;
-      font-size: 14px;
-      line-height: 1.2;
-      margin-top: 2px
-    }
-
-    .sug .m {
-      color: var(--muted);
-      font-size: 12px;
-      margin-top: 6px
-    }
-
-    .empty {
-      color: var(--muted);
-      font-size: 13px;
-      padding: 14px;
-    }
+    .empty { color: var(--muted); font-size: 13px; padding: 14px; }
   </style>
 </head>
 
@@ -651,8 +372,6 @@
           </div>
 
           <iframe id="frame" allow="autoplay; fullscreen" allowfullscreen referrerpolicy="no-referrer"></iframe>
-
-          <!-- ✅ mask che icon ↗ của Drive -->
           <div class="drive-ui-mask" aria-hidden="true"></div>
         </div>
 
@@ -684,7 +403,7 @@
           </div>
           <div class="server-row">
             <span class="server-label">Server</span>
-            <span class="server-pill active" title="Google Drive">Khoilolo</span>
+            <span class="server-pill active">Khoilolo</span>
           </div>
 
           <div class="episodes-head" style="margin-top:12px">
@@ -716,16 +435,12 @@
       ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
       : null;
 
-    // ===== Level 2: ẩn driveId khỏi URL (lưu tạm sessionStorage) =====
+    // ===== Ẩn driveId khỏi URL (lưu tạm sessionStorage) =====
     const SESSION_DRIVE_KEY = "khoii_watch_drive_v1";
-    function setCurrentDriveId(id) {
-      try { sessionStorage.setItem(SESSION_DRIVE_KEY, String(id || "")); } catch { }
-    }
-    function getCurrentDriveId() {
-      try { return sessionStorage.getItem(SESSION_DRIVE_KEY) || ""; } catch { return ""; }
-    }
+    function setCurrentDriveId(id) { try { sessionStorage.setItem(SESSION_DRIVE_KEY, String(id || "")); } catch { } }
+    function getCurrentDriveId() { try { return sessionStorage.getItem(SESSION_DRIVE_KEY) || ""; } catch { return ""; } }
 
-    // ✅ goWatch: giữ drive trong sessionStorage, URL khác nhau theo ep/season để chắc chắn reload
+    // ✅ goWatch: set driveId session, URL chỉ để title/season/ep (không lộ drive)
     window.goWatch = function (driveId, title, ep, season) {
       const id = String(driveId || "").trim();
       if (id) setCurrentDriveId(id);
@@ -733,7 +448,6 @@
       const t = String(title || "").trim();
       const p = new URLSearchParams();
       if (t) p.set("title", t);
-
       if (season !== undefined && season !== null && season !== "") p.set("season", String(season));
       if (ep !== undefined && ep !== null && ep !== "") p.set("ep", String(ep));
 
@@ -790,6 +504,7 @@
       epGrid: document.getElementById("epGrid"),
       epHint: document.getElementById("epHint"),
       btnEpisodes: document.getElementById("btnEpisodes"),
+      episodesSection: document.getElementById("episodesSection"),
       sugList: document.getElementById("sugList"),
       btnLike: document.getElementById("btnLike"),
     };
@@ -899,7 +614,7 @@
           .order("season", { ascending: true, nullsFirst: true })
           .order("ep", { ascending: true, nullsFirst: true })
           .order("created_at", { ascending: true })
-          .limit(200);
+          .limit(400);
 
         if (error) return [];
 
@@ -918,9 +633,10 @@
       try {
         let q = sb.from("movies")
           .select("title,kind,year,posterurl,driveid,updatedat,created_at")
-          .limit(10);
+          .limit(12);
 
-        q = q.order("updatedat", { ascending: false, nullsFirst: false }).order("created_at", { ascending: false });
+        q = q.order("updatedat", { ascending: false, nullsFirst: false })
+          .order("created_at", { ascending: false });
 
         const { data, error } = await q;
         if (error) return [];
@@ -928,31 +644,55 @@
       } catch { return []; }
     }
 
+    // ✅ FIX: render đề xuất bằng DOM + addEventListener (không dùng onclick string)
     function renderSuggestions(items) {
       if (!items || items.length === 0) {
         el.sugList.innerHTML = `<div class="empty">Chưa có đề xuất.</div>`;
         return;
       }
-      el.sugList.innerHTML = items.map(it => {
+
+      el.sugList.innerHTML = "";
+      items.forEach(it => {
         const k = it.kind === "movie" ? "Phim Lẻ" : it.kind === "series" ? "Phim Bộ" : "Anime";
         const meta = [k, it.year].filter(Boolean).join(" • ");
-        const poster = it.posterurl || "";
+        const poster = String(it.posterurl || "").trim();
 
-        const did = JSON.stringify(it.driveid || "");
-        const ttl = JSON.stringify(it.title || "");
+        const wrap = document.createElement("div");
+        wrap.className = "sug";
+        wrap.addEventListener("click", () => {
+          if (!it.driveid) return alert("Phim này chưa có Drive ID.");
+          window.goWatch(it.driveid, it.title || "", 1, 1);
+        });
 
-        return `
-          <div class="sug" onclick="goWatch(${did}, ${ttl}, 1, 1)">
-            <div class="thumb">${poster ? `<img src="${escapeHtml(poster)}" alt="">` : ""}</div>
-            <div>
-              <div class="t">${escapeHtml(it.title || "—")}</div>
-              <div class="m">${escapeHtml(meta)}</div>
-            </div>
-          </div>
-        `;
-      }).join("");
+        const thumb = document.createElement("div");
+        thumb.className = "thumb";
+        if (poster) {
+          const img = document.createElement("img");
+          img.alt = "";
+          img.loading = "lazy";
+          img.referrerPolicy = "no-referrer";
+          img.src = poster;
+          thumb.appendChild(img);
+        }
+
+        const right = document.createElement("div");
+        const t = document.createElement("div");
+        t.className = "t";
+        t.textContent = it.title || "—";
+        const m = document.createElement("div");
+        m.className = "m";
+        m.textContent = meta || "";
+        right.appendChild(t);
+        right.appendChild(m);
+
+        wrap.appendChild(thumb);
+        wrap.appendChild(right);
+
+        el.sugList.appendChild(wrap);
+      });
     }
 
+    // ✅ FIX: render tập bằng DOM + addEventListener (bấm tập 2 chắc chắn chạy)
     function renderEpisodes(list, currentDriveId, seriesTitle, currentEp, currentSeason) {
       if (!Array.isArray(list) || list.length === 0) {
         el.epHint.textContent = "Chưa có danh sách tập.";
@@ -961,25 +701,30 @@
       }
 
       el.epHint.textContent = `${list.length} tập`;
-      el.epGrid.innerHTML = list.map((r, i) => {
+      el.epGrid.innerHTML = "";
+
+      list.forEach((r, i) => {
         const ep = r._ep || (i + 1);
         const season = r._season || 1;
 
-        const active =
+        const isActive =
           (currentEp && currentSeason && ep === currentEp && season === currentSeason) ||
-          (r.driveid === currentDriveId)
-            ? "active"
-            : "";
+          (r.driveid === currentDriveId);
 
-        const t = `Tập ${pad2(ep)}`;
+        const btn = document.createElement("div");
+        btn.className = "ep" + (isActive ? " active" : "");
+        btn.textContent = `Tập ${pad2(ep)}`;
 
-        const did = JSON.stringify(r.driveid || "");
-        const ttl = JSON.stringify(seriesTitle || "");
-        const epJs = JSON.stringify(ep);
-        const ssJs = JSON.stringify(season);
+        if (!r.driveid) {
+          btn.classList.add("disabled");
+        } else {
+          btn.addEventListener("click", () => {
+            window.goWatch(r.driveid, seriesTitle || "", ep, season);
+          });
+        }
 
-        return `<div class="ep ${active}" onclick="goWatch(${did}, ${ttl}, ${epJs}, ${ssJs})">${escapeHtml(t)}</div>`;
-      }).join("");
+        el.epGrid.appendChild(btn);
+      });
     }
 
     (async () => {
@@ -987,8 +732,8 @@
         if (ev.key === "Enter") applySearchKeyword(el.q.value);
       });
 
-      document.getElementById("btnEpisodes")?.addEventListener("click", () => {
-        document.getElementById("episodesSection")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      el.btnEpisodes?.addEventListener("click", () => {
+        el.episodesSection?.scrollIntoView({ behavior: "smooth", block: "start" });
       });
 
       el.btnLike?.addEventListener("click", () => {
@@ -1000,12 +745,17 @@
       const epWanted = Number(params.get("ep") || "") || null;
       const seasonWanted = Number(params.get("season") || "") || 1;
 
-      const driveParam = params.get("drive") || params.get("m") || "";
-      let driveCandidate = driveParam || getCurrentDriveId();
+      // ✅ FIX quan trọng: nếu URL có title+ep -> ưu tiên DB lookup để lấy đúng driveId
+      const driveParam = (params.get("drive") || params.get("m") || "").trim();
+      let driveCandidate = "";
 
-      if (!driveCandidate && titleQ && epWanted) {
+      if (driveParam) {
+        driveCandidate = driveParam;
+      } else if (titleQ && epWanted) {
         const row = await fetchMovieByTitleEp(titleQ, seasonWanted, epWanted);
-        if (row?.driveid) driveCandidate = row.driveid;
+        driveCandidate = row?.driveid || getCurrentDriveId();
+      } else {
+        driveCandidate = getCurrentDriveId();
       }
 
       const r = DriveTool.normalize(driveCandidate);
@@ -1022,25 +772,30 @@
         return;
       }
 
+      // lưu lại driveId hiện tại
       setCurrentDriveId(r.id);
 
+      // ✅ Xóa drive khỏi URL, chỉ giữ title/season/ep
       const cleanParams = new URLSearchParams();
       if (titleQ) cleanParams.set("title", titleQ);
       if (seasonWanted) cleanParams.set("season", String(seasonWanted));
       if (epWanted) cleanParams.set("ep", String(epWanted));
       history.replaceState({}, "", "watch.html" + (cleanParams.toString() ? "?" + cleanParams.toString() : ""));
 
+      // Player
       el.frame.src = r.links.preview;
       el.frame.addEventListener("load", () => { el.loading.style.display = "none"; });
       setTimeout(() => { el.loading.style.display = "none"; }, 6500);
 
-      el.title.textContent = titleQ;
+      // Default UI
+      el.title.textContent = titleQ || "Xem phim";
       el.subtitle.textContent = "Đang tải thông tin…";
       renderBadges({ quality: "FHD", kind: "anime" });
       renderGenres([]);
       el.desc.textContent = "";
       setPoster("");
 
+      // Movie info
       const info = await fetchMovieByDriveId(r.id);
       const seriesTitle = (info?.title || titleQ || "Xem phim").trim();
       el.title.textContent = seriesTitle;
@@ -1056,19 +811,29 @@
         el.subtitle.textContent = "Không tìm thấy dữ liệu phim trong kho (vẫn xem được nếu Drive hợp lệ).";
       }
 
-      const eps = await fetchEpisodesByTitle(seriesTitle, info?.kind || null);
+      // Episodes (ẩn nếu là movie)
+      if (info?.kind === "movie") {
+        el.episodesSection.style.display = "none";
+        el.btnEpisodes.style.display = "none";
+      } else {
+        el.episodesSection.style.display = "";
+        el.btnEpisodes.style.display = "";
+        const eps = await fetchEpisodesByTitle(seriesTitle, info?.kind || null);
 
-      if (epWanted && eps.length) {
-        const hit = eps.find(x => x._season === seasonWanted && x._ep === epWanted);
-        if (hit?.driveid && hit.driveid !== r.id) {
-          setCurrentDriveId(hit.driveid);
-          const rr = DriveTool.normalize(hit.driveid);
-          if (rr.ok) el.frame.src = rr.links.preview;
+        // nếu URL có epWanted -> đảm bảo player đúng tập (trường hợp sessionStorage bị lệch)
+        if (epWanted && eps.length) {
+          const hit = eps.find(x => x._season === seasonWanted && x._ep === epWanted);
+          if (hit?.driveid && hit.driveid !== r.id) {
+            setCurrentDriveId(hit.driveid);
+            const rr = DriveTool.normalize(hit.driveid);
+            if (rr.ok) el.frame.src = rr.links.preview;
+          }
         }
+
+        renderEpisodes(eps, getCurrentDriveId() || r.id, seriesTitle, epWanted, seasonWanted);
       }
 
-      renderEpisodes(eps, getCurrentDriveId() || r.id, seriesTitle, epWanted, seasonWanted);
-
+      // Suggestions
       const sug = await fetchSuggestions(getCurrentDriveId() || r.id);
       renderSuggestions(sug);
     })();
