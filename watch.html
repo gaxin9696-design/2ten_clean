@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="description" content="Khoii – Trang xem phim. Mở nhanh, xem mượt." />
   <meta name="robots" content="index,follow" />
   <meta name="theme-color" content="#0b1224" />
@@ -42,6 +42,7 @@
         radial-gradient(900px 420px at 85% 10%, rgba(245, 158, 11, .10), transparent 55%),
         linear-gradient(180deg, var(--bg0), var(--bg1));
       overflow-x: hidden;
+      padding-bottom: env(safe-area-inset-bottom);
     }
 
     body::before {
@@ -65,7 +66,13 @@
       z-index: 1;
       max-width: 1320px;
       margin: 0 auto;
-      padding: 18px 22px 40px;
+      padding: 18px 22px calc(40px + env(safe-area-inset-bottom));
+    }
+
+    @media (max-width: 560px) {
+      .container {
+        padding: 14px 12px calc(28px + env(safe-area-inset-bottom));
+      }
     }
 
     .topbar {
@@ -240,6 +247,7 @@
       position: relative;
       width: 100%;
       background: #000;
+      overflow: hidden;
     }
 
     .player-wrap::before {
@@ -248,12 +256,111 @@
       padding-top: 56.25%;
     }
 
-    .player-wrap iframe {
+    .player-wrap iframe,
+    .player-wrap video {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
       border: 0;
+      background: #000;
+    }
+
+    /* ✅ chặn click nhầm icon “mở drive” trong iframe bằng lớp nút của mình */
+    .player-actions {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 6;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      pointer-events: auto;
+    }
+
+    .pbtn {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, .14);
+      background: rgba(10, 14, 22, .60);
+      color: rgba(231, 237, 249, .95);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, .28);
+    }
+
+    .pbtn:hover {
+      border-color: rgba(255, 255, 255, .22);
+      background: rgba(255, 255, 255, .08);
+    }
+
+    .pbtn svg {
+      width: 20px;
+      height: 20px;
+      opacity: .95;
+    }
+
+    .iab-notice {
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      z-index: 6;
+      padding: 12px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, .12);
+      background: rgba(10, 14, 22, .78);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, .35);
+    }
+
+    .iab-title {
+      font-weight: 900;
+      letter-spacing: .2px;
+      margin-bottom: 6px;
+    }
+
+    .iab-text {
+      color: rgba(231, 237, 249, .78);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .iab-actions {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .iab-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, .14);
+      background: rgba(255, 255, 255, .06);
+      color: rgba(231, 237, 249, .92);
+      cursor: pointer;
+      user-select: none;
+      font-weight: 800;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .iab-btn:hover {
+      background: rgba(255, 255, 255, .10);
+    }
+
+    .iab-btn.primary {
+      border-color: rgba(242, 198, 79, .35);
+      background: rgba(242, 198, 79, .14);
+      color: rgba(242, 198, 79, .98);
     }
 
     .player-overlay {
@@ -262,7 +369,7 @@
       display: grid;
       place-items: center;
       background: linear-gradient(180deg, rgba(0, 0, 0, .25), rgba(0, 0, 0, .65));
-      z-index: 2;
+      z-index: 5;
     }
 
     .spinner {
@@ -608,10 +715,50 @@
           <div class="player-overlay" id="loading">
             <div style="display:flex;align-items:center;gap:10px">
               <div class="spinner"></div>
-              <div style="color:rgba(231,237,249,.88);font-weight:800">Đang tải player…</div>
+              <div style="color:rgba(231,237,249,.88);font-weight:800" id="loadingText">Đang tải player…</div>
             </div>
           </div>
-          <iframe id="frame" allow="autoplay; fullscreen" allowfullscreen referrerpolicy="no-referrer"></iframe>
+
+          <!-- ✅ Action overlay: chặn click nhầm icon Drive + cho nút riêng -->
+          <div class="player-actions" aria-label="Player actions">
+            <button class="pbtn" id="btnOpenDrive" type="button" title="Mở Google Drive">
+              <!-- external-link icon -->
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M14 5h5v5" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M10 14 19 5" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M19 14v5a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5" stroke="rgba(231,237,249,.72)" stroke-width="2" stroke-linecap="round" />
+              </svg>
+            </button>
+
+            <button class="pbtn" id="btnFullscreen" type="button" title="Toàn màn hình">
+              <!-- fullscreen icon -->
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M9 4H5v4" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M15 4h4v4" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M9 20H5v-4" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M15 20h4v-4" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- ✅ Notice cho in-app browser (Messenger/FB/Instagram/...) -->
+          <div class="iab-notice" id="iabNotice" hidden>
+            <div class="iab-title">Đang mở trong trình duyệt của app</div>
+            <div class="iab-text">
+              Trình duyệt trong Messenger/Facebook/Instagram thường chặn phát video Google Drive.
+              Nếu video không chạy, hãy bấm <b>Mở bằng trình duyệt</b> hoặc <b>Mở Drive</b>.
+            </div>
+            <div class="iab-actions">
+              <button class="iab-btn primary" id="btnOpenBrowser" type="button">Mở bằng trình duyệt</button>
+              <button class="iab-btn" id="btnOpenDrive2" type="button">Mở Drive</button>
+            </div>
+          </div>
+
+          <!-- ✅ Player 2: Direct video (thử cho in-app browser) -->
+          <video id="video" playsinline controls style="display:none"></video>
+
+          <!-- Player 1: Google Drive preview -->
+          <iframe id="frame" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
         </div>
 
         <section class="info">
@@ -698,6 +845,47 @@
       location.href = "watch.html" + (p.toString() ? "?" + p.toString() : "");
     };
 
+    function detectEnv() {
+      const ua = navigator.userAgent || "";
+      const isAndroid = /Android/i.test(ua);
+      const isIOS = /iPhone|iPad|iPod/i.test(ua);
+      // FB/Messenger/Instagram in-app browser
+      const isIAB =
+        /FBAN|FBAV|FB_IAB|FBIOS|FB4A|Instagram|Messenger|Line\/|Zalo|TikTok|Snapchat|Twitter/i.test(ua);
+      return { ua, isAndroid, isIOS, isIAB };
+    }
+
+    function openExternalUrl(url) {
+      const env = detectEnv();
+      const safeUrl = String(url || "").trim();
+      if (!safeUrl) return;
+
+      // Android: cố gắng mở Chrome bằng intent
+      if (env.isAndroid) {
+        try {
+          const u = new URL(safeUrl);
+          const intent = `intent://${u.host}${u.pathname}${u.search}#Intent;scheme=${u.protocol.replace(":", "")};package=com.android.chrome;end`;
+          location.href = intent;
+          setTimeout(() => { window.open(safeUrl, "_blank"); }, 450);
+          return;
+        } catch { }
+      }
+
+      // iOS: thử mở Chrome nếu có (nếu không có thì user vẫn có thể bấm “Open in Safari” trong menu)
+      if (env.isIOS) {
+        try {
+          const u = new URL(safeUrl);
+          const scheme = (u.protocol === "https:") ? "googlechromes://" : "googlechrome://";
+          const chromeUrl = scheme + u.host + u.pathname + u.search + u.hash;
+          location.href = chromeUrl;
+          setTimeout(() => { window.open(safeUrl, "_blank"); }, 450);
+          return;
+        } catch { }
+      }
+
+      window.open(safeUrl, "_blank");
+    }
+
     const DriveTool = (() => {
       const patterns = [
         /drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]{10,})/i,
@@ -720,10 +908,13 @@
         return null;
       }
       function links(id) {
+        const enc = encodeURIComponent(id);
         return {
           id,
-          preview: `https://drive.google.com/file/d/${encodeURIComponent(id)}/preview`,
-          view: `https://drive.google.com/file/d/${encodeURIComponent(id)}/view`,
+          preview: `https://drive.google.com/file/d/${enc}/preview`,
+          view: `https://drive.google.com/file/d/${enc}/view`,
+          // ✅ thử direct stream (hay dùng để “cứu” in-app browser)
+          download: `https://drive.google.com/uc?export=download&id=${enc}`,
         };
       }
       function normalize(input) {
@@ -742,7 +933,9 @@
       genres: document.getElementById("genres"),
       desc: document.getElementById("desc"),
       frame: document.getElementById("frame"),
+      video: document.getElementById("video"),
       loading: document.getElementById("loading"),
+      loadingText: document.getElementById("loadingText"),
       posterBox: document.getElementById("posterBox"),
       posterImg: document.getElementById("posterImg"),
       epGrid: document.getElementById("epGrid"),
@@ -750,12 +943,27 @@
       btnEpisodes: document.getElementById("btnEpisodes"),
       sugList: document.getElementById("sugList"),
       btnLike: document.getElementById("btnLike"),
+
+      btnOpenDrive: document.getElementById("btnOpenDrive"),
+      btnFullscreen: document.getElementById("btnFullscreen"),
+      iabNotice: document.getElementById("iabNotice"),
+      btnOpenBrowser: document.getElementById("btnOpenBrowser"),
+      btnOpenDrive2: document.getElementById("btnOpenDrive2"),
     };
 
     function escapeHtml(s) {
       return String(s ?? "")
         .replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+    }
+
+    function showLoading(text = "Đang tải player…") {
+      if (el.loadingText) el.loadingText.textContent = text;
+      el.loading.style.display = "grid";
+    }
+
+    function hideLoading() {
+      el.loading.style.display = "none";
     }
 
     function renderBadges(info) {
@@ -794,15 +1002,6 @@
       location.href = `list.html?q=${encodeURIComponent(s)}`;
     }
 
-    function baseTitleGuess(title) {
-      const t = String(title || "").trim();
-      if (!t) return "";
-      return t
-        .replace(/[\s_-]*(tập|tap|ep|episode)\s*\d{1,3}\s*$/i, "")
-        .replace(/[\s_-]*\d{1,3}\s*$/i, (m) => (m.length <= 4 ? "" : m))
-        .trim();
-    }
-
     // fallback nếu bạn quên nhập ep trong DB (khuyên: luôn nhập ep)
     function inferEpNumber(row, idx) {
       const s = `${row?.drivelink || ""} ${row?.title || ""}`.toLowerCase();
@@ -837,7 +1036,6 @@
       } catch { return null; }
     }
 
-    // ✅ mở link kiểu watch.html?title=...&season=1&ep=2 (không cần sessionStorage)
     async function fetchMovieByTitleEp(title, season, ep) {
       if (!sb || !title || !season || !ep) return null;
       try {
@@ -854,7 +1052,23 @@
       } catch { return null; }
     }
 
-    // ✅ lấy list tập theo title/kind, sort theo season/ep
+    // ✅ fallback cho phim lẻ: nếu URL chỉ có title mà không có drive (vì bạn đã replaceState)
+    async function fetchLatestByTitle(title) {
+      if (!sb || !title) return null;
+      try {
+        const { data, error } = await sb
+          .from("movies")
+          .select("id,title,kind,year,quality,desc,genres,country,imdb,posterurl,herourl,driveid,drivelink,updatedat,created_at,ep,eps,season")
+          .eq("title", title)
+          .order("updatedat", { ascending: false, nullsFirst: false })
+          .order("created_at", { ascending: false })
+          .limit(1);
+
+        if (error) return null;
+        return (data || [])[0] || null;
+      } catch { return null; }
+    }
+
     async function fetchEpisodesByTitle(seriesTitle, kind) {
       if (!sb || !seriesTitle) return [];
       try {
@@ -888,7 +1102,7 @@
       try {
         let q = sb.from("movies")
           .select("title,kind,year,posterurl,driveid,updatedat,created_at")
-          .limit(10);
+          .limit(12);
 
         q = q.order("updatedat", { ascending: false, nullsFirst: false }).order("created_at", { ascending: false });
 
@@ -911,7 +1125,6 @@
         const did = JSON.stringify(it.driveid || "");
         const ttl = JSON.stringify(it.title || "");
 
-        // đề xuất: mở ep mặc định 1 (nếu là bộ)
         return `
           <div class="sug" onclick="goWatch(${did}, ${ttl}, 1, 1)">
             <div class="thumb">${poster ? `<img src="${escapeHtml(poster)}" alt="">` : ""}</div>
@@ -953,6 +1166,129 @@
       }).join("");
     }
 
+    // ===== Player mode handling =====
+    const env = detectEnv();
+    const playerMode = env.isIAB ? "video" : "iframe"; // ✅ in-app: thử video direct
+
+    let currentLinks = null;
+    let currentDriveId = "";
+    let currentTitle = "";
+    let currentEp = null;
+    let currentSeason = 1;
+
+    function setPlayerLinks(links) {
+      currentLinks = links;
+    }
+
+    function setPlayerByDriveId(driveId) {
+      const rr = DriveTool.normalize(driveId);
+      if (!rr.ok) return false;
+
+      currentDriveId = rr.id;
+      setPlayerLinks(rr.links);
+
+      // nút mở drive dùng view
+      // (bị block popup thì vẫn ok vì click user)
+      // player:
+      showLoading(playerMode === "video" ? "Đang tải video (Direct)..." : "Đang tải player…");
+
+      if (playerMode === "video") {
+        el.frame.style.display = "none";
+        el.video.style.display = "block";
+
+        // reset video
+        try {
+          el.video.pause();
+        } catch { }
+        el.video.removeAttribute("src");
+
+        // set src direct
+        el.video.src = rr.links.download;
+        el.video.load();
+
+        // nếu play được thì hide loading ở event
+        setTimeout(() => hideLoading(), 6500);
+      } else {
+        // iframe preview
+        el.video.style.display = "none";
+        el.frame.style.display = "block";
+        el.frame.src = rr.links.preview;
+
+        setTimeout(() => hideLoading(), 6500);
+      }
+
+      // lưu session
+      setCurrentDriveId(rr.id);
+      return true;
+    }
+
+    function openDrive() {
+      if (!currentLinks?.view) return;
+      window.open(currentLinks.view, "_blank", "noopener");
+    }
+
+    async function toggleFullscreen() {
+      // Fullscreen API (nếu không hỗ trợ thì mở Drive)
+      const wrap = document.querySelector(".player-wrap");
+      try {
+        if (!document.fullscreenElement) {
+          if (wrap?.requestFullscreen) await wrap.requestFullscreen();
+          else if (wrap?.webkitRequestFullscreen) wrap.webkitRequestFullscreen();
+          else openDrive();
+        } else {
+          if (document.exitFullscreen) await document.exitFullscreen();
+          else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        }
+      } catch {
+        openDrive();
+      }
+    }
+
+    function showIabNotice() {
+      // chỉ show khi là in-app (hoặc khi video lỗi)
+      if (env.isIAB && el.iabNotice) el.iabNotice.hidden = false;
+    }
+
+    function hideIabNotice() {
+      if (el.iabNotice) el.iabNotice.hidden = true;
+    }
+
+    function buildOpenBrowserUrl() {
+      const url = new URL(location.href);
+      url.search = "";
+      url.hash = "";
+      const p = url.searchParams;
+
+      // ✅ để chắc chắn mở được ở browser ngoài: nhét drive vào (bên ngoài vào trang thì code sẽ tự replaceState lại)
+      if (currentDriveId) p.set("drive", currentDriveId);
+      if (currentTitle) p.set("title", currentTitle);
+      if (currentSeason) p.set("season", String(currentSeason));
+      if (currentEp) p.set("ep", String(currentEp));
+
+      return url.toString();
+    }
+
+    // events
+    el.frame.addEventListener("load", () => hideLoading());
+    el.video.addEventListener("canplay", () => {
+      hideLoading();
+      // nếu direct play ok thì có thể ẩn notice cho gọn
+      // nhưng giữ lại vì Messenger vẫn hay lỗi ngẫu nhiên
+    });
+    el.video.addEventListener("error", () => {
+      hideLoading();
+      showIabNotice();
+    });
+
+    el.btnOpenDrive?.addEventListener("click", openDrive);
+    el.btnOpenDrive2?.addEventListener("click", openDrive);
+    el.btnFullscreen?.addEventListener("click", toggleFullscreen);
+
+    el.btnOpenBrowser?.addEventListener("click", () => {
+      const u = buildOpenBrowserUrl();
+      openExternalUrl(u);
+    });
+
     (async () => {
       el.q.addEventListener("keydown", (ev) => {
         if (ev.key === "Enter") applySearchKeyword(el.q.value);
@@ -966,26 +1302,43 @@
         alert("Đã thêm vào yêu thích (demo).");
       });
 
+      if (env.isIAB) showIabNotice();
+
       const params = new URLSearchParams(location.search);
       const titleQ = (params.get("title") || "Xem phim").trim();
-      const epWanted = Number(params.get("ep") || "") || null;
-      const seasonWanted = Number(params.get("season") || "") || 1;
+      let epWanted = Number(params.get("ep") || "") || null;
+      let seasonWanted = Number(params.get("season") || "") || 1;
 
-      // ưu tiên: drive trong URL -> nếu không có drive thì tìm theo title+season+ep -> fallback sessionStorage
       const driveParam = params.get("drive") || params.get("m") || "";
       let driveCandidate = driveParam || getCurrentDriveId();
 
+      // ✅ nếu không có drive, thử tìm theo title+season+ep (phim bộ)
       if (!driveCandidate && titleQ && epWanted) {
         const row = await fetchMovieByTitleEp(titleQ, seasonWanted, epWanted);
         if (row?.driveid) driveCandidate = row.driveid;
+      }
+
+      // ✅ nếu vẫn không có drive (phim lẻ / hoặc link share bị clean), thử tìm theo title (lấy record mới nhất)
+      if (!driveCandidate && titleQ) {
+        const row = await fetchLatestByTitle(titleQ);
+        if (row?.driveid) {
+          driveCandidate = row.driveid;
+          // nếu phim bộ mà thiếu epWanted -> default ep 1
+          if (!epWanted && (row.kind === "anime" || row.kind === "series")) {
+            seasonWanted = Number(row.season || seasonWanted || 1) || 1;
+            epWanted = Number(row.ep || 1) || 1;
+          }
+        }
       }
 
       const r = DriveTool.normalize(driveCandidate);
       if (!r.ok) {
         el.title.textContent = "Không có phim để phát";
         el.subtitle.textContent = "Thiếu link/ID hoặc không hợp lệ.";
-        el.loading.style.display = "none";
+        hideLoading();
         el.frame.src = "";
+        try { el.video.pause(); } catch { }
+        el.video.style.display = "none";
         renderBadges({ quality: "—" });
         renderGenres([]);
         el.desc.textContent = "";
@@ -994,20 +1347,22 @@
         return;
       }
 
-      // lưu lại driveId cho lần sau
+      // lưu lại driveId
       setCurrentDriveId(r.id);
 
-      // ✅ xóa drive khỏi URL, nhưng giữ title + ep + season (để link tập là link thật)
+      // ✅ xóa drive khỏi URL, nhưng giữ title + ep + season
+      currentTitle = titleQ || "";
+      currentEp = epWanted;
+      currentSeason = seasonWanted || 1;
+
       const cleanParams = new URLSearchParams();
-      if (titleQ) cleanParams.set("title", titleQ);
-      if (seasonWanted) cleanParams.set("season", String(seasonWanted));
-      if (epWanted) cleanParams.set("ep", String(epWanted));
+      if (currentTitle) cleanParams.set("title", currentTitle);
+      if (currentSeason) cleanParams.set("season", String(currentSeason));
+      if (currentEp) cleanParams.set("ep", String(currentEp));
       history.replaceState({}, "", "watch.html" + (cleanParams.toString() ? "?" + cleanParams.toString() : ""));
 
       // Player
-      el.frame.src = r.links.preview;
-      el.frame.addEventListener("load", () => { el.loading.style.display = "none"; });
-      setTimeout(() => { el.loading.style.display = "none"; }, 6500);
+      setPlayerByDriveId(r.id);
 
       // Default UI
       el.title.textContent = titleQ;
@@ -1020,8 +1375,9 @@
       // Movie info
       const info = await fetchMovieByDriveId(r.id);
       const seriesTitle = (info?.title || titleQ || "Xem phim").trim();
-      el.title.textContent = seriesTitle;
+      currentTitle = seriesTitle;
       document.title = seriesTitle + " - Khoii";
+      el.title.textContent = seriesTitle;
 
       if (info) {
         el.subtitle.textContent = info.kind === "movie" ? "Phim Lẻ" : info.kind === "series" ? "Phim Bộ" : "Anime";
@@ -1033,20 +1389,19 @@
         el.subtitle.textContent = "Không tìm thấy dữ liệu phim trong kho (vẫn xem được nếu Drive hợp lệ).";
       }
 
-      // Episodes
+      // Episodes list
       const eps = await fetchEpisodesByTitle(seriesTitle, info?.kind || null);
 
-      // nếu URL có epWanted thì ép player sang đúng driveid tập đó (phòng trường hợp sessionStorage đang là tập khác)
-      if (epWanted && eps.length) {
-        const hit = eps.find(x => x._season === seasonWanted && x._ep === epWanted);
+      // nếu URL có epWanted thì ép player sang đúng driveid tập đó
+      if (currentEp && eps.length) {
+        const hit = eps.find(x => x._season === currentSeason && x._ep === currentEp);
         if (hit?.driveid && hit.driveid !== r.id) {
           setCurrentDriveId(hit.driveid);
-          const rr = DriveTool.normalize(hit.driveid);
-          if (rr.ok) el.frame.src = rr.links.preview;
+          setPlayerByDriveId(hit.driveid);
         }
       }
 
-      renderEpisodes(eps, getCurrentDriveId() || r.id, seriesTitle, epWanted, seasonWanted);
+      renderEpisodes(eps, getCurrentDriveId() || r.id, seriesTitle, currentEp, currentSeason);
 
       // Suggestions
       const sug = await fetchSuggestions(getCurrentDriveId() || r.id);
