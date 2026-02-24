@@ -150,7 +150,22 @@
       position: relative;
     }
 
-    .player-wrap { position: relative; width: 100%; background: #000; }
+    /* ✅ Video container: bo tròn cả 4 góc, đặc biệt 2 góc dưới */
+    .player-wrap {
+      position: relative;
+      width: 100%;
+      background: #000;
+      overflow: hidden;
+
+      /* bo tròn giống góc trên của card */
+      border-top-left-radius: var(--radius);
+      border-top-right-radius: var(--radius);
+
+      /* ✅ bo tròn 2 góc dưới của khung video */
+      border-bottom-left-radius: 18px;
+      border-bottom-right-radius: 18px;
+    }
+
     .player-wrap::before { content: ""; display: block; padding-top: 56.25%; }
     .player-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 
@@ -169,16 +184,32 @@
     }
     @keyframes rot { to { transform: rotate(360deg) } }
 
-    /* ✅ Ẩn icon ↗ của Drive (che + chặn bấm) */
+    /* ✅ Mask che icon ↗ Drive: THU NHỎ + bo tròn nhẹ để không “ô đen” quá lộ */
     .drive-ui-mask{
-      position:absolute; top:0; right:0; z-index:3;
-      width:104px; height:88px;
-      background: rgba(0,0,0,.98);
-      border-bottom-left-radius: 14px;
-      pointer-events:auto;
+      position:absolute;
+      top:0; right:0;
+      z-index:3;
+
+      /* nhỏ hơn nhiều so với bản cũ */
+      width: clamp(56px, 16vw, 84px);
+      height: clamp(50px, 14vw, 76px);
+
+      /* che kín icon */
+      background: rgba(0,0,0,.96);
+
+      border-bottom-left-radius: 16px;
+
+      /* chặn bấm vào icon */
+      pointer-events: auto;
     }
+
+    /* Nếu bạn thấy icon vẫn lọt ra (một số máy), tăng nhẹ size ở đây */
     @media (max-width:560px){
-      .drive-ui-mask{ width:116px; height:96px; border-bottom-left-radius:16px; }
+      .drive-ui-mask{
+        width: clamp(62px, 18vw, 92px);
+        height: clamp(56px, 16vw, 84px);
+        border-bottom-left-radius: 18px;
+      }
     }
 
     .info {
@@ -372,6 +403,8 @@
           </div>
 
           <iframe id="frame" allow="autoplay; fullscreen" allowfullscreen referrerpolicy="no-referrer"></iframe>
+
+          <!-- ✅ mask che icon ↗ Drive -->
           <div class="drive-ui-mask" aria-hidden="true"></div>
         </div>
 
@@ -435,12 +468,10 @@
       ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
       : null;
 
-    // ===== Ẩn driveId khỏi URL (lưu tạm sessionStorage) =====
     const SESSION_DRIVE_KEY = "khoii_watch_drive_v1";
     function setCurrentDriveId(id) { try { sessionStorage.setItem(SESSION_DRIVE_KEY, String(id || "")); } catch { } }
     function getCurrentDriveId() { try { return sessionStorage.getItem(SESSION_DRIVE_KEY) || ""; } catch { return ""; } }
 
-    // ✅ goWatch: set driveId session, URL chỉ để title/season/ep (không lộ drive)
     window.goWatch = function (driveId, title, ep, season) {
       const id = String(driveId || "").trim();
       if (id) setCurrentDriveId(id);
@@ -644,7 +675,6 @@
       } catch { return []; }
     }
 
-    // ✅ FIX: render đề xuất bằng DOM + addEventListener (không dùng onclick string)
     function renderSuggestions(items) {
       if (!items || items.length === 0) {
         el.sugList.innerHTML = `<div class="empty">Chưa có đề xuất.</div>`;
@@ -687,12 +717,10 @@
 
         wrap.appendChild(thumb);
         wrap.appendChild(right);
-
         el.sugList.appendChild(wrap);
       });
     }
 
-    // ✅ FIX: render tập bằng DOM + addEventListener (bấm tập 2 chắc chắn chạy)
     function renderEpisodes(list, currentDriveId, seriesTitle, currentEp, currentSeason) {
       if (!Array.isArray(list) || list.length === 0) {
         el.epHint.textContent = "Chưa có danh sách tập.";
@@ -745,7 +773,6 @@
       const epWanted = Number(params.get("ep") || "") || null;
       const seasonWanted = Number(params.get("season") || "") || 1;
 
-      // ✅ FIX quan trọng: nếu URL có title+ep -> ưu tiên DB lookup để lấy đúng driveId
       const driveParam = (params.get("drive") || params.get("m") || "").trim();
       let driveCandidate = "";
 
@@ -772,22 +799,18 @@
         return;
       }
 
-      // lưu lại driveId hiện tại
       setCurrentDriveId(r.id);
 
-      // ✅ Xóa drive khỏi URL, chỉ giữ title/season/ep
       const cleanParams = new URLSearchParams();
       if (titleQ) cleanParams.set("title", titleQ);
       if (seasonWanted) cleanParams.set("season", String(seasonWanted));
       if (epWanted) cleanParams.set("ep", String(epWanted));
       history.replaceState({}, "", "watch.html" + (cleanParams.toString() ? "?" + cleanParams.toString() : ""));
 
-      // Player
       el.frame.src = r.links.preview;
       el.frame.addEventListener("load", () => { el.loading.style.display = "none"; });
       setTimeout(() => { el.loading.style.display = "none"; }, 6500);
 
-      // Default UI
       el.title.textContent = titleQ || "Xem phim";
       el.subtitle.textContent = "Đang tải thông tin…";
       renderBadges({ quality: "FHD", kind: "anime" });
@@ -795,7 +818,6 @@
       el.desc.textContent = "";
       setPoster("");
 
-      // Movie info
       const info = await fetchMovieByDriveId(r.id);
       const seriesTitle = (info?.title || titleQ || "Xem phim").trim();
       el.title.textContent = seriesTitle;
@@ -811,7 +833,6 @@
         el.subtitle.textContent = "Không tìm thấy dữ liệu phim trong kho (vẫn xem được nếu Drive hợp lệ).";
       }
 
-      // Episodes (ẩn nếu là movie)
       if (info?.kind === "movie") {
         el.episodesSection.style.display = "none";
         el.btnEpisodes.style.display = "none";
@@ -820,7 +841,6 @@
         el.btnEpisodes.style.display = "";
         const eps = await fetchEpisodesByTitle(seriesTitle, info?.kind || null);
 
-        // nếu URL có epWanted -> đảm bảo player đúng tập (trường hợp sessionStorage bị lệch)
         if (epWanted && eps.length) {
           const hit = eps.find(x => x._season === seasonWanted && x._ep === epWanted);
           if (hit?.driveid && hit.driveid !== r.id) {
@@ -833,7 +853,6 @@
         renderEpisodes(eps, getCurrentDriveId() || r.id, seriesTitle, epWanted, seasonWanted);
       }
 
-      // Suggestions
       const sug = await fetchSuggestions(getCurrentDriveId() || r.id);
       renderSuggestions(sug);
     })();
