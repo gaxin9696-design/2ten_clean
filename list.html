@@ -1,12 +1,8 @@
-<!-- =========================
-     FILE: list.html (MERGED)
-     FIX: Phim bộ/anime chỉ hiện 1 card (không trùng theo tập)
-========================= -->
 <!doctype html>
 <html lang="vi">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="description" content="Khoii – Danh sách phim. Lọc theo thể loại, quốc gia, loại phim, tìm kiếm nhanh." />
   <meta name="robots" content="index,follow" />
   <meta name="theme-color" content="#0b1224" />
@@ -21,6 +17,7 @@
       --accent:#f2c64f;
       --radius:22px;
       --shadow:0 18px 65px rgba(0,0,0,.55);
+      --bn-h:72px;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -33,7 +30,11 @@
         radial-gradient(900px 420px at 85% 10%, rgba(245,158,11,.10), transparent 55%),
         linear-gradient(180deg,var(--bg0),var(--bg1));
       overflow-x:hidden;
+      padding-bottom: env(safe-area-inset-bottom);
+      -webkit-tap-highlight-color: transparent;
     }
+    a,button{ -webkit-tap-highlight-color: transparent; }
+    button{ touch-action: manipulation; }
 
     body::before{
       content:"";
@@ -54,7 +55,13 @@
       position:relative; z-index:1;
       max-width:1320px;
       margin:0 auto;
-      padding:18px 22px 40px;
+      padding:18px 22px calc(40px + env(safe-area-inset-bottom));
+    }
+    @media (max-width:980px){
+      .container{ padding-bottom: calc(40px + var(--bn-h) + 10px + env(safe-area-inset-bottom)); }
+    }
+    @media (max-width:560px){
+      .container{ padding:14px 12px calc(28px + var(--bn-h) + 10px + env(safe-area-inset-bottom)); }
     }
 
     .topbar{display:flex;align-items:center;gap:16px}
@@ -86,6 +93,7 @@
       border:1px solid rgba(255,255,255,.12);
       box-shadow:0 10px 30px rgba(0,0,0,.30);
       backdrop-filter:blur(14px);
+      min-height:44px;
     }
     .search input{
       width:100%;border:0;outline:0;background:transparent;
@@ -98,17 +106,15 @@
       color:rgba(231,237,249,.88);
       text-decoration:none;font-size:14px;
       display:inline-flex;align-items:center;gap:6px;
-      padding:8px 10px;border-radius:10px;
+      padding:10px 12px;border-radius:10px;
+      min-height:44px;
     }
     .nav a:hover{background:rgba(255,255,255,.06)}
     .nav a.active{
       border:1px solid rgba(242,198,79,.35);
       background:rgba(242,198,79,.10);
     }
-    .caret{
-      width:10px;height:10px;opacity:.9;
-      transform:translateY(1px);
-    }
+    .caret{width:10px;height:10px;opacity:.9;transform:translateY(1px);}
 
     .drop{position:relative}
     .drop-menu{
@@ -135,7 +141,7 @@
     }
     .drop-head b{font-size:13px;letter-spacing:.2px}
     .drop-close{
-      width:34px;height:34px;border-radius:12px;
+      width:38px;height:38px;border-radius:12px;
       border:1px solid rgba(255,255,255,.12);
       background:rgba(18,24,36,.45);
       color:rgba(231,237,249,.92);
@@ -144,15 +150,10 @@
     .drop-close:hover{background:rgba(255,255,255,.06)}
     .drop-grid{columns:4; column-gap:10px;}
     .drop-grid.cols-3{columns:3}
-    .drop-item{
-      break-inside:avoid;
-      display:block;
-      width:100%;
-      margin:0 0 8px;
-    }
+    .drop-item{break-inside:avoid;display:block;width:100%;margin:0 0 8px;}
     .drop-item a{
       display:block;
-      padding:8px 10px;
+      padding:10px 10px;
       border-radius:12px;
       border:1px solid rgba(255,255,255,.08);
       background:rgba(18,24,36,.35);
@@ -160,6 +161,7 @@
       text-decoration:none;
       font-size:13px;
       line-height:1.2;
+      min-height:40px;
     }
     .drop-item a:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.16)}
     .drop-item a.on{
@@ -176,9 +178,25 @@
       color:var(--text);cursor:pointer;
       backdrop-filter:blur(14px);
       box-shadow:0 10px 30px rgba(0,0,0,.24);
+      min-height:44px;
     }
     .member-btn:hover{border-color:var(--line2)}
     .member-btn svg{opacity:.95}
+
+    /* ✅ sticky topbar trên mobile */
+    @media (max-width:980px){
+      .topbar{
+        position:sticky;
+        top:10px;
+        z-index:60;
+        padding:10px 10px;
+        border-radius:16px;
+        background:rgba(10,14,22,.58);
+        border:1px solid rgba(255,255,255,.08);
+        backdrop-filter: blur(14px);
+        box-shadow: 0 14px 35px rgba(0,0,0,.30);
+      }
+    }
 
     .page-head{
       margin-top:18px;
@@ -187,15 +205,8 @@
       justify-content:space-between;
       gap:12px;
     }
-    .page-head h1{
-      margin:0;
-      font-size:26px;
-      letter-spacing:.2px;
-    }
-    .page-head .count{
-      font-size:13px;
-      color:var(--muted);
-    }
+    .page-head h1{margin:0;font-size:26px;letter-spacing:.2px;}
+    .page-head .count{font-size:13px;color:var(--muted);}
 
     .bar{
       margin-top:14px;
@@ -213,18 +224,17 @@
     }
     .chips{display:flex;flex-wrap:wrap;gap:10px}
     .chip{
-      padding:8px 12px;border-radius:999px;
+      padding:10px 12px;border-radius:999px;
       border:1px solid rgba(255,255,255,.12);
       background:rgba(18,24,36,.45);
       color:rgba(231,237,249,.88);
       cursor:pointer;
       font-size:13px;
+      min-height:40px;
+      white-space:nowrap;
     }
     .chip:hover{background:rgba(255,255,255,.06)}
-    .chip.on{
-      border-color:rgba(242,198,79,.65);
-      background:rgba(242,198,79,.12);
-    }
+    .chip.on{border-color:rgba(242,198,79,.65);background:rgba(242,198,79,.12)}
 
     .right{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
     select{
@@ -234,6 +244,7 @@
       border-radius:12px;
       padding:10px 12px;
       outline:none;
+      min-height:42px;
     }
 
     .btn{
@@ -246,8 +257,32 @@
       box-shadow:0 10px 30px rgba(0,0,0,.24);
       display:inline-flex;align-items:center;gap:10px;
       white-space:nowrap;
+      min-height:42px;
     }
     .btn:hover{border-color:rgba(255,255,255,.20); background:rgba(255,255,255,.06)}
+
+    /* ✅ Mobile: chips + filters thành hàng cuộn ngang (gọn hơn, ít cao) */
+    @media (max-width:640px){
+      .bar{flex-direction:column; align-items:stretch}
+      .chips{
+        flex-wrap:nowrap;
+        overflow-x:auto;
+        scrollbar-width:none;
+        -webkit-overflow-scrolling:touch;
+        padding-bottom:2px;
+      }
+      .chips::-webkit-scrollbar{height:0}
+      .right{
+        flex-wrap:nowrap;
+        overflow-x:auto;
+        scrollbar-width:none;
+        -webkit-overflow-scrolling:touch;
+        padding-bottom:2px;
+        justify-content:flex-start;
+      }
+      .right::-webkit-scrollbar{height:0}
+      select{min-width:160px}
+    }
 
     .grid{
       margin-top:16px;
@@ -264,6 +299,7 @@
       cursor:pointer;
       transition:transform .14s ease, border-color .14s ease;
       position:relative;
+      touch-action: manipulation;
     }
     .card:hover{transform:translateY(-4px); border-color:rgba(255,255,255,.22)}
     .card::after{
@@ -273,8 +309,20 @@
       background-size:8px 8px;
       opacity:.18;mix-blend-mode:overlay;z-index:1;
     }
-    .img{height:220px;background:#000;border-bottom:1px solid rgba(255,255,255,.10);position:relative;z-index:2}
-    .img img{width:100%;height:100%;object-fit:cover;display:block}
+
+    .img{
+      height:220px;background:#000;border-bottom:1px solid rgba(255,255,255,.10);
+      position:relative;z-index:2;
+    }
+    .img img{
+      width:100%;height:100%;object-fit:cover;display:block;
+    }
+
+    /* ✅ giảm layout shift trên mobile: dùng aspect-ratio thay vì height cứng */
+    @media (max-width:640px){
+      .img{ height:auto; aspect-ratio: 2 / 3; }
+    }
+
     .meta{padding:10px 10px 12px;position:relative;z-index:2}
     .meta b{display:block;font-size:13px;line-height:1.25}
     .meta small{display:block;margin-top:6px;color:rgba(231,237,249,.65)}
@@ -298,6 +346,8 @@
       background:rgba(18,24,36,.45);
       color:rgba(231,237,249,.92);
       cursor:pointer;
+      min-height:46px;
+      min-width:160px;
     }
     .loadmore:hover{background:rgba(255,255,255,.06)}
 
@@ -318,6 +368,55 @@
     @media (max-width:640px){
       .grid{grid-template-columns:repeat(2, minmax(0, 1fr));}
       .page-head h1{font-size:22px}
+    }
+
+    /* ===== Mobile bottom nav ===== */
+    .bottom-nav{
+      position:fixed;
+      left:10px; right:10px;
+      bottom: calc(10px + env(safe-area-inset-bottom));
+      height: var(--bn-h);
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(10,14,22,.72);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 18px 55px rgba(0,0,0,.45);
+      z-index:80;
+
+      display:none;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      padding: 8px;
+    }
+    .bn-item{
+      border:0;
+      background:transparent;
+      color: rgba(231,237,249,.88);
+      border-radius: 14px;
+      padding: 8px 6px;
+      cursor:pointer;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:4px;
+      min-height: 44px;
+      font-size: 11px;
+      letter-spacing: .2px;
+      user-select:none;
+    }
+    .bn-item svg{ width:18px; height:18px; opacity:.95; }
+    .bn-item.active{
+      border:1px solid rgba(242,198,79,.35);
+      background: rgba(242,198,79,.12);
+      color: rgba(242,198,79,.98);
+    }
+    .bn-item:active{ transform: translateY(1px); }
+    @media (max-width:980px){ .bottom-nav{ display:grid; } }
+
+    @media (prefers-reduced-motion: reduce){
+      *{ animation:none !important; transition:none !important; }
+      html{ scroll-behavior:auto !important; }
     }
   </style>
 </head>
@@ -388,7 +487,7 @@
       <div class="count"><span id="count">0</span> phim</div>
     </div>
 
-    <div class="bar">
+    <div class="bar" id="barTop">
       <div class="chips" id="chipsKind"></div>
       <div class="right">
         <select id="sort" aria-label="Sắp xếp">
@@ -409,6 +508,49 @@
       <button class="loadmore" id="loadMore" type="button">Tải thêm</button>
     </div>
   </div>
+
+  <!-- ✅ Bottom nav cho mobile -->
+  <nav class="bottom-nav" aria-label="Điều hướng nhanh">
+    <a class="bn-item" href="index.html" aria-label="Trang chủ">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M3 10.5 12 3l9 7.5V21a1.5 1.5 0 0 1-1.5 1.5H4.5A1.5 1.5 0 0 1 3 21V10.5Z" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M9.5 22V15.5A1.5 1.5 0 0 1 11 14h2a1.5 1.5 0 0 1 1.5 1.5V22" stroke="rgba(231,237,249,.72)" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span>Home</span>
+    </a>
+
+    <button class="bn-item" id="bnSearch" type="button" aria-label="Tìm kiếm">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M10.5 19a8.5 8.5 0 1 1 0-17 8.5 8.5 0 0 1 0 17Z" stroke="rgba(231,237,249,.92)" stroke-width="2" />
+        <path d="M16.8 16.8 21 21" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round" />
+      </svg>
+      <span>Search</span>
+    </button>
+
+    <button class="bn-item" id="bnAnime" type="button" data-kind="anime" aria-label="Anime">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M4 6h16v12H4V6Z" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M9 10v4l4-2-4-2Z" fill="rgba(231,237,249,.92)"/>
+      </svg>
+      <span>Anime</span>
+    </button>
+
+    <button class="bn-item" id="bnMovie" type="button" data-kind="movie" aria-label="Phim lẻ">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M4 7h16v14H4V7Z" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M4 7l2-4h3l-2 4M11 7l2-4h3l-2 4M18 7l2-4" stroke="rgba(231,237,249,.72)" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span>Lẻ</span>
+    </button>
+
+    <button class="bn-item" id="bnSeries" type="button" data-kind="series" aria-label="Phim bộ">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M4 6h16v6H4V6Z" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M4 12h16v6H4v-6Z" stroke="rgba(231,237,249,.72)" stroke-width="2" stroke-linejoin="round"/>
+      </svg>
+      <span>Bộ</span>
+    </button>
+  </nav>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
@@ -440,6 +582,13 @@
       countryGrid: document.getElementById("countryGrid"),
       navMovie: document.getElementById("navMovie"),
       navSeries: document.getElementById("navSeries"),
+
+      // bottom nav
+      bnSearch: document.getElementById("bnSearch"),
+      bnAnime: document.getElementById("bnAnime"),
+      bnMovie: document.getElementById("bnMovie"),
+      bnSeries: document.getElementById("bnSeries"),
+      barTop: document.getElementById("barTop"),
     };
 
     const state = {
@@ -578,7 +727,6 @@
       }
       const { data, error } = await supabase
         .from("movies")
-        // ✅ thêm ep/eps/season + posterurl/herourl để gom đúng
         .select("id,title,kind,year,quality,desc,driveid,drivelink,posterurl,herourl,updatedat,genres,country,ep,eps,season")
         .order("updatedat", { ascending: false });
 
@@ -607,7 +755,6 @@
         openEp: 1,
       }));
 
-      // ✅ gom phim bộ/anime thành 1 card
       state.all = collapseEpisodicRows(raw);
     }
 
@@ -717,6 +864,14 @@
       updateNavActive();
     }
 
+    function updateBottomNav(){
+      const btns = [el.bnAnime, el.bnMovie, el.bnSeries].filter(Boolean);
+      btns.forEach(b => b.classList.remove("active"));
+      if (state.kind === "anime") el.bnAnime?.classList.add("active");
+      if (state.kind === "movie") el.bnMovie?.classList.add("active");
+      if (state.kind === "series") el.bnSeries?.classList.add("active");
+    }
+
     function apply(){
       state.q = (el.q.value || "").trim().toLowerCase();
       state.sort = el.sort.value;
@@ -756,6 +911,7 @@
       renderNextPage();
       syncChipsUI();
       syncDropActive();
+      updateBottomNav();
     }
 
     function syncChipsUI(){
@@ -784,6 +940,7 @@
           </div>
         `;
         const img = c.querySelector("img");
+        img.decoding = "async";
         img.onerror = ()=>{ img.onerror=null; img.src = svgPlaceholder("Khoii • Poster", 500, 750); };
         img.src = item.poster || svgPlaceholder("Khoii • Poster", 500, 750);
 
@@ -806,7 +963,14 @@
 
     // ===== events =====
     el.loadMore.addEventListener("click", renderNextPage);
-    el.q.addEventListener("input", ()=> apply());
+
+    // ✅ debounce search để đỡ lag khi gõ
+    let qTimer = null;
+    el.q.addEventListener("input", ()=>{
+      if(qTimer) clearTimeout(qTimer);
+      qTimer = setTimeout(()=>apply(), 140);
+    });
+
     el.sort.addEventListener("change", ()=> apply());
 
     el.filterGenre.addEventListener("change", ()=>{
@@ -881,6 +1045,21 @@
     document.addEventListener("keydown", (ev)=>{
       if(ev.key === "Escape") closeDrops();
     });
+
+    // ✅ bottom nav actions
+    el.bnSearch?.addEventListener("click", ()=>{
+      window.scrollTo({ top:0, behavior:"smooth" });
+      setTimeout(()=>{ try{ el.q.focus(); }catch{} }, 250);
+    });
+
+    function bnSetKind(kind){
+      state.kind = (state.kind === kind) ? null : kind;
+      state.page = 0;
+      apply();
+    }
+    el.bnAnime?.addEventListener("click", ()=>bnSetKind("anime"));
+    el.bnMovie?.addEventListener("click", ()=>bnSetKind("movie"));
+    el.bnSeries?.addEventListener("click", ()=>bnSetKind("series"));
 
     (async ()=>{
       parseParams();
