@@ -1,12 +1,8 @@
-<!-- =========================
-     FILE: index.html (MERGED)
-     FIX: Phim bộ/anime chỉ hiện 1 card (không trùng theo tập)
-========================= -->
 <!doctype html>
 <html lang="vi">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="description" content="Khoii – Xem phim nhanh, giao diện đẹp. Cập nhật phim mới, xem trên mọi thiết bị." />
   <meta name="robots" content="index,follow" />
   <meta name="theme-color" content="#0b1224" />
@@ -21,6 +17,7 @@
       --accent:#f2c64f;
       --radius:22px;
       --shadow:0 18px 65px rgba(0,0,0,.55);
+      --bn-h:72px; /* bottom nav height */
     }
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -33,7 +30,11 @@
         radial-gradient(900px 420px at 85% 10%, rgba(245,158,11,.10), transparent 55%),
         linear-gradient(180deg,var(--bg0),var(--bg1));
       overflow-x:hidden;
+      padding-bottom: env(safe-area-inset-bottom);
+      -webkit-tap-highlight-color: transparent;
     }
+    a,button{ -webkit-tap-highlight-color: transparent; }
+    button{ touch-action: manipulation; }
 
     /* ===== tiny dots overlay (giống web mẫu) ===== */
     body::before{
@@ -50,11 +51,17 @@
       mix-blend-mode:overlay;
       filter:blur(.15px);
     }
+
     .container{
       position:relative; z-index:1;
       max-width:1320px;
       margin:0 auto;
-      padding:18px 22px 40px;
+      padding:18px 22px calc(40px + env(safe-area-inset-bottom));
+    }
+
+    /* ✅ chừa chỗ cho bottom nav trên mobile */
+    @media (max-width:980px){
+      .container{ padding-bottom: calc(40px + var(--bn-h) + 10px + env(safe-area-inset-bottom)); }
     }
 
     /* ===== TOPBAR ===== */
@@ -87,6 +94,7 @@
       border:1px solid rgba(255,255,255,.12);
       box-shadow:0 10px 30px rgba(0,0,0,.30);
       backdrop-filter:blur(14px);
+      min-height:44px; /* ✅ hit-area */
     }
     .search input{
       width:100%;border:0;outline:0;background:transparent;
@@ -99,7 +107,8 @@
       color:rgba(231,237,249,.88);
       text-decoration:none;font-size:14px;
       display:inline-flex;align-items:center;gap:6px;
-      padding:8px 10px;border-radius:10px;
+      padding:10px 12px;border-radius:10px;
+      min-height:44px; /* ✅ hit-area */
     }
     .nav a:hover{background:rgba(255,255,255,.06)}
     .nav a.active{
@@ -116,14 +125,30 @@
       color:var(--text);cursor:pointer;
       backdrop-filter:blur(14px);
       box-shadow:0 10px 30px rgba(0,0,0,.24);
+      min-height:44px; /* ✅ hit-area */
     }
     .member-btn:hover{border-color:var(--line2)}
+
+    /* ✅ Sticky topbar trên mobile để dễ thao tác */
+    @media (max-width:980px){
+      .topbar{
+        position:sticky;
+        top:10px;
+        z-index:60;
+        padding:10px 10px;
+        border-radius:16px;
+        background:rgba(10,14,22,.58);
+        border:1px solid rgba(255,255,255,.08);
+        backdrop-filter: blur(14px);
+        box-shadow: 0 14px 35px rgba(0,0,0,.30);
+      }
+    }
 
     /* ===== SECTION TITLE ===== */
     .section-title{margin-top:18px;display:flex;align-items:center;gap:12px}
     .section-title h2{margin:0;font-size:30px;letter-spacing:.2px}
     .circle-action{
-      width:34px;height:34px;border-radius:999px;
+      width:38px;height:38px;border-radius:999px;
       border:1px solid rgba(255,255,255,.12);
       background:rgba(18,24,36,.55);
       display:grid;place-items:center;cursor:pointer;
@@ -163,7 +188,7 @@
       isolation:isolate;
     }
 
-    /* ✅ FIX CHÍNH: canh ảnh từ trên xuống để không cắt phần đầu */
+    /* ✅ canh ảnh từ trên xuống để không cắt phần đầu */
     .hero-media{
       position:absolute;inset:0;left:auto;
       width:64%;height:100%;
@@ -255,6 +280,7 @@
       color:rgba(231,237,249,.92);
       font-size:13px;
       backdrop-filter:blur(10px);
+      min-height:34px;
     }
     .badge.imdb{border-color:rgba(242,198,79,.75);background:rgba(242,198,79,.10)}
     .badge b{font-size:11px;letter-spacing:.6px;opacity:.9}
@@ -265,6 +291,7 @@
       color:rgba(231,237,249,.88);
       font-size:13px;
       backdrop-filter:blur(10px);
+      min-height:34px;
     }
     .hero-desc{
       margin:12px 0 16px;
@@ -297,7 +324,7 @@
       z-index:4;display:flex;gap:10px;align-items:center;
     }
     .ctrl-btn{
-      width:44px;height:44px;border-radius:999px;
+      width:48px;height:48px;border-radius:999px;
       border:1px solid rgba(255,255,255,.12);
       background:rgba(18,24,36,.48);
       color:var(--text);
@@ -313,7 +340,7 @@
       z-index:4;display:flex;gap:8px;align-items:center;
     }
     .dot{
-      width:8px;height:8px;border-radius:999px;
+      width:10px;height:10px;border-radius:999px;
       background:rgba(255,255,255,.20);
       border:1px solid rgba(255,255,255,.12);
       cursor:pointer;
@@ -339,13 +366,13 @@
       padding:2px 2px 4px;
       scroll-snap-type:x mandatory;
       -webkit-overflow-scrolling:touch;
+      scrollbar-width:none;
     }
-    .thumbs::-webkit-scrollbar{height:10px}
-    .thumbs::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:999px}
+    .thumbs::-webkit-scrollbar{height:0}
 
     .thumb{
       scroll-snap-align:start;
-      width:70px;height:100px;border-radius:14px;
+      width:72px;height:104px;border-radius:14px;
       border:1px solid rgba(255,255,255,.16);
       overflow:hidden;background:rgba(255,255,255,.05);
       cursor:pointer;flex:0 0 auto;padding:0;
@@ -382,9 +409,11 @@
     .row-head h3{margin:0;font-size:18px;letter-spacing:.2px}
     .row-head a{
       color:rgba(231,237,249,.8);text-decoration:none;font-size:13px;
-      padding:6px 10px;border-radius:999px;
+      padding:8px 12px;border-radius:999px;
       border:1px solid rgba(255,255,255,.10);
       background:rgba(18,24,36,.35);
+      min-height:36px;
+      display:inline-flex;align-items:center;
     }
     .row-head a:hover{border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.06)}
     .cards{
@@ -393,9 +422,9 @@
       padding:6px 2px 10px;
       scroll-snap-type:x mandatory;
       -webkit-overflow-scrolling:touch;
+      scrollbar-width:none;
     }
-    .cards::-webkit-scrollbar{height:10px}
-    .cards::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:999px}
+    .cards::-webkit-scrollbar{height:0}
     .card{
       scroll-snap-align:start;
       width:170px;flex:0 0 auto;
@@ -407,9 +436,14 @@
       cursor:pointer;
       transition:transform .14s ease,border-color .14s ease;
       position:relative;
+      touch-action: manipulation;
     }
     .card:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.22)}
-    .card .img{height:240px;background:#000;border-bottom:1px solid rgba(255,255,255,.10)}
+    .card .img{
+      height:240px;
+      background:#000;
+      border-bottom:1px solid rgba(255,255,255,.10);
+    }
     .card img{width:100%;height:100%;object-fit:cover;display:block}
     .card .meta{padding:10px 10px 12px}
     .card .meta b{display:block;font-size:13px;line-height:1.25}
@@ -441,7 +475,7 @@
     }
     .filter-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
     .filter-close{
-      width:38px;height:38px;border-radius:12px;
+      width:42px;height:42px;border-radius:12px;
       border:1px solid rgba(255,255,255,.12);
       background:rgba(18,24,36,.45);
       color:rgba(231,237,249,.92);
@@ -450,21 +484,23 @@
     .filter-close:hover{background:rgba(255,255,255,.06)}
     .filter-chips{display:flex;flex-wrap:wrap;gap:10px}
     .chip{
-      padding:8px 12px;border-radius:999px;
+      padding:10px 12px;border-radius:999px;
       border:1px solid rgba(255,255,255,.12);
       background:rgba(18,24,36,.45);
       color:rgba(231,237,249,.88);
       cursor:pointer;font-size:13px;
+      min-height:40px;
     }
     .chip:hover{background:rgba(255,255,255,.06)}
     .chip.on{border-color:rgba(242,198,79,.65);background:rgba(242,198,79,.12)}
     .filter-actions{margin-top:10px;display:flex;justify-content:flex-end}
     .filter-clear{
-      padding:9px 12px;border-radius:12px;
+      padding:10px 12px;border-radius:12px;
       border:1px solid rgba(255,255,255,.12);
       background:rgba(18,24,36,.45);
       color:rgba(231,237,249,.92);
       cursor:pointer;
+      min-height:42px;
     }
     .filter-clear:hover{background:rgba(255,255,255,.06)}
 
@@ -548,6 +584,7 @@
       height:100%;
       object-fit:cover;
       transform:scale(1.05);
+      display:block;
     }
     .hero-poster:hover{ transform: translateY(-2px); border-color: rgba(255,255,255,.22); }
     .hero-poster.on{
@@ -561,10 +598,88 @@
     @media (max-width: 560px){
       .hero-posters{ display:none; }
     }
+
+    /* ===== Mobile bottom sheet backdrop ===== */
+    .sheet-backdrop{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.48);
+      z-index:90;
+      backdrop-filter: blur(2px);
+    }
+    body.sheet-open{ overflow:hidden; }
+
+    /* ✅ Filter panel thành bottom-sheet trên mobile */
+    @media (max-width:760px){
+      .filter-panel{
+        position:fixed;
+        left:12px; right:12px;
+        bottom: calc(var(--bn-h) + 12px + env(safe-area-inset-bottom));
+        margin:0;
+        z-index:100;
+        max-height: 62vh;
+        overflow:auto;
+      }
+    }
+
+    /* ===== Mobile bottom nav ===== */
+    .bottom-nav{
+      position:fixed;
+      left:10px; right:10px;
+      bottom: calc(10px + env(safe-area-inset-bottom));
+      height: var(--bn-h);
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(10,14,22,.72);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 18px 55px rgba(0,0,0,.45);
+      z-index:80;
+
+      display:none;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      padding: 8px;
+    }
+    .bn-item{
+      border:0;
+      background:transparent;
+      color: rgba(231,237,249,.88);
+      border-radius: 14px;
+      padding: 8px 6px;
+      cursor:pointer;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:4px;
+      min-height: 44px;
+      font-size: 11px;
+      letter-spacing: .2px;
+      user-select:none;
+    }
+    .bn-item svg{ width:18px; height:18px; opacity:.95; }
+    .bn-item.active{
+      border:1px solid rgba(242,198,79,.35);
+      background: rgba(242,198,79,.12);
+      color: rgba(242,198,79,.98);
+    }
+    .bn-item:active{ transform: translateY(1px); }
+
+    @media (max-width:980px){
+      .bottom-nav{ display:grid; }
+    }
+
+    /* ===== Reduced motion ===== */
+    @media (prefers-reduced-motion: reduce){
+      *{ animation:none !important; transition:none !important; }
+      html{ scroll-behavior:auto !important; }
+    }
   </style>
 </head>
 
 <body>
+  <!-- ✅ backdrop cho filter sheet (mobile) -->
+  <div id="sheetBackdrop" class="sheet-backdrop" hidden></div>
+
   <div class="container">
     <header class="topbar">
       <div class="brand" style="cursor:pointer" onclick="location.href='index.html'">
@@ -704,6 +819,50 @@
     </div>
   </div>
 
+  <!-- ✅ Bottom nav cho mobile -->
+  <nav class="bottom-nav" aria-label="Điều hướng nhanh">
+    <button class="bn-item nav-btn" type="button" data-action="home" aria-label="Trang chủ">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M3 10.5 12 3l9 7.5V21a1.5 1.5 0 0 1-1.5 1.5H4.5A1.5 1.5 0 0 1 3 21V10.5Z" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M9.5 22V15.5A1.5 1.5 0 0 1 11 14h2a1.5 1.5 0 0 1 1.5 1.5V22" stroke="rgba(231,237,249,.72)" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span>Home</span>
+    </button>
+
+    <button class="bn-item nav-btn" type="button" data-action="genres" aria-label="Thể loại">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M4 6h16M4 12h16M4 18h10" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span>Thể loại</span>
+    </button>
+
+    <button class="bn-item nav-btn" type="button" data-action="countries" aria-label="Quốc gia">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Z" stroke="rgba(231,237,249,.92)" stroke-width="2"/>
+        <path d="M2 12h20" stroke="rgba(231,237,249,.72)" stroke-width="2" stroke-linecap="round"/>
+        <path d="M12 2c3.5 3 3.5 17 0 20" stroke="rgba(231,237,249,.72)" stroke-width="2" stroke-linecap="round"/>
+        <path d="M12 2c-3.5 3-3.5 17 0 20" stroke="rgba(231,237,249,.72)" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span>Quốc gia</span>
+    </button>
+
+    <button class="bn-item nav-btn" type="button" data-action="kind" data-kind="movie" aria-label="Phim lẻ">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M4 7h16v14H4V7Z" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M4 7l2-4h3l-2 4M11 7l2-4h3l-2 4M18 7l2-4" stroke="rgba(231,237,249,.72)" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span>Phim lẻ</span>
+    </button>
+
+    <button class="bn-item nav-btn" type="button" data-action="kind" data-kind="series" aria-label="Phim bộ">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M4 6h16v6H4V6Z" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M4 12h16v6H4v-6Z" stroke="rgba(231,237,249,.72)" stroke-width="2" stroke-linejoin="round"/>
+      </svg>
+      <span>Phim bộ</span>
+    </button>
+  </nav>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     // ================== SUPABASE (Public Read) ==================
@@ -718,7 +877,6 @@
       if (!sb) return null;
       const { data, error } = await sb
         .from("movies")
-        // ✅ thêm ep/eps/season để gom phim bộ
         .select("id,title,kind,year,quality,desc,driveid,drivelink,posterurl,herourl,updatedat,genres,country,imdb,ep,eps,season")
         .order("updatedat", { ascending: false });
 
@@ -975,8 +1133,11 @@
       chips: document.getElementById("filterChips"),
       close: document.getElementById("closeFilter"),
       clear: document.getElementById("clearFilter"),
-      navBtns: [...document.querySelectorAll(".nav .nav-btn")],
+      navBtns: [...document.querySelectorAll(".nav-btn")], // ✅ include bottom nav too
+      backdrop: document.getElementById("sheetBackdrop"),
     };
+
+    function isSheetMode(){ return window.matchMedia("(max-width:760px)").matches; }
 
     function safeText(s){ return String(s ?? ""); }
     function escapeHtml(s){
@@ -1006,6 +1167,7 @@
     }
 
     function setImgWithFallback(imgEl, url, fallbackUrl){
+      try{ imgEl.decoding = "async"; }catch{}
       imgEl.onerror = () => { imgEl.onerror = null; imgEl.src = fallbackUrl; };
       imgEl.src = url || fallbackUrl;
     }
@@ -1084,6 +1246,7 @@
         const img = document.createElement("img");
         img.alt = item.title;
         img.loading = "lazy";
+        img.decoding = "async";
         img.onerror = () => { img.onerror = null; img.src = svgPlaceholder("Khoii Poster", 500, 750); };
         img.src = item.poster || svgPlaceholder("Khoii Poster", 500, 750);
 
@@ -1113,6 +1276,7 @@
         const img = document.createElement("img");
         img.alt = item.title;
         img.loading = "lazy";
+        img.decoding = "async";
         img.onerror = () => { img.onerror = null; img.src = svgPlaceholder("Khoii Poster", 500, 750); };
         img.src = item.poster || svgPlaceholder("Khoii Poster", 500, 750);
 
@@ -1144,6 +1308,7 @@
           </div>
         `;
         const img = c.querySelector("img");
+        img.decoding = "async";
         img.onerror = () => { img.onerror = null; img.src = svgPlaceholder("Khoii Poster", 500, 750); };
         img.src = item.poster || svgPlaceholder("Khoii Poster", 500, 750);
 
@@ -1202,6 +1367,7 @@
       list.forEach(x => { if (x.country) set.add(String(x.country)); });
       return [...set].sort((a,b)=>a.localeCompare(b));
     }
+
     function openPanel(title, chips){
       fp.title.textContent = title;
       fp.chips.innerHTML = "";
@@ -1214,13 +1380,25 @@
         fp.chips.appendChild(b);
       });
       fp.panel.hidden = false;
-      fp.panel.scrollIntoView({ behavior:"smooth", block:"nearest" });
+
+      // ✅ mobile sheet mode: show backdrop + lock scroll
+      if (isSheetMode()){
+        fp.backdrop.hidden = false;
+        document.body.classList.add("sheet-open");
+      }
     }
-    function closePanel(){ fp.panel.hidden = true; }
+    function closePanel(){
+      fp.panel.hidden = true;
+      fp.backdrop.hidden = true;
+      document.body.classList.remove("sheet-open");
+    }
+
+    fp.backdrop?.addEventListener("click", closePanel);
 
     fp.close?.addEventListener("click", closePanel);
     fp.clear?.addEventListener("click", ()=>{
       filterState.kind = null; filterState.genre = null; filterState.country = null;
+      el.q.value = "";
       applyAllFilters();
       closePanel();
     });
@@ -1314,33 +1492,48 @@
       alert(`Thông tin (demo): ${item.title}\nIMDb: ${item.imdb || "—"}\nNăm: ${item.year} • ${item.quality}\nQuốc gia: ${item.country || "—"}\nThể loại: ${gs || "—"}`);
     });
 
-    el.q.addEventListener("input", applyAllFilters);
+    // ✅ debounce search để giảm lag mobile
+    let qTimer = null;
+    el.q.addEventListener("input", ()=>{
+      if (qTimer) clearTimeout(qTimer);
+      qTimer = setTimeout(()=>applyAllFilters(), 140);
+    });
 
     el.btnMore.addEventListener("click", ()=>{
       document.getElementById("rows")?.scrollIntoView({ behavior:"smooth", block:"start" });
     });
 
-    // NAV actions
+    // NAV actions (desktop + bottom nav)
     fp.navBtns.forEach(a=>{
       a.addEventListener("click",(ev)=>{
         ev.preventDefault();
         const action = a.dataset.action;
 
+        if (action === "home"){
+          filterState.kind = null; filterState.genre = null; filterState.country = null;
+          el.q.value = "";
+          applyAllFilters();
+          closePanel();
+          window.scrollTo({ top:0, behavior:"smooth" });
+          return;
+        }
+
         if (action === "kind"){
           const k = a.dataset.kind;
           filterState.kind = (filterState.kind === k) ? null : k;
           applyAllFilters();
+          closePanel();
           return;
         }
 
         if (action === "genres"){
           const genres = getAllGenres(items);
           const chips = genres.length ? [
-            { label:"Tất cả", on:!filterState.genre, action:()=>{ filterState.genre=null; applyAllFilters(); } },
+            { label:"Tất cả", on:!filterState.genre, action:()=>{ filterState.genre=null; applyAllFilters(); if(isSheetMode()) closePanel(); } },
             ...genres.slice(0,40).map(g=>({
               label:g,
               on:filterState.genre===g,
-              action:()=>{ filterState.genre = (filterState.genre===g ? null : g); applyAllFilters(); }
+              action:()=>{ filterState.genre = (filterState.genre===g ? null : g); applyAllFilters(); if(isSheetMode()) closePanel(); }
             }))
           ] : [{ label:"Chưa có dữ liệu thể loại", on:false, action:()=>{} }];
           openPanel("Chọn thể loại", chips);
@@ -1350,11 +1543,11 @@
         if (action === "countries"){
           const cs = getAllCountries(items);
           const chips = cs.length ? [
-            { label:"Tất cả", on:!filterState.country, action:()=>{ filterState.country=null; applyAllFilters(); } },
+            { label:"Tất cả", on:!filterState.country, action:()=>{ filterState.country=null; applyAllFilters(); if(isSheetMode()) closePanel(); } },
             ...cs.slice(0,40).map(c=>({
               label:c,
               on:filterState.country===c,
-              action:()=>{ filterState.country = (filterState.country===c ? null : c); applyAllFilters(); }
+              action:()=>{ filterState.country = (filterState.country===c ? null : c); applyAllFilters(); if(isSheetMode()) closePanel(); }
             }))
           ] : [{ label:"Chưa có dữ liệu quốc gia", on:false, action:()=>{} }];
           openPanel("Chọn quốc gia", chips);
