@@ -1,675 +1,585 @@
 <!doctype html>
 <html lang="vi">
-
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="Khoii – Trang xem phim. Mở nhanh, xem mượt." />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="description" content="Khoii – Xem phim nhanh. Hỗ trợ phim bộ theo tập, đề xuất phim, thông tin phim." />
   <meta name="robots" content="index,follow" />
   <meta name="theme-color" content="#0b1224" />
-  <title>Khoii - Xem phim</title>
+  <title>Khoii - Watch</title>
 
   <style>
-    :root {
-      --bg0: #0b0f17;
-      --bg1: #0b1224;
-      --text: #e7edf9;
-      --muted: rgba(231, 237, 249, .72);
-      --line: rgba(255, 255, 255, .10);
-      --line2: rgba(255, 255, 255, .16);
-      --glass: rgba(18, 24, 36, .72);
-      --glass2: rgba(18, 24, 36, .55);
-      --accent: #f2c64f;
-      --radius: 22px;
-      --shadow: 0 18px 65px rgba(0, 0, 0, .55);
+    :root{
+      --bg0:#0b0f17; --bg1:#0b1224;
+      --text:#e7edf9; --muted:rgba(231,237,249,.72);
+      --line:rgba(255,255,255,.10); --line2:rgba(255,255,255,.16);
+      --glass:rgba(18,24,36,.72); --glass2:rgba(18,24,36,.55);
+      --accent:#f2c64f;
+      --radius:22px;
+      --shadow:0 18px 65px rgba(0,0,0,.55);
+      --bn-h:72px; /* bottom nav height */
     }
-
-    * {
-      box-sizing: border-box
-    }
-
-    html,
-    body {
-      height: 100%
-    }
-
-    body {
-      margin: 0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      color: var(--text);
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,"Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
       background:
-        radial-gradient(1200px 500px at 20% -10%, rgba(99, 102, 241, .18), transparent 55%),
-        radial-gradient(900px 420px at 85% 10%, rgba(245, 158, 11, .10), transparent 55%),
-        linear-gradient(180deg, var(--bg0), var(--bg1));
-      overflow-x: hidden;
+        radial-gradient(1200px 500px at 20% -10%, rgba(99,102,241,.18), transparent 55%),
+        radial-gradient(900px 420px at 85% 10%, rgba(245,158,11,.10), transparent 55%),
+        linear-gradient(180deg,var(--bg0),var(--bg1));
+      overflow-x:hidden;
+      padding-bottom: env(safe-area-inset-bottom);
       -webkit-tap-highlight-color: transparent;
     }
+    a,button{ -webkit-tap-highlight-color: transparent; }
+    button{ touch-action: manipulation; }
 
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
+    /* ===== tiny dots overlay ===== */
+    body::before{
+      content:"";
+      position:fixed; inset:0;
+      pointer-events:none;
+      z-index:0;
       background-image:
-        radial-gradient(circle, rgba(255, 255, 255, .22) 1px, transparent 1.2px),
-        radial-gradient(circle, rgba(255, 255, 255, .14) 1px, transparent 1.25px);
-      background-size: 7px 7px, 14px 14px;
-      background-position: 0 0, 3px 3px;
-      opacity: .10;
-      mix-blend-mode: overlay;
-      filter: blur(.15px);
+        radial-gradient(circle, rgba(255,255,255,.22) 1px, transparent 1.2px),
+        radial-gradient(circle, rgba(255,255,255,.14) 1px, transparent 1.25px);
+      background-size:6px 6px, 12px 12px;
+      background-position:0 0, 3px 3px;
+      opacity:.14;
+      mix-blend-mode:overlay;
+      filter:blur(.15px);
     }
 
-    .container {
-      position: relative;
-      z-index: 1;
-      max-width: 1320px;
-      margin: 0 auto;
-      padding: 18px 22px 40px;
+    .container{
+      position:relative; z-index:1;
+      max-width:1320px;
+      margin:0 auto;
+      padding:18px 22px calc(40px + env(safe-area-inset-bottom));
+    }
+    @media (max-width:980px){
+      .container{ padding-bottom: calc(40px + var(--bn-h) + 10px + env(safe-area-inset-bottom)); }
+    }
+    @media (max-width:560px){
+      .container{ padding:14px 12px calc(28px + var(--bn-h) + 10px + env(safe-area-inset-bottom)); }
     }
 
-    .topbar {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 170px;
-      cursor: pointer
-    }
-
-    .brand-logo {
-      width: 44px;
-      height: 34px;
-      border-radius: 10px;
-      display: grid;
-      place-items: center;
-      font-weight: 900;
-      letter-spacing: .6px;
-      color: #0b1224;
+    /* ===== TOPBAR ===== */
+    .topbar{display:flex;align-items:center;gap:16px}
+    .brand{display:flex;align-items:center;gap:10px;min-width:170px;cursor:pointer}
+    .brand-logo{
+      width:44px;height:34px;border-radius:10px;
+      display:grid;place-items:center;
+      font-weight:900;letter-spacing:.6px;color:#0b1224;
       background:
-        radial-gradient(18px 18px at 30% 35%, rgba(255, 255, 255, .22), transparent 60%),
-        linear-gradient(135deg, #f59e0b, #fb7185);
-      box-shadow: 0 10px 25px rgba(245, 158, 11, .22);
-      position: relative;
-      overflow: hidden;
-      user-select: none;
+        radial-gradient(18px 18px at 30% 35%, rgba(255,255,255,.22), transparent 60%),
+        linear-gradient(135deg,#f59e0b,#fb7185);
+      box-shadow:0 10px 25px rgba(245,158,11,.22);
+      position:relative;overflow:hidden;user-select:none;
+    }
+    .brand-logo:before{
+      content:"";position:absolute;inset:0;
+      background:conic-gradient(from 220deg, rgba(0,0,0,.35), transparent 40%, rgba(0,0,0,.28));
+      mix-blend-mode:overlay;
+    }
+    .brand-logo span{position:relative;z-index:1}
+    .brand-name{font-weight:900;letter-spacing:.3px;font-size:18px;line-height:1.1}
+    .brand-sub{font-size:11px;color:rgba(231,237,249,.55);margin-top:2px}
+
+    .search{
+      flex:1;max-width:620px;
+      display:flex;align-items:center;gap:10px;
+      padding:10px 14px;border-radius:12px;
+      background:var(--glass);
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:0 10px 30px rgba(0,0,0,.30);
+      backdrop-filter:blur(14px);
+      min-height:44px;
+    }
+    .search input{
+      width:100%;border:0;outline:0;background:transparent;
+      color:var(--text);font-size:14px;
+    }
+    .search input::placeholder{color:rgba(231,237,249,.50)}
+
+    .nav{display:flex;align-items:center;gap:14px;margin-left:6px}
+    .nav a{
+      color:rgba(231,237,249,.88);
+      text-decoration:none;font-size:14px;
+      display:inline-flex;align-items:center;gap:6px;
+      padding:10px 12px;border-radius:10px;
+      min-height:44px;
+    }
+    .nav a:hover{background:rgba(255,255,255,.06)}
+    .nav a.active{
+      border:1px solid rgba(242,198,79,.35);
+      background:rgba(242,198,79,.10);
     }
 
-    .brand-logo:before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: conic-gradient(from 220deg, rgba(0, 0, 0, .35), transparent 40%, rgba(0, 0, 0, .28));
-      mix-blend-mode: overlay;
+    .member-btn{
+      margin-left:auto;
+      display:inline-flex;align-items:center;gap:10px;
+      padding:10px 14px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:var(--glass2);
+      color:var(--text);cursor:pointer;
+      backdrop-filter:blur(14px);
+      box-shadow:0 10px 30px rgba(0,0,0,.24);
+      min-height:44px;
+    }
+    .member-btn:hover{border-color:var(--line2)}
+    .member-btn svg{opacity:.95}
+
+    /* Sticky topbar (mobile) */
+    @media (max-width:980px){
+      .topbar{
+        position:sticky;
+        top:10px;
+        z-index:60;
+        padding:10px 10px;
+        border-radius:16px;
+        background:rgba(10,14,22,.58);
+        border:1px solid rgba(255,255,255,.08);
+        backdrop-filter: blur(14px);
+        box-shadow: 0 14px 35px rgba(0,0,0,.30);
+      }
+      .nav{display:none}
+      .brand-sub{display:none}
+      .member-btn span{display:none}
     }
 
-    .brand-logo span {
-      position: relative;
-      z-index: 1
+    /* ===== Tooltip ===== */
+    .tip{position:relative}
+    .tip::after{
+      content:attr(data-tip);
+      position:absolute;left:50%;
+      transform:translateX(-50%) translateY(6px);
+      bottom:100%;
+      background:rgba(10,14,22,.92);
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow:0 12px 30px rgba(0,0,0,.35);
+      color:rgba(231,237,249,.92);
+      padding:8px 10px;border-radius:10px;
+      font-size:12px;white-space:nowrap;
+      opacity:0;pointer-events:none;
+      transition:opacity .15s ease, transform .15s ease;
+      backdrop-filter:blur(10px);
+      z-index:99;
+    }
+    .tip:hover::after{opacity:1;transform:translateX(-50%) translateY(0)}
+
+    /* ===== Watch layout ===== */
+    .watch-grid{
+      margin-top:16px;
+      display:grid;
+      grid-template-columns: 1.65fr 1fr;
+      gap:16px;
+      align-items:start;
+    }
+    @media (max-width:980px){
+      .watch-grid{grid-template-columns:1fr}
     }
 
-    .brand-name {
-      font-weight: 900;
-      letter-spacing: .3px;
-      font-size: 18px;
-      line-height: 1.1
+    .card{
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(18,24,36,.40);
+      overflow:hidden;
+      box-shadow:0 18px 50px rgba(0,0,0,.35);
+      position:relative;
+    }
+    .card::after{
+      content:"";
+      position:absolute;inset:0;pointer-events:none;border-radius:inherit;
+      background-image:radial-gradient(circle, rgba(255,255,255,.10) 1px, transparent 1.35px);
+      background-size:8px 8px;
+      opacity:.14;mix-blend-mode:overlay;z-index:0;
+    }
+    .card > *{position:relative; z-index:1}
+
+    /* ===== Player ===== */
+    .player-wrap{padding:12px}
+    .player{
+      width:100%;
+      border-radius:14px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.12);
+      background:#000;
+      aspect-ratio: 16 / 9;
+      position:relative;
+    }
+    .player iframe{
+      position:absolute;inset:0;
+      width:100%;height:100%;
+      border:0;
+      background:#000;
+    }
+    .player-loading{
+      position:absolute;inset:0;
+      display:grid;place-items:center;
+      color:rgba(231,237,249,.82);
+      background:linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.25));
+      font-size:13px;
+      letter-spacing:.2px;
+    }
+    .player-bar{
+      margin-top:12px;
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    .title-block h1{
+      margin:0;
+      font-size:20px;
+      letter-spacing:.2px;
+      font-weight:900;
+      line-height:1.2;
+    }
+    .subline{
+      margin-top:6px;
+      color:rgba(231,237,249,.72);
+      font-size:13px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .badge{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:7px 10px;border-radius:10px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(18,24,36,.55);
+      color:rgba(231,237,249,.92);
+      font-size:13px;
+      backdrop-filter:blur(10px);
+      min-height:34px;
+    }
+    .badge.imdb{border-color:rgba(242,198,79,.75);background:rgba(242,198,79,.10)}
+    .badge b{font-size:11px;letter-spacing:.6px;opacity:.9}
+    .badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+
+    .p-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      align-items:center;
+    }
+    .btn{
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(18,24,36,.45);
+      color:rgba(231,237,249,.92);
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      min-height:42px;
+      display:inline-flex;align-items:center;gap:10px;
+      backdrop-filter:blur(14px);
+      box-shadow:0 10px 30px rgba(0,0,0,.20);
+      text-decoration:none;
+      white-space:nowrap;
+      font-weight:700;
+      font-size:13px;
+    }
+    .btn:hover{border-color:rgba(255,255,255,.20); background:rgba(255,255,255,.06)}
+    .btn.primary{
+      background:rgba(242,198,79,.14);
+      border-color:rgba(242,198,79,.35);
+      color:rgba(242,198,79,.98);
+    }
+    .btn.primary:hover{background:rgba(242,198,79,.18)}
+    .btn:disabled{opacity:.55;cursor:not-allowed}
+
+    /* ===== Episodes ===== */
+    .ep-wrap{padding:12px}
+    .ep-head{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      margin-bottom:10px;
+      flex-wrap:wrap;
+    }
+    .ep-head h3{margin:0;font-size:15px;letter-spacing:.2px}
+    .ep-meta{color:rgba(231,237,249,.70);font-size:12px}
+
+    .season-chips{
+      display:flex;
+      gap:10px;
+      overflow:auto hidden;
+      padding:2px 2px 8px;
+      scrollbar-width:none;
+      -webkit-overflow-scrolling:touch;
+    }
+    .season-chips::-webkit-scrollbar{height:0}
+    .chip{
+      padding:10px 12px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(18,24,36,.45);
+      color:rgba(231,237,249,.88);
+      cursor:pointer;
+      font-size:13px;
+      min-height:40px;
+      white-space:nowrap;
+      user-select:none;
+    }
+    .chip:hover{background:rgba(255,255,255,.06)}
+    .chip.on{border-color:rgba(242,198,79,.65);background:rgba(242,198,79,.12);color:rgba(242,198,79,.98)}
+
+    .ep-pager{
+      display:flex;gap:10px;align-items:center;justify-content:space-between;
+      margin-top:6px;
+      flex-wrap:wrap;
+    }
+    .ep-range{
+      color:rgba(231,237,249,.72);
+      font-size:12px;
+    }
+    .jump{
+      display:flex;gap:8px;align-items:center;flex-wrap:wrap;
+    }
+    .jump input{
+      width:110px;
+      background:rgba(18,24,36,.45);
+      color:rgba(231,237,249,.90);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:12px;
+      padding:10px 12px;
+      outline:none;
+      min-height:42px;
     }
 
-    .brand-sub {
-      font-size: 11px;
-      color: rgba(231, 237, 249, .55);
-      margin-top: 2px
+    .ep-list{
+      margin-top:12px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+    .ep-btn{
+      min-width:52px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(18,24,36,.45);
+      color:rgba(231,237,249,.92);
+      cursor:pointer;
+      font-weight:800;
+      font-size:13px;
+      min-height:42px;
+      user-select:none;
+    }
+    .ep-btn:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.20)}
+    .ep-btn.on{
+      border-color:rgba(242,198,79,.65);
+      background:rgba(242,198,79,.12);
+      color:rgba(242,198,79,.98);
+    }
+    .ep-btn.miss{
+      opacity:.50;
+      cursor:not-allowed;
     }
 
-    .search {
-      flex: 1;
-      max-width: 620px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 14px;
-      border-radius: 12px;
-      background: var(--glass);
-      border: 1px solid rgba(255, 255, 255, .12);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, .30);
+    /* ===== Info ===== */
+    .info-wrap{padding:12px}
+    .poster{
+      display:grid;
+      grid-template-columns: 120px 1fr;
+      gap:12px;
+      align-items:start;
+    }
+    .poster img{
+      width:120px;height:170px;
+      border-radius:14px;
+      object-fit:cover;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+    }
+    @media (max-width:560px){
+      .poster{grid-template-columns: 96px 1fr;}
+      .poster img{width:96px;height:140px;border-radius:12px}
+    }
+    .info-title{
+      margin:0;
+      font-size:16px;
+      font-weight:900;
+      letter-spacing:.2px;
+      line-height:1.25;
+    }
+    .info-sub{
+      margin-top:6px;
+      color:rgba(231,237,249,.70);
+      font-size:12px;
+    }
+    .genres{
+      display:flex;flex-wrap:wrap;gap:10px;margin-top:10px
+    }
+    .genre{
+      padding:7px 10px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(18,24,36,.45);
+      color:rgba(231,237,249,.88);
+      font-size:13px;
+      min-height:34px;
+      backdrop-filter:blur(10px);
+    }
+    .desc{
+      margin-top:12px;
+      color:rgba(231,237,249,.82);
+      font-size:13px;
+      line-height:1.55;
+      white-space:pre-wrap;
+    }
+    .kv{
+      margin-top:10px;
+      display:grid;
+      grid-template-columns: 110px 1fr;
+      gap:8px 10px;
+      font-size:13px;
+      color:rgba(231,237,249,.84);
+    }
+    .kv div:nth-child(odd){
+      color:rgba(231,237,249,.62);
+    }
+
+    /* ===== Rows (suggestions) ===== */
+    .rows{margin-top:18px;display:grid;gap:16px}
+    .row-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .row-head h3{margin:0;font-size:18px;letter-spacing:.2px}
+    .row-head a{
+      color:rgba(231,237,249,.8);text-decoration:none;font-size:13px;
+      padding:8px 12px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(18,24,36,.35);
+      min-height:36px;
+      display:inline-flex;align-items:center;
+    }
+    .row-head a:hover{border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.06)}
+    .cards{
+      display:flex;gap:14px;
+      overflow-x:auto;
+      padding:6px 2px 10px;
+      scroll-snap-type:x mandatory;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:none;
+    }
+    .cards::-webkit-scrollbar{height:0}
+    .m-card{
+      scroll-snap-align:start;
+      width:170px;flex:0 0 auto;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(18,24,36,.40);
+      overflow:hidden;
+      box-shadow:0 18px 50px rgba(0,0,0,.35);
+      cursor:pointer;
+      transition:transform .14s ease,border-color .14s ease;
+      position:relative;
+      touch-action: manipulation;
+    }
+    .m-card:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.22)}
+    .m-card .img{
+      height:240px;
+      background:#000;
+      border-bottom:1px solid rgba(255,255,255,.10);
+    }
+    .m-card img{width:100%;height:100%;object-fit:cover;display:block}
+    .m-card .meta{padding:10px 10px 12px}
+    .m-card .meta b{display:block;font-size:13px;line-height:1.25}
+    .m-card .meta small{display:block;margin-top:6px;color:rgba(231,237,249,.65)}
+    .tag{
+      position:absolute;top:10px;left:10px;
+      padding:6px 8px;border-radius:999px;
+      font-size:11px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(10,14,22,.65);
+      backdrop-filter:blur(10px);
+      z-index:3;
+    }
+    .m-card::after{
+      content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
+      background-image:radial-gradient(circle, rgba(255,255,255,.10) 1px, transparent 1.35px);
+      background-size:8px 8px;
+      opacity:.18;mix-blend-mode:overlay;z-index:2;
+    }
+
+    /* ===== Toast ===== */
+    .toast{
+      position:fixed;
+      left:12px; right:12px;
+      bottom: calc(var(--bn-h) + 14px + env(safe-area-inset-bottom));
+      z-index:200;
+      display:none;
+      max-width: 720px;
+      margin: 0 auto;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(10,14,22,.86);
+      color:rgba(231,237,249,.92);
+      box-shadow:0 18px 55px rgba(0,0,0,.45);
       backdrop-filter: blur(14px);
+      font-size:13px;
+      line-height:1.35;
     }
+    .toast.on{display:block}
+    .toast.ok{border-color:rgba(124,255,178,.35)}
+    .toast.err{border-color:rgba(255,124,124,.35)}
 
-    .search input {
-      width: 100%;
-      border: 0;
-      outline: 0;
-      background: transparent;
-      color: var(--text);
-      font-size: 14px;
-    }
+    /* ===== Mobile bottom nav ===== */
+    .bottom-nav{
+      position:fixed;
+      left:10px; right:10px;
+      bottom: calc(10px + env(safe-area-inset-bottom));
+      height: var(--bn-h);
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(10,14,22,.72);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 18px 55px rgba(0,0,0,.45);
+      z-index:80;
 
-    .search input::placeholder {
-      color: rgba(231, 237, 249, .50)
-    }
-
-    .nav {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-left: 6px
-    }
-
-    .nav a {
-      color: rgba(231, 237, 249, .88);
-      text-decoration: none;
-      font-size: 14px;
-      display: inline-flex;
-      align-items: center;
+      display:none;
+      grid-template-columns: repeat(5, 1fr);
       gap: 6px;
-      padding: 8px 10px;
-      border-radius: 10px;
+      padding: 8px;
     }
-
-    .nav a:hover {
-      background: rgba(255, 255, 255, .06)
-    }
-
-    .member-btn {
-      margin-left: auto;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 14px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, .12);
-      background: var(--glass2);
-      color: var(--text);
-      cursor: pointer;
-      backdrop-filter: blur(14px);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, .24);
-    }
-
-    .member-btn:hover {
-      border-color: var(--line2)
-    }
-
-    .member-btn svg {
-      opacity: .95
-    }
-
-    .grid {
-      margin-top: 18px;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 340px;
-      gap: 18px;
-      align-items: start;
-    }
-
-    @media (max-width:1100px) {
-      .grid {
-        grid-template-columns: minmax(0, 1fr) 300px;
-      }
-    }
-
-    @media (max-width:980px) {
-      .nav {
-        display: none
-      }
-
-      .member-btn span {
-        display: none
-      }
-
-      .grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width:560px) {
-      .brand {
-        min-width: auto;
-      }
-
-      .brand-sub {
-        display: none;
-      }
-    }
-
-    .card {
-      border-radius: var(--radius);
-      border: 1px solid rgba(255, 255, 255, .10);
-      background: rgba(10, 14, 22, .55);
-      backdrop-filter: blur(14px);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-      position: relative;
-    }
-
-    /* ✅ PLAYER: bỏ hẳn "ô che" và dùng crop toolbar Drive */
-    .player-wrap {
-      position: relative;
-      width: 100%;
-      background: #000;
-      overflow: hidden;
-
-      border-top-left-radius: var(--radius);
-      border-top-right-radius: var(--radius);
-      border-bottom-left-radius: 18px;
-      border-bottom-right-radius: 18px;
-
-      /* Toolbar Drive trên mobile thường dày hơn */
-      --driveToolbarH: 48px;
-    }
-
-    @media (max-width:560px) {
-      .player-wrap {
-        --driveToolbarH: 56px;
-      }
-    }
-
-    .player-wrap::before {
-      content: "";
-      display: block;
-      padding-top: 56.25%;
-    }
-
-    /* Crop toolbar: đẩy iframe lên trên */
-    .player-wrap iframe {
-      position: absolute;
-      left: 0;
-      width: 100%;
-      border: 0;
-
-      top: calc(-1 * var(--driveToolbarH));
-      height: calc(100% + var(--driveToolbarH));
-    }
-
-    .player-overlay {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      padding: 18px;
-      background: linear-gradient(180deg, rgba(0, 0, 0, .25), rgba(0, 0, 0, .70));
-      z-index: 2;
-      text-align: center;
-    }
-
-    .loading-box {
-      max-width: 520px;
-      width: 100%;
-      border: 1px solid rgba(255, 255, 255, .10);
-      background: rgba(10, 14, 22, .50);
-      backdrop-filter: blur(12px);
-      border-radius: 16px;
-      padding: 14px 14px;
-      box-shadow: 0 18px 60px rgba(0, 0, 0, .45);
-    }
-
-    .loading-row {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .spinner {
-      width: 28px;
-      height: 28px;
-      border-radius: 999px;
-      border: 3px solid rgba(255, 255, 255, .22);
-      border-top-color: rgba(255, 255, 255, .85);
-      animation: rot 1s linear infinite
-    }
-
-    @keyframes rot {
-      to {
-        transform: rotate(360deg)
-      }
-    }
-
-    .loading-title {
-      color: rgba(231, 237, 249, .92);
-      font-weight: 900;
-      letter-spacing: .2px;
-    }
-
-    .loading-sub {
-      margin-top: 8px;
-      color: rgba(231, 237, 249, .70);
-      font-size: 13px;
-      line-height: 1.45;
-    }
-
-    .overlay-actions {
-      margin-top: 12px;
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    .info {
-      padding: 14px 14px 16px;
-      border-top: 1px solid rgba(255, 255, 255, .08);
-      display: grid;
-      grid-template-columns: 120px minmax(0, 1fr);
-      gap: 14px;
-    }
-
-    @media (max-width:560px) {
-      .info {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .poster {
-      width: 120px;
-      aspect-ratio: 2/3;
+    .bn-item{
+      border:0;
+      background:transparent;
+      color: rgba(231,237,249,.88);
       border-radius: 14px;
-      border: 1px solid rgba(255, 255, 255, .14);
-      background: rgba(255, 255, 255, .06);
-      overflow: hidden;
-      box-shadow: 0 14px 40px rgba(0, 0, 0, .35);
-    }
-
-    .poster img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block
-    }
-
-    .h1 {
-      margin: 0;
-      font-size: 22px;
-      letter-spacing: .2px;
-      font-weight: 900
-    }
-
-    .sub {
-      margin-top: 6px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .badges {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 10px;
-      border-radius: 10px;
-      border: 1px solid rgba(255, 255, 255, .12);
-      background: rgba(18, 24, 36, .45);
-      color: rgba(231, 237, 249, .92);
-      font-size: 13px;
-      backdrop-filter: blur(10px);
-    }
-
-    .badge.imdb {
-      border-color: rgba(242, 198, 79, .75);
-      background: rgba(242, 198, 79, .10);
-    }
-
-    .badge b {
+      padding: 8px 6px;
+      cursor:pointer;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:4px;
+      min-height: 44px;
       font-size: 11px;
-      letter-spacing: .6px;
-      opacity: .9
+      letter-spacing: .2px;
+      user-select:none;
+      text-decoration:none;
     }
-
-    .genres {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 10px;
+    .bn-item svg{ width:18px; height:18px; opacity:.95; }
+    .bn-item.active{
+      border:1px solid rgba(242,198,79,.35);
+      background: rgba(242,198,79,.12);
+      color: rgba(242,198,79,.98);
     }
+    .bn-item:active{ transform: translateY(1px); }
+    @media (max-width:980px){ .bottom-nav{ display:grid; } }
 
-    .genre {
-      padding: 7px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, .12);
-      background: rgba(18, 24, 36, .40);
-      color: rgba(231, 237, 249, .88);
-      font-size: 13px;
-      backdrop-filter: blur(10px);
-    }
-
-    .desc {
-      margin: 12px 0 0;
-      color: rgba(231, 237, 249, .80);
-      font-size: 14px;
-      line-height: 1.55;
-      max-width: 90ch;
-    }
-
-    /* ✅ Buttons chuẩn: dùng <button> + <a> chung style */
-    .actions {
-      margin-top: 12px;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    a {
-      color: var(--accent);
-      text-decoration: none
-    }
-
-    a:hover {
-      text-decoration: underline
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 9px 12px;
-      border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, .12);
-      background: rgba(255, 255, 255, .06);
-      color: rgba(231, 237, 249, .92);
-      cursor: pointer;
-      user-select: none;
-      touch-action: manipulation;
-      font: inherit;
-      text-decoration: none;
-    }
-
-    button.btn {
-      appearance: none;
-      -webkit-appearance: none;
-    }
-
-    .btn:hover {
-      background: rgba(255, 255, 255, .10);
-      text-decoration: none;
-    }
-
-    .btn:focus-visible {
-      outline: 2px solid rgba(242, 198, 79, .65);
-      outline-offset: 2px;
-    }
-
-    .btn[disabled],
-    .btn.disabled {
-      opacity: .55;
-      cursor: not-allowed;
-    }
-
-    .episodes {
-      margin-top: 14px;
-      padding: 14px;
-      border-top: 1px solid rgba(255, 255, 255, .08);
-    }
-
-    .episodes-head {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      justify-content: space-between;
-      flex-wrap: wrap;
-    }
-
-    .episodes-title {
-      font-weight: 900;
-      letter-spacing: .2px
-    }
-
-    .server-row {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
-
-    .server-label {
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 700;
-      margin-right: 6px
-    }
-
-    .server-pill {
-      padding: 8px 10px;
-      border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, .12);
-      background: rgba(18, 24, 36, .45);
-      color: rgba(231, 237, 249, .90);
-      font-size: 13px;
-      cursor: pointer;
-      touch-action: manipulation;
-    }
-
-    .server-pill.active {
-      border-color: rgba(242, 198, 79, .35);
-      background: rgba(242, 198, 79, .10);
-      color: rgba(242, 198, 79, .98);
-    }
-
-    .ep-grid {
-      margin-top: 12px;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .ep {
-      min-width: 108px;
-      padding: 12px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(255, 255, 255, .12);
-      background: rgba(18, 24, 36, .35);
-      color: rgba(231, 237, 249, .90);
-      font-size: 14px;
-      text-align: center;
-      cursor: pointer;
-      user-select: none;
-      touch-action: manipulation;
-    }
-
-    .ep:hover {
-      background: rgba(255, 255, 255, .08);
-    }
-
-    .ep.active {
-      border-color: rgba(242, 198, 79, .40);
-      background: rgba(242, 198, 79, .14);
-      color: rgba(242, 198, 79, .98);
-      font-weight: 800;
-    }
-
-    .ep.disabled {
-      opacity: .55;
-      cursor: not-allowed;
-    }
-
-    .sidebar .head {
-      padding: 14px 14px 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid rgba(255, 255, 255, .08);
-    }
-
-    .sidebar .head b {
-      font-size: 18px;
-      letter-spacing: .2px
-    }
-
-    .sug-list {
-      padding: 10px 10px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .sug {
-      display: grid;
-      grid-template-columns: 54px minmax(0, 1fr);
-      gap: 10px;
-      padding: 10px;
-      border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, .10);
-      background: rgba(255, 255, 255, .05);
-      cursor: pointer;
-      touch-action: manipulation;
-    }
-
-    .sug:hover {
-      background: rgba(255, 255, 255, .08);
-    }
-
-    .sug .thumb {
-      width: 54px;
-      aspect-ratio: 2/3;
-      border-radius: 10px;
-      overflow: hidden;
-      background: rgba(255, 255, 255, .06);
-      border: 1px solid rgba(255, 255, 255, .10);
-    }
-
-    .sug img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block
-    }
-
-    .sug .t {
-      font-weight: 850;
-      font-size: 14px;
-      line-height: 1.2;
-      margin-top: 2px
-    }
-
-    .sug .m {
-      color: var(--muted);
-      font-size: 12px;
-      margin-top: 6px
-    }
-
-    .empty {
-      color: var(--muted);
-      font-size: 13px;
-      padding: 14px;
+    @media (prefers-reduced-motion: reduce){
+      *{ animation:none !important; transition:none !important; }
+      html{ scroll-behavior:auto !important; }
     }
   </style>
 </head>
 
 <body>
+  <div class="toast" id="toast"></div>
+
   <div class="container">
     <header class="topbar">
       <div class="brand" onclick="location.href='index.html'">
@@ -685,100 +595,175 @@
           <path d="M10.5 19a8.5 8.5 0 1 1 0-17 8.5 8.5 0 0 1 0 17Z" stroke="rgba(231,237,249,.85)" stroke-width="2" />
           <path d="M16.8 16.8 21 21" stroke="rgba(231,237,249,.85)" stroke-width="2" stroke-linecap="round" />
         </svg>
-        <input id="q" placeholder="Tìm kiếm phim, diễn viên" />
+        <input id="q" placeholder="Tìm kiếm phim, diễn viên (Enter)" />
       </div>
 
       <nav class="nav" aria-label="Main navigation">
-        <a href="list.html">Thể loại</a>
-        <a href="list.html?kind=movie">Phim Lẻ</a>
-        <a href="list.html?kind=series">Phim Bộ</a>
-        <a href="list.html">Quốc gia</a>
+        <a href="index.html" class="nav-btn">Home</a>
+        <a href="list.html" class="nav-btn">Danh sách</a>
+        <a href="list.html?kind=anime" class="nav-btn">Anime</a>
+        <a href="list.html?kind=movie" class="nav-btn">Phim lẻ</a>
+        <a href="list.html?kind=series" class="nav-btn">Phim bộ</a>
       </nav>
 
-      <button class="member-btn" onclick="location.href='test.html'" type="button">
+      <button class="member-btn" onclick="location.href='sql.html'">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M12 12a4.5 4.5 0 1 0-4.5-4.5A4.5 4.5 0 0 0 12 12Z" stroke="rgba(231,237,249,.9)" stroke-width="2" />
-          <path d="M20 21a8 8.0 0 1 0-16 0" stroke="rgba(231,237,249,.9)" stroke-width="2" stroke-linecap="round" />
+          <path d="M20 21a8 8 0 1 0-16 0" stroke="rgba(231,237,249,.9)" stroke-width="2" stroke-linecap="round" />
         </svg>
-        <span>Thành viên</span>
+        <span>Admin</span>
       </button>
     </header>
 
-    <div class="grid">
-      <main class="card">
-        <div class="player-wrap">
-          <div class="player-overlay" id="loading" role="status" aria-live="polite">
-            <div class="loading-box">
-              <div class="loading-row">
-                <div class="spinner" id="spinner"></div>
-                <div class="loading-title" id="loadingTitle">Đang tải player…</div>
-              </div>
-              <div class="loading-sub" id="loadingSub">Nếu quá lâu, hãy thử tải lại.</div>
-              <div class="overlay-actions">
-                <button class="btn" id="btnReload" type="button" style="display:none">Tải lại</button>
-              </div>
+    <section class="watch-grid" aria-label="Watch layout">
+      <!-- LEFT: player + episodes -->
+      <div class="left">
+        <div class="card player-wrap" aria-label="Player">
+          <div class="player">
+            <iframe id="playerFrame" allow="autoplay; fullscreen" allowfullscreen referrerpolicy="no-referrer"></iframe>
+            <div id="playerLoading" class="player-loading">Đang tải video...</div>
+          </div>
+
+          <div class="player-bar">
+            <div class="title-block">
+              <h1 id="movieTitle">Đang tải...</h1>
+              <div id="movieSubline" class="subline"></div>
+              <div id="movieBadges" class="badges"></div>
+            </div>
+
+            <div class="p-actions">
+              <button id="btnPrev" class="btn tip" data-tip="Tập trước" type="button" disabled>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M15 6l-6 6 6 6" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Trước
+              </button>
+              <button id="btnNext" class="btn tip" data-tip="Tập sau" type="button" disabled>
+                Sau
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M9 6l6 6-6 6" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+
+              <a id="btnOpenDrive" class="btn" href="#" target="_blank" rel="noreferrer">
+                Mở Drive
+              </a>
+              <button id="btnCopy" class="btn primary" type="button">Copy link</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="episodeCard" class="card ep-wrap" aria-label="Danh sách tập" hidden>
+          <div class="ep-head">
+            <h3>Danh sách tập</h3>
+            <div id="epMeta" class="ep-meta">—</div>
+          </div>
+
+          <div id="seasonChips" class="season-chips" aria-label="Season chips"></div>
+
+          <div class="ep-pager">
+            <div class="jump">
+              <button id="btnPagePrev" class="btn" type="button">Trang trước</button>
+              <button id="btnPageNext" class="btn" type="button">Trang sau</button>
+              <div id="epRange" class="ep-range">—</div>
+            </div>
+
+            <div class="jump">
+              <input id="jumpEp" type="number" inputmode="numeric" placeholder="Nhập tập..." />
+              <button id="btnJump" class="btn" type="button">Đi</button>
             </div>
           </div>
 
-          <iframe id="frame" title="Trình phát video" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen
-            referrerpolicy="no-referrer"></iframe>
+          <div id="epList" class="ep-list" aria-label="Episode list"></div>
         </div>
+      </div>
 
-        <section class="info">
-          <div class="poster" id="posterBox" aria-label="Poster">
-            <img id="posterImg" alt="" style="display:none" />
-          </div>
-
-          <div>
-            <h1 class="h1" id="title">Đang tải…</h1>
-            <div class="sub" id="subtitle">—</div>
-
-            <div class="badges" id="badges" aria-label="Thông tin nhanh"></div>
-            <div class="genres" id="genres" aria-label="Thể loại"></div>
-            <p class="desc" id="desc"></p>
-
-            <div class="actions">
-              <button class="btn" id="btnPrevEp" type="button" disabled>← Tập trước</button>
-              <button class="btn" id="btnNextEp" type="button" disabled>Tập sau →</button>
-              <button class="btn" id="btnEpisodes" type="button">Chuyển tập</button>
-              <button class="btn" id="btnLike" type="button">♥ Yêu thích</button>
-              <a class="btn" href="index.html">← Quay lại</a>
+      <!-- RIGHT: info -->
+      <aside class="right">
+        <div class="card info-wrap" aria-label="Thông tin phim">
+          <div class="poster">
+            <img id="posterImg" alt="Poster" />
+            <div>
+              <div id="infoTitle" class="info-title">—</div>
+              <div id="infoSub" class="info-sub">—</div>
+              <div id="infoGenres" class="genres"></div>
             </div>
           </div>
-        </section>
 
-        <section class="episodes" id="episodesSection">
-          <div class="episodes-head">
-            <div class="episodes-title">Server</div>
-            <div style="color:var(--muted);font-size:13px">Chọn tập để xem</div>
-          </div>
-          <div class="server-row">
-            <span class="server-label">Server</span>
-            <span class="server-pill active">Khoilolo</span>
-          </div>
+          <div id="infoDesc" class="desc">—</div>
 
-          <div class="episodes-head" style="margin-top:12px">
-            <div class="episodes-title">Tập phim</div>
-            <div style="color:var(--muted);font-size:13px" id="epHint"></div>
+          <div class="kv" style="margin-top:14px">
+            <div>Loại</div><div id="kvKind">—</div>
+            <div>Năm</div><div id="kvYear">—</div>
+            <div>Chất lượng</div><div id="kvQuality">—</div>
+            <div>Quốc gia</div><div id="kvCountry">—</div>
+            <div>IMDb</div><div id="kvImdb">—</div>
+            <div>Cập nhật</div><div id="kvUpdated">—</div>
           </div>
-          <div class="ep-grid" id="epGrid"></div>
-        </section>
-      </main>
-
-      <aside class="card sidebar">
-        <div class="head">
-          <b>Đề xuất</b>
-          <a href="index.html" style="font-size:13px;color:var(--muted)">Xem tất cả</a>
-        </div>
-        <div class="sug-list" id="sugList">
-          <div class="empty">Đang tải…</div>
         </div>
       </aside>
+    </section>
+
+    <div class="rows" aria-label="Đề xuất">
+      <div class="row-head">
+        <h3>Đề xuất cho bạn</h3>
+        <a href="list.html?tab=suggest">Xem tất cả</a>
+      </div>
+      <div id="rowSuggest" class="cards"></div>
+
+      <div class="row-head">
+        <h3>Mới cập nhật</h3>
+        <a href="list.html?tab=new">Xem tất cả</a>
+      </div>
+      <div id="rowNew" class="cards"></div>
     </div>
   </div>
 
+  <!-- Bottom nav mobile -->
+  <nav class="bottom-nav" aria-label="Điều hướng nhanh">
+    <a class="bn-item" href="index.html" aria-label="Trang chủ">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M3 10.5 12 3l9 7.5V21a1.5 1.5 0 0 1-1.5 1.5H4.5A1.5 1.5 0 0 1 3 21V10.5Z" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M9.5 22V15.5A1.5 1.5 0 0 1 11 14h2a1.5 1.5 0 0 1 1.5 1.5V22" stroke="rgba(231,237,249,.72)" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span>Home</span>
+    </a>
+
+    <a class="bn-item" href="list.html" aria-label="Danh sách">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M4 6h16M4 12h16M4 18h10" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span>List</span>
+    </a>
+
+    <a class="bn-item" href="list.html?kind=anime" aria-label="Anime">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M4 6h16v12H4V6Z" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M9 10v4l4-2-4-2Z" fill="rgba(231,237,249,.92)"/>
+      </svg>
+      <span>Anime</span>
+    </a>
+
+    <a class="bn-item" href="list.html?kind=movie" aria-label="Phim lẻ">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M4 7h16v14H4V7Z" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M4 7l2-4h3l-2 4M11 7l2-4h3l-2 4M18 7l2-4" stroke="rgba(231,237,249,.72)" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span>Lẻ</span>
+    </a>
+
+    <a class="bn-item" href="list.html?kind=series" aria-label="Phim bộ">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M4 6h16v6H4V6Z" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M4 12h16v6H4v-6Z" stroke="rgba(231,237,249,.72)" stroke-width="2" stroke-linejoin="round"/>
+      </svg>
+      <span>Bộ</span>
+    </a>
+  </nav>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
+    // ================== SUPABASE (Public Read) ==================
     const SUPABASE_URL = "https://nzalaxolteaiafvuceqz.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56YWxheG9sdGVhaWFmdnVjZXF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyOTY2MjAsImV4cCI6MjA4NTg3MjYyMH0.0eIz6cfB4Dr_g5Wja70tZCMvVfUKoI5H4D8MJBP49Bg";
 
@@ -786,22 +771,59 @@
       ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
       : null;
 
-    const SESSION_DRIVE_KEY = "khoii_watch_drive_v1";
-    function setCurrentDriveId(id) { try { sessionStorage.setItem(SESSION_DRIVE_KEY, String(id || "")); } catch { } }
-    function getCurrentDriveId() { try { return sessionStorage.getItem(SESSION_DRIVE_KEY) || ""; } catch { return ""; } }
+    // ================== LOCAL FALLBACK ==================
+    const STORAGE_KEY = "khoii_drive_movies_v1";
+    const LEGACY_KEY = "my_drive_movies_v2";
 
-    window.goWatch = function (driveId, title, ep, season) {
-      const id = String(driveId || "").trim();
-      if (id) setCurrentDriveId(id);
+    function loadMoviesLocal(){
+      try{
+        let raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw){
+          const old = localStorage.getItem(LEGACY_KEY);
+          if(old){
+            localStorage.setItem(STORAGE_KEY, old);
+            raw = old;
+          }
+        }
+        const arr = raw ? JSON.parse(raw) : [];
+        return Array.isArray(arr) ? arr : [];
+      }catch{ return []; }
+    }
 
-      const t = String(title || "").trim();
-      const p = new URLSearchParams();
-      if (t) p.set("title", t);
-      if (season !== undefined && season !== null && season !== "") p.set("season", String(season));
-      if (ep !== undefined && ep !== null && ep !== "") p.set("ep", String(ep));
+    // ================== Helpers ==================
+    const $ = (id) => document.getElementById(id);
 
-      location.href = "watch.html" + (p.toString() ? "?" + p.toString() : "");
-    };
+    function safeText(s){ return String(s ?? ""); }
+    function escapeHtml(s){
+      return String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function svgPlaceholder(title="Khoii", w=1200, h=700){
+      const safe = String(title).replace(/[<>&"]/g, "");
+      const svg =
+`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1">
+      <stop offset="0" stop-color="#0b0f17"/>
+      <stop offset="1" stop-color="#141a2a"/>
+    </linearGradient>
+    <radialGradient id="r" cx="30%" cy="25%" r="70%">
+      <stop offset="0" stop-color="rgba(242,198,79,.28)"/>
+      <stop offset="1" stop-color="rgba(0,0,0,0)"/>
+    </radialGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#g)"/>
+  <rect width="100%" height="100%" fill="url(#r)"/>
+  <text x="6%" y="52%" fill="rgba(231,237,249,.92)" font-family="system-ui,Segoe UI,Roboto" font-size="56" font-weight="800">${safe}</text>
+  <text x="6%" y="64%" fill="rgba(231,237,249,.55)" font-family="system-ui,Segoe UI,Roboto" font-size="22">Khoii Watch</text>
+</svg>`;
+      return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    }
 
     const DriveTool = (() => {
       const patterns = [
@@ -809,495 +831,712 @@
         /drive\.google\.com\/open\?id=([a-zA-Z0-9_-]{10,})/i,
         /drive\.google\.com\/uc\?id=([a-zA-Z0-9_-]{10,})/i,
         /drive\.google\.com\/uc\?export=download&id=([a-zA-Z0-9_-]{10,})/i,
+        /drive\.google\.com\/thumbnail\?id=([a-zA-Z0-9_-]{10,})/i,
       ];
-      function extractId(input) {
+      function extractId(input){
         const s = String(input || "").trim();
+        if(!s) return null;
         if (/^[a-zA-Z0-9_-]{10,}$/.test(s)) return s;
-        try {
+        try{
           const u = new URL(s);
           const qid = u.searchParams.get("id");
-          if (qid && /^[a-zA-Z0-9_-]{10,}$/.test(qid)) return qid;
-        } catch { }
-        for (const re of patterns) {
+          if(qid && /^[a-zA-Z0-9_-]{10,}$/.test(qid)) return qid;
+        }catch{}
+        for(const re of patterns){
           const m = s.match(re);
-          if (m && m[1]) return m[1];
+          if(m && m[1]) return m[1];
         }
         return null;
       }
-      function links(id) {
-        return {
-          id,
-          preview: `https://drive.google.com/file/d/${encodeURIComponent(id)}/preview`,
-          view: `https://drive.google.com/file/d/${encodeURIComponent(id)}/view`,
-        };
-      }
-      function normalize(input) {
-        const id = extractId(input);
-        if (!id) return { ok: false, error: "Không tách được ID.", id: null, links: null };
-        return { ok: true, id, links: links(id) };
-      }
-      return { normalize };
+      function thumb(id, w=800){ return `https://drive.google.com/thumbnail?id=${id}&sz=w${w}`; }
+      function preview(id){ return `https://drive.google.com/file/d/${id}/preview`; }
+      function view(id){ return `https://drive.google.com/file/d/${id}/view`; }
+      return { extractId, thumb, preview, view };
     })();
 
-    const el = {
-      q: document.getElementById("q"),
-      title: document.getElementById("title"),
-      subtitle: document.getElementById("subtitle"),
-      badges: document.getElementById("badges"),
-      genres: document.getElementById("genres"),
-      desc: document.getElementById("desc"),
-      frame: document.getElementById("frame"),
-      loading: document.getElementById("loading"),
-      spinner: document.getElementById("spinner"),
-      loadingTitle: document.getElementById("loadingTitle"),
-      loadingSub: document.getElementById("loadingSub"),
-      btnReload: document.getElementById("btnReload"),
-      posterBox: document.getElementById("posterBox"),
-      posterImg: document.getElementById("posterImg"),
-      epGrid: document.getElementById("epGrid"),
-      epHint: document.getElementById("epHint"),
-      btnEpisodes: document.getElementById("btnEpisodes"),
-      episodesSection: document.getElementById("episodesSection"),
-      sugList: document.getElementById("sugList"),
-      btnLike: document.getElementById("btnLike"),
-      btnPrevEp: document.getElementById("btnPrevEp"),
-      btnNextEp: document.getElementById("btnNextEp"),
-    };
-
-    function escapeHtml(s) {
-      return String(s ?? "")
-        .replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+    function kindLabel(kind){
+      return kind === "movie" ? "Phim Lẻ" : kind === "series" ? "Phim Bộ" : "Anime";
     }
 
-    function renderBadges(info) {
-      const parts = [];
-      if (info.imdb) parts.push(`<span class="badge imdb"><b>IMDb</b> ${escapeHtml(info.imdb)}</span>`);
-      if (info.quality) parts.push(`<span class="badge">${escapeHtml(info.quality)}</span>`);
-      if (info.year) parts.push(`<span class="badge">${escapeHtml(info.year)}</span>`);
-      if (info.country) parts.push(`<span class="badge">${escapeHtml(info.country)}</span>`);
-      if (info.kind) {
-        const k = info.kind === "movie" ? "Phim Lẻ" : info.kind === "series" ? "Phim Bộ" : "Anime";
-        parts.push(`<span class="badge">${escapeHtml(k)}</span>`);
-      }
-      el.badges.innerHTML = parts.join("");
+    function fmtMs(ms){
+      const n = Number(ms);
+      if(!Number.isFinite(n) || n <= 0) return "—";
+      try{ return new Date(n).toLocaleString("vi-VN"); }catch{ return String(n); }
     }
 
-    function renderGenres(arr) {
-      const gs = Array.isArray(arr) ? arr.filter(Boolean).slice(0, 16) : [];
-      el.genres.innerHTML = gs.map(g => `<span class="genre">${escapeHtml(g)}</span>`).join("");
+    function showToast(msg, type="ok"){
+      const t = $("toast");
+      t.className = "toast on " + (type === "err" ? "err" : "ok");
+      t.textContent = String(msg || "");
+      clearTimeout(showToast._tm);
+      showToast._tm = setTimeout(()=>{ t.className = "toast"; }, 2200);
     }
 
-    function setPoster(url) {
-      const u = String(url || "").trim();
-      if (!u) {
-        el.posterImg.style.display = "none";
-        el.posterBox.style.background = "rgba(255,255,255,.06)";
-        return;
-      }
-      el.posterImg.src = u;
-      el.posterImg.alt = "Poster";
-      el.posterImg.style.display = "block";
+    function normalizeRow(r){
+      // Support both Supabase row & localStorage object
+      const driveId = r.driveid || r.driveId || DriveTool.extractId(r.drivelink || r.driveLink) || "";
+      const posterUrl = r.posterurl || r.posterUrl || (driveId ? DriveTool.thumb(driveId, 600) : "");
+      const heroUrl = r.herourl || r.heroUrl || posterUrl || (driveId ? DriveTool.thumb(driveId, 1400) : "");
+
+      const genres = Array.isArray(r.genres) ? r.genres : (Array.isArray(r.genresArr) ? r.genresArr : []);
+      return {
+        id: r.id || r._id || "",
+        title: r.title || "Không tên",
+        kind: r.kind || "anime",
+        year: r.year || "",
+        quality: r.quality || "FHD",
+        desc: r.desc || r["desc"] || "",
+        imdb: r.imdb || "",
+        driveId,
+        driveLink: r.drivelink || r.driveLink || "",
+        posterUrl,
+        heroUrl,
+        genres,
+        country: r.country || "",
+        updatedAt: Number(r.updatedat || r.updatedAt || 0),
+        ep: (r.ep === null || r.ep === undefined) ? null : Number(r.ep),
+        eps: (r.eps === null || r.eps === undefined) ? null : Number(r.eps),
+        season: (r.season === null || r.season === undefined) ? null : Number(r.season),
+      };
     }
 
-    function applySearchKeyword(q) {
-      const s = (q || "").trim();
-      if (!s) return;
-      location.href = `list.html?q=${encodeURIComponent(s)}`;
-    }
+    // Gom phim bộ/anime theo tập -> 1 card đại diện (ep=1), updatedAt=max
+    function collapseEpisodicRows(rows){
+      const out = [];
+      const map = new Map();
 
-    function inferEpNumber(row, idx) {
-      const s = `${row?.drivelink || ""} ${row?.title || ""}`.toLowerCase();
-      const pats = [
-        /tập\s*(\d{1,3})/,
-        /\bep\s*(\d{1,3})/,
-        /\bepisode\s*(\d{1,3})/,
-        /[-_ ](\d{1,3})(?=\D|$)/,
-      ];
-      for (const re of pats) {
-        const m = s.match(re);
-        if (m && m[1]) {
-          const n = parseInt(m[1], 10);
-          if (Number.isFinite(n) && n > 0 && n < 1000) return n;
+      for(const raw of (rows || [])){
+        const r = normalizeRow(raw);
+        const kind = r.kind || "anime";
+        const episodic = (kind === "anime" || kind === "series");
+
+        if(!episodic){
+          out.push({ ...r, openSeason: 1, openEp: 1 });
+          continue;
         }
-      }
-      return idx + 1;
-    }
 
-    function pad2(n) { return String(n).padStart(2, "0"); }
+        const season = Number(r.season || 1) || 1; // null -> 1
+        const title = String(r.title || "").trim();
+        const key = `${kind}||${season}||${title}`.toLowerCase();
 
-    async function fetchMovieByDriveId(driveId) {
-      if (!sb) return null;
-      try {
-        const { data, error } = await sb
-          .from("movies")
-          .select("id,title,kind,year,quality,desc,genres,country,imdb,posterurl,herourl,driveid,drivelink,updatedat,created_at,ep,eps,season")
-          .eq("driveid", driveId)
-          .limit(1);
-        if (error) return null;
-        return (data || [])[0] || null;
-      } catch { return null; }
-    }
-
-    async function fetchMovieByTitleEp(title, season, ep) {
-      if (!sb || !title || !season || !ep) return null;
-      try {
-        const { data, error } = await sb
-          .from("movies")
-          .select("id,title,kind,year,quality,desc,genres,country,imdb,posterurl,herourl,driveid,drivelink,updatedat,created_at,ep,eps,season")
-          .eq("title", title)
-          .eq("season", season)
-          .eq("ep", ep)
-          .limit(1);
-
-        if (error) return null;
-        return (data || [])[0] || null;
-      } catch { return null; }
-    }
-
-    async function fetchEpisodesByTitle(seriesTitle, kind) {
-      if (!sb || !seriesTitle) return [];
-      try {
-        let q = sb
-          .from("movies")
-          .select("id,title,kind,driveid,drivelink,updatedat,created_at,ep,eps,season")
-          .eq("title", seriesTitle);
-
-        if (kind) q = q.eq("kind", kind);
-
-        const { data, error } = await q
-          .order("season", { ascending: true, nullsFirst: true })
-          .order("ep", { ascending: true, nullsFirst: true })
-          .order("created_at", { ascending: true })
-          .limit(400);
-
-        if (error) return [];
-
-        const rows = Array.isArray(data) ? data : [];
-        return rows.map((r, i) => ({
-          ...r,
-          _season: Number.isFinite(r.season) ? r.season : 1,
-          _ep: Number.isFinite(r.ep) ? r.ep : inferEpNumber(r, i),
-          _eps: Number.isFinite(r.eps) ? r.eps : null,
-        }));
-      } catch { return []; }
-    }
-
-    async function fetchSuggestions(excludeDriveId) {
-      if (!sb) return [];
-      try {
-        let q = sb.from("movies")
-          .select("title,kind,year,posterurl,driveid,updatedat,created_at")
-          .limit(12);
-
-        q = q.order("updatedat", { ascending: false, nullsFirst: false })
-          .order("created_at", { ascending: false });
-
-        const { data, error } = await q;
-        if (error) return [];
-        return (data || []).filter(x => x.driveid !== excludeDriveId).slice(0, 8);
-      } catch { return []; }
-    }
-
-    function renderSuggestions(items) {
-      if (!items || items.length === 0) {
-        el.sugList.innerHTML = `<div class="empty">Chưa có đề xuất.</div>`;
-        return;
+        let g = map.get(key);
+        if(!g){
+          g = { kind, season, title, rows: [] };
+          map.set(key, g);
+        }
+        g.rows.push(r);
       }
 
-      el.sugList.innerHTML = "";
-      items.forEach(it => {
-        const k = it.kind === "movie" ? "Phim Lẻ" : it.kind === "series" ? "Phim Bộ" : "Anime";
-        const meta = [k, it.year].filter(Boolean).join(" • ");
-        const poster = String(it.posterurl || "").trim();
+      for(const g of map.values()){
+        const arr = g.rows.slice();
+        arr.sort((a,b)=>(Number(a.ep||0)-Number(b.ep||0)) || (Number(a.updatedAt||0)-Number(b.updatedAt||0)));
 
-        const wrap = document.createElement("div");
-        wrap.className = "sug";
-        wrap.addEventListener("click", () => {
-          if (!it.driveid) return alert("Phim này chưa có Drive ID.");
-          window.goWatch(it.driveid, it.title || "", 1, 1);
+        const rep = arr.find(x=>Number(x.ep)===1) || arr[0];
+        const maxUpdated = Math.max(...arr.map(x=>Number(x.updatedAt||0)||0));
+        const maxEp = Math.max(...arr.map(x=>Number(x.ep||0)||0));
+        const totalEps = arr.reduce((m,x)=>Math.max(m, Number(x.eps||0)||0), 0) || (rep.eps || null);
+
+        const posterUrl = arr.map(x=>x.posterUrl).find(Boolean) || rep.posterUrl || "";
+        const heroUrl = arr.map(x=>x.heroUrl).find(Boolean) || rep.heroUrl || posterUrl || "";
+
+        out.push({
+          ...rep,
+          title: g.title,
+          kind: g.kind,
+          season: g.season,
+          ep: (rep.ep ?? 1),
+          eps: totalEps,
+          posterUrl, heroUrl,
+          updatedAt: maxUpdated,
+          openSeason: g.season,
+          openEp: 1,
+          _latestEp: maxEp,
+        });
+      }
+
+      out.sort((a,b)=>(Number(b.updatedAt||0)-Number(a.updatedAt||0)));
+      return out;
+    }
+
+    function makeWatchHref(item, overrides={}){
+      const it = { ...item, ...overrides };
+      const kind = it.kind || "anime";
+      const episodic = (kind === "anime" || kind === "series");
+      if(episodic){
+        const season = Number(it.openSeason || it.season || 1) || 1;
+        const ep = Number(it.openEp || 1) || 1;
+        return `watch.html?title=${encodeURIComponent(it.title)}&season=${encodeURIComponent(season)}&ep=${encodeURIComponent(ep)}`;
+      }
+      return `watch.html?drive=${encodeURIComponent(it.driveId)}&title=${encodeURIComponent(it.title)}`;
+    }
+
+    function badgeHTML(item, episodeText){
+      const imdbPart = item.imdb ? `<span class="badge imdb"><b>IMDb</b> ${escapeHtml(item.imdb)}</span>` : "";
+      const countryPart = item.country ? `<span class="badge">${escapeHtml(item.country)}</span>` : "";
+      const year = item.year || "—";
+      const quality = item.quality || "FHD";
+      const kind = kindLabel(item.kind);
+
+      const epPart = episodeText ? `<span class="badge">${escapeHtml(episodeText)}</span>` : "";
+
+      return `
+        ${imdbPart}
+        <span class="badge">${escapeHtml(quality)}</span>
+        <span class="badge">${escapeHtml(year)}</span>
+        ${countryPart}
+        <span class="badge">${escapeHtml(kind)}</span>
+        ${epPart}
+      `;
+    }
+
+    function genresHTML(item){
+      const arr = Array.isArray(item.genres) ? item.genres : [];
+      return arr.slice(0,10).map(g => `<span class="genre">${escapeHtml(g)}</span>`).join("");
+    }
+
+    function renderCards(container, list, tagText){
+      container.innerHTML = "";
+      list.forEach((raw)=>{
+        const item = normalizeRow(raw);
+        const c = document.createElement("div");
+        c.className = "m-card tip";
+        c.dataset.tip = item.title;
+        c.innerHTML = `
+          <div class="tag">${escapeHtml(tagText)}</div>
+          <div class="img"><img alt="" loading="lazy"></div>
+          <div class="meta">
+            <b>${escapeHtml(item.title)}</b>
+            <small>${escapeHtml(kindLabel(item.kind))} • ${escapeHtml(item.year || "—")} • ${escapeHtml(item.quality || "FHD")}</small>
+          </div>
+        `;
+        const img = c.querySelector("img");
+        img.decoding = "async";
+        img.onerror = () => { img.onerror = null; img.src = svgPlaceholder("Khoii • Poster", 500, 750); };
+        img.src = item.posterUrl || svgPlaceholder("Khoii • Poster", 500, 750);
+
+        c.addEventListener("click", ()=>{
+          if(!item.driveId){
+            showToast("Phim này chưa có Drive ID.", "err");
+            return;
+          }
+          location.href = makeWatchHref(item);
         });
 
-        const thumb = document.createElement("div");
-        thumb.className = "thumb";
-        if (poster) {
-          const img = document.createElement("img");
-          img.alt = "";
-          img.loading = "lazy";
-          img.referrerPolicy = "no-referrer";
-          img.src = poster;
-          thumb.appendChild(img);
-        }
-
-        const right = document.createElement("div");
-        const t = document.createElement("div");
-        t.className = "t";
-        t.textContent = it.title || "—";
-        const m = document.createElement("div");
-        m.className = "m";
-        m.textContent = meta || "";
-        right.appendChild(t);
-        right.appendChild(m);
-
-        wrap.appendChild(thumb);
-        wrap.appendChild(right);
-        el.sugList.appendChild(wrap);
+        container.appendChild(c);
       });
     }
 
-    function renderEpisodes(list, currentDriveId, seriesTitle, currentEp, currentSeason) {
-      if (!Array.isArray(list) || list.length === 0) {
-        el.epHint.textContent = "Chưa có danh sách tập.";
-        el.epGrid.innerHTML = `<div class="empty" style="padding:0">Không có tập.</div>`;
+    // ================== Load data from Supabase ==================
+    async function dbFetchByDriveId(driveId){
+      if(!sb || !driveId) return null;
+      const { data, error } = await sb
+        .from("movies")
+        .select("id,title,kind,year,quality,desc,driveid,drivelink,posterurl,herourl,updatedat,genres,country,imdb,ep,eps,season")
+        .eq("driveid", driveId)
+        .maybeSingle();
+      if(error) return null;
+      return data || null;
+    }
+
+    async function dbFetchEpisodesByTitle(title){
+      if(!sb || !title) return [];
+      const { data, error } = await sb
+        .from("movies")
+        .select("id,title,kind,year,quality,desc,driveid,drivelink,posterurl,herourl,updatedat,genres,country,imdb,ep,eps,season")
+        .eq("title", title)
+        .in("kind", ["anime","series"])
+        .order("season", { ascending:true })
+        .order("ep", { ascending:true });
+
+      if(error) return [];
+      return Array.isArray(data) ? data : [];
+    }
+
+    async function dbFetchSuggestions(){
+      if(!sb) return [];
+      const { data, error } = await sb
+        .from("movies")
+        .select("id,title,kind,year,quality,desc,driveid,drivelink,posterurl,herourl,updatedat,genres,country,imdb,ep,eps,season")
+        .order("updatedat", { ascending:false })
+        .limit(250);
+      if(error) return [];
+      return Array.isArray(data) ? data : [];
+    }
+
+    // ================== State ==================
+    const state = {
+      mode: "movie", // movie | episodic
+      current: null, // normalized item being played (episode row or movie row)
+      title: "",
+      driveId: "",
+      season: 1,
+      ep: 1,
+
+      episodesAll: [],
+      seasons: [],
+      seasonRows: [],
+      epMap: new Map(),
+      totalEps: 0,
+
+      chunkSize: 50,
+      pageStart: 1,
+      pageEnd: 1,
+    };
+
+    // ================== URL / Navigation ==================
+    function parseUrl(){
+      const u = new URL(location.href);
+      const driveRaw = u.searchParams.get("drive") || "";
+      const title = u.searchParams.get("title") || "";
+      const season = Number(u.searchParams.get("season") || 1) || 1;
+      const ep = Number(u.searchParams.get("ep") || 1) || 1;
+      const driveId = DriveTool.extractId(driveRaw) || "";
+      return { title, season, ep, driveId };
+    }
+
+    function setUrlEpisodic(title, season, ep){
+      const u = new URL(location.href);
+      u.searchParams.set("title", title);
+      u.searchParams.set("season", String(season));
+      u.searchParams.set("ep", String(ep));
+      u.searchParams.delete("drive"); // episodic: drive thay đổi theo từng tập
+      history.replaceState(null, "", u.toString());
+    }
+
+    function setUrlMovie(driveId, title){
+      const u = new URL(location.href);
+      u.searchParams.set("drive", driveId);
+      if(title) u.searchParams.set("title", title);
+      u.searchParams.delete("season");
+      u.searchParams.delete("ep");
+      history.replaceState(null, "", u.toString());
+    }
+
+    // ================== Render ==================
+    function setImgWithFallback(imgEl, url, fallbackUrl){
+      try{ imgEl.decoding = "async"; }catch{}
+      imgEl.onerror = () => { imgEl.onerror = null; imgEl.src = fallbackUrl; };
+      imgEl.src = url || fallbackUrl;
+    }
+
+    function renderPlayer(item){
+      const title = item?.title || "Không có tiêu đề";
+      document.title = title + " - Khoii";
+
+      const isEpisodic = (state.mode === "episodic");
+      const episodeText = isEpisodic ? `S${state.season} • Tập ${state.ep}` : "";
+
+      $("movieTitle").textContent = title;
+      $("movieSubline").innerHTML = `
+        <span>${escapeHtml(kindLabel(item.kind))}</span>
+        ${isEpisodic ? `<span>• Season ${escapeHtml(state.season)}</span><span>• Tập ${escapeHtml(state.ep)}</span>` : ""}
+      `;
+
+      $("movieBadges").innerHTML = badgeHTML(item, episodeText);
+
+      // Drive links
+      const open = $("btnOpenDrive");
+      open.href = item.driveId ? DriveTool.view(item.driveId) : "#";
+
+      // Player iframe
+      const frame = $("playerFrame");
+      const loading = $("playerLoading");
+      loading.style.display = "grid";
+
+      frame.onload = () => { loading.style.display = "none"; };
+      frame.src = item.driveId ? DriveTool.preview(item.driveId) : "about:blank";
+
+      // Prev/Next enable (episodic)
+      $("btnPrev").disabled = !(state.mode === "episodic" && canGoPrev());
+      $("btnNext").disabled = !(state.mode === "episodic" && canGoNext());
+    }
+
+    function renderInfo(item){
+      const title = item?.title || "—";
+      const episodic = (item.kind === "anime" || item.kind === "series");
+      const sub = episodic
+        ? `${kindLabel(item.kind)} • Season ${state.season} • Tập ${state.ep}`
+        : `${kindLabel(item.kind)} • ${item.year || "—"} • ${item.quality || "FHD"}`;
+
+      $("infoTitle").textContent = title;
+      $("infoSub").textContent = sub;
+
+      setImgWithFallback($("posterImg"), item.posterUrl, svgPlaceholder("Khoii • Poster", 500, 750));
+      $("infoGenres").innerHTML = genresHTML(item);
+      $("infoDesc").textContent = item.desc || "—";
+
+      $("kvKind").textContent = kindLabel(item.kind);
+      $("kvYear").textContent = item.year || "—";
+      $("kvQuality").textContent = item.quality || "FHD";
+      $("kvCountry").textContent = item.country || "—";
+      $("kvImdb").textContent = item.imdb || "—";
+      $("kvUpdated").textContent = fmtMs(item.updatedAt);
+    }
+
+    function renderSeasons(){
+      const wrap = $("seasonChips");
+      wrap.innerHTML = "";
+      if(state.seasons.length <= 1){
+        wrap.style.display = "none";
+        return;
+      }
+      wrap.style.display = "flex";
+      state.seasons.forEach(s=>{
+        const b = document.createElement("button");
+        b.type="button";
+        b.className = "chip" + (s === state.season ? " on" : "");
+        b.textContent = "Season " + s;
+        b.addEventListener("click", ()=> setSeason(s));
+        wrap.appendChild(b);
+      });
+    }
+
+    function computeEpStats(){
+      const rows = state.seasonRows || [];
+      const maxEp = rows.reduce((m,r)=>Math.max(m, Number(r.ep||0)||0), 0);
+      const maxEpsField = rows.reduce((m,r)=>Math.max(m, Number(r.eps||0)||0), 0);
+      state.totalEps = maxEpsField || maxEp || 1;
+
+      state.epMap = new Map();
+      rows.forEach(r=>{
+        const n = Number(r.ep||0);
+        if(Number.isFinite(n) && n > 0) state.epMap.set(n, r);
+      });
+    }
+
+    function ensurePageForEp(ep){
+      const total = state.totalEps || 1;
+      const size = state.chunkSize;
+      const safeEp = Math.min(Math.max(1, ep), total);
+      const pageIdx = Math.floor((safeEp - 1) / size);
+      state.pageStart = pageIdx * size + 1;
+      state.pageEnd = Math.min(total, state.pageStart + size - 1);
+    }
+
+    function renderEpisodes(){
+      const card = $("episodeCard");
+
+      if(state.mode !== "episodic" || !state.episodesAll.length){
+        card.hidden = true;
         return;
       }
 
-      el.epHint.textContent = `${list.length} tập`;
-      el.epGrid.innerHTML = "";
+      card.hidden = false;
 
-      list.forEach((r, i) => {
-        const ep = r._ep || (i + 1);
-        const season = r._season || 1;
+      $("epMeta").textContent = `Season ${state.season} • Tổng ${state.totalEps} tập • Có dữ liệu ${state.seasonRows.length} tập`;
 
-        const isActive =
-          (currentEp && currentSeason && ep === currentEp && season === currentSeason) ||
-          (r.driveid === currentDriveId);
+      renderSeasons();
+      ensurePageForEp(state.ep);
 
-        const btn = document.createElement("div");
-        btn.className = "ep" + (isActive ? " active" : "");
-        btn.textContent = `Tập ${pad2(ep)}`;
+      $("epRange").textContent = `Hiện: ${state.pageStart}-${state.pageEnd} / ${state.totalEps}`;
 
-        if (!r.driveid) {
-          btn.classList.add("disabled");
-        } else {
-          btn.addEventListener("click", () => {
-            window.goWatch(r.driveid, seriesTitle || "", ep, season);
-          });
+      const list = $("epList");
+      list.innerHTML = "";
+
+      for(let n=state.pageStart; n<=state.pageEnd; n++){
+        const row = state.epMap.get(n);
+        const b = document.createElement("button");
+        b.type="button";
+        b.className = "ep-btn" + (n === state.ep ? " on" : "") + (!row ? " miss" : "");
+        b.textContent = String(n);
+
+        if(row){
+          b.addEventListener("click", ()=> setEpisode(n));
+        }else{
+          b.disabled = true;
+          b.title = "Chưa có link tập này";
         }
 
-        el.epGrid.appendChild(btn);
-      });
-    }
-
-    function setupPrevNext(list, currentDriveId, seriesTitle, currentEp, currentSeason) {
-      // Reset
-      el.btnPrevEp.disabled = true;
-      el.btnNextEp.disabled = true;
-      el.btnPrevEp.onclick = null;
-      el.btnNextEp.onclick = null;
-
-      if (!Array.isArray(list) || list.length === 0) return;
-
-      let idx = -1;
-      if (currentEp && currentSeason) {
-        idx = list.findIndex(x => x._season === currentSeason && x._ep === currentEp);
-      }
-      if (idx === -1 && currentDriveId) {
-        idx = list.findIndex(x => x.driveid === currentDriveId);
+        list.appendChild(b);
       }
 
-      // Nếu vẫn không xác định được, coi như đang ở phần tử đầu tiên
-      if (idx === -1) idx = 0;
+      // update prev/next
+      $("btnPrev").disabled = !canGoPrev();
+      $("btnNext").disabled = !canGoNext();
+    }
 
-      const prev = idx > 0 ? [...list.slice(0, idx)].reverse().find(x => x.driveid) : null;
-      const next = idx < list.length - 1 ? list.slice(idx + 1).find(x => x.driveid) : null;
-
-      if (prev?.driveid) {
-        el.btnPrevEp.disabled = false;
-        el.btnPrevEp.onclick = () => window.goWatch(prev.driveid, seriesTitle || "", prev._ep || 1, prev._season || 1);
+    // ================== Episode Navigation ==================
+    function canGoPrev(){
+      if(state.mode !== "episodic") return false;
+      for(let n=state.ep-1; n>=1; n--){
+        if(state.epMap.has(n)) return true;
       }
-      if (next?.driveid) {
-        el.btnNextEp.disabled = false;
-        el.btnNextEp.onclick = () => window.goWatch(next.driveid, seriesTitle || "", next._ep || 1, next._season || 1);
+      return false;
+    }
+    function canGoNext(){
+      if(state.mode !== "episodic") return false;
+      for(let n=state.ep+1; n<=state.totalEps; n++){
+        if(state.epMap.has(n)) return true;
       }
+      return false;
     }
-
-    // --- Player loading UX ---
-    let currentPlayerBase = "";
-    let playerLoaded = false;
-    let slowTimer = null;
-    let failTimer = null;
-
-    function clearPlayerTimers() {
-      if (slowTimer) clearTimeout(slowTimer);
-      if (failTimer) clearTimeout(failTimer);
-      slowTimer = null;
-      failTimer = null;
-    }
-
-    function showLoadingUI(state = "loading") {
-      el.loading.style.display = "";
-      el.btnReload.style.display = "none";
-      el.spinner.style.display = "";
-
-      if (state === "loading") {
-        el.loadingTitle.textContent = "Đang tải player…";
-        el.loadingSub.textContent = "Nếu quá lâu, hãy thử tải lại.";
-      } else if (state === "slow") {
-        el.loadingTitle.textContent = "Mạng chậm hoặc player đang bận…";
-        el.loadingSub.textContent = "Bạn có thể bấm Tải lại (hoặc thử tập khác).";
-        el.btnReload.style.display = "inline-flex";
-      } else if (state === "error") {
-        el.spinner.style.display = "none";
-        el.loadingTitle.textContent = "Không thể tải player.";
-        el.loadingSub.textContent = "Link có thể bị chặn/đổi quyền Drive hoặc mạng đang lỗi. Hãy thử Tải lại.";
-        el.btnReload.style.display = "inline-flex";
+    function findPrevEp(){
+      for(let n=state.ep-1; n>=1; n--){
+        if(state.epMap.has(n)) return n;
       }
+      return null;
+    }
+    function findNextEp(){
+      for(let n=state.ep+1; n<=state.totalEps; n++){
+        if(state.epMap.has(n)) return n;
+      }
+      return null;
     }
 
-    function hideLoadingUI() {
-      el.loading.style.display = "none";
-    }
+    function setSeason(season){
+      const s = Number(season || 1) || 1;
+      state.season = s;
 
-    function startPlayerTimers() {
-      clearPlayerTimers();
-      // 9s -> báo chậm
-      slowTimer = setTimeout(() => {
-        if (playerLoaded) return;
-        showLoadingUI("slow");
-      }, 9000);
+      // filter season rows (null -> 1)
+      state.seasonRows = state.episodesAll
+        .map(normalizeRow)
+        .filter(r => (Number(r.season || 1) || 1) === s)
+        .sort((a,b)=>(Number(a.ep||0)-Number(b.ep||0)));
 
-      // 16s -> báo lỗi
-      failTimer = setTimeout(() => {
-        if (playerLoaded) return;
-        showLoadingUI("error");
-      }, 16000);
-    }
+      computeEpStats();
 
-    function loadPlayer(url) {
-      currentPlayerBase = String(url || "");
-      playerLoaded = false;
-      showLoadingUI("loading");
-      startPlayerTimers();
-
-      // Force reload
-      const bust = (currentPlayerBase.includes("?") ? "&" : "?") + "r=" + Date.now();
-      el.frame.src = currentPlayerBase + bust;
-    }
-
-    (async () => {
-      el.q.addEventListener("keydown", (ev) => {
-        if (ev.key === "Enter") applySearchKeyword(el.q.value);
-      });
-
-      el.btnEpisodes?.addEventListener("click", () => {
-        el.episodesSection?.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-
-      el.btnLike?.addEventListener("click", () => {
-        alert("Đã thêm vào yêu thích (demo).");
-      });
-
-      el.btnReload?.addEventListener("click", () => {
-        if (!currentPlayerBase) return;
-        loadPlayer(currentPlayerBase);
-      });
-
-      el.frame.addEventListener("load", () => {
-        playerLoaded = true;
-        clearPlayerTimers();
-        hideLoadingUI();
-      });
-
-      const params = new URLSearchParams(location.search);
-      const titleQ = (params.get("title") || "Xem phim").trim();
-      const epWanted = Number(params.get("ep") || "") || null;
-      const seasonWanted = Number(params.get("season") || "") || 1;
-
-      const driveParam = (params.get("drive") || params.get("m") || "").trim();
-      let driveCandidate = "";
-
-      if (driveParam) {
-        driveCandidate = driveParam;
-      } else if (titleQ && epWanted) {
-        const row = await fetchMovieByTitleEp(titleQ, seasonWanted, epWanted);
-        driveCandidate = row?.driveid || getCurrentDriveId();
-      } else {
-        driveCandidate = getCurrentDriveId();
+      // choose ep: keep current if exists, else fallback to first available
+      if(!state.epMap.has(state.ep)){
+        const first = state.seasonRows.find(r=>Number(r.ep||0)>0)?.ep || 1;
+        state.ep = Number(first || 1) || 1;
       }
 
-      const r = DriveTool.normalize(driveCandidate);
-      if (!r.ok) {
-        el.title.textContent = "Không có phim để phát";
-        el.subtitle.textContent = "Thiếu link/ID hoặc không hợp lệ.";
-        hideLoadingUI();
-        el.frame.src = "";
-        renderBadges({ quality: "—" });
-        renderGenres([]);
-        el.desc.textContent = "";
-        renderSuggestions([]);
-        renderEpisodes([], "", titleQ, epWanted, seasonWanted);
-        el.btnPrevEp.style.display = "none";
-        el.btnNextEp.style.display = "none";
+      // update current item row
+      const row = state.epMap.get(state.ep) || state.seasonRows[0];
+      if(row){
+        state.current = normalizeRow(row);
+        state.current.kind = state.current.kind || "anime";
+        state.current.openSeason = state.season;
+        state.current.openEp = state.ep;
+        state.current.driveId = state.current.driveId || row.driveid || "";
+      }
+
+      setUrlEpisodic(state.title, state.season, state.ep);
+      renderPlayer(state.current);
+      renderInfo(state.current);
+      renderEpisodes();
+      scrollEpIntoView();
+    }
+
+    function setEpisode(ep){
+      const n = Number(ep || 1) || 1;
+      const row = state.epMap.get(n);
+      if(!row){
+        showToast("Tập này chưa có link.", "err");
         return;
       }
 
-      setCurrentDriveId(r.id);
+      state.ep = n;
+      state.current = normalizeRow(row);
+      state.current.openSeason = state.season;
+      state.current.openEp = state.ep;
 
-      const cleanParams = new URLSearchParams();
-      if (titleQ) cleanParams.set("title", titleQ);
-      if (seasonWanted) cleanParams.set("season", String(seasonWanted));
-      if (epWanted) cleanParams.set("ep", String(epWanted));
-      history.replaceState({}, "", "watch.html" + (cleanParams.toString() ? "?" + cleanParams.toString() : ""));
+      setUrlEpisodic(state.title, state.season, state.ep);
+      renderPlayer(state.current);
+      renderInfo(state.current);
+      renderEpisodes();
+      scrollEpIntoView();
+    }
 
-      // Load player (có reload-busting + timers)
-      loadPlayer(r.links.preview);
+    function scrollEpIntoView(){
+      const btn = $("epList")?.querySelector(".ep-btn.on");
+      if(btn?.scrollIntoView){
+        btn.scrollIntoView({ behavior:"smooth", block:"nearest", inline:"nearest" });
+      }
+    }
 
-      // Render tạm
-      el.title.textContent = titleQ || "Xem phim";
-      el.subtitle.textContent = "Đang tải thông tin…";
-      renderBadges({ quality: "FHD", kind: "anime" });
-      renderGenres([]);
-      el.desc.textContent = "";
-      setPoster("");
+    // ================== Main init ==================
+    async function init(){
+      // Search (Enter -> list.html?q=...)
+      $("q").addEventListener("keydown", (ev)=>{
+        if(ev.key === "Enter"){
+          const q = ($("q").value || "").trim();
+          if(!q) return;
+          location.href = `list.html?q=${encodeURIComponent(q)}`;
+        }
+      });
 
-      const info = await fetchMovieByDriveId(r.id);
-      const seriesTitle = (info?.title || titleQ || "Xem phim").trim();
-      el.title.textContent = seriesTitle;
-      document.title = seriesTitle + " - Khoii";
+      // Copy link
+      $("btnCopy").addEventListener("click", async ()=>{
+        try{
+          await navigator.clipboard.writeText(location.href);
+          showToast("Đã copy link trang xem.", "ok");
+        }catch{
+          showToast("Không copy được (trình duyệt chặn).", "err");
+        }
+      });
 
-      if (info) {
-        el.subtitle.textContent = info.kind === "movie" ? "Phim Lẻ" : info.kind === "series" ? "Phim Bộ" : "Anime";
-        renderBadges(info);
-        renderGenres(info.genres);
-        el.desc.textContent = info.desc || "";
-        setPoster(info.posterurl || "");
-      } else {
-        el.subtitle.textContent = "Không tìm thấy dữ liệu phim trong kho (vẫn xem được nếu Drive hợp lệ).";
+      // Prev / Next
+      $("btnPrev").addEventListener("click", ()=>{
+        const p = findPrevEp();
+        if(p) setEpisode(p);
+      });
+      $("btnNext").addEventListener("click", ()=>{
+        const n = findNextEp();
+        if(n) setEpisode(n);
+      });
+
+      // Episode pager
+      $("btnPagePrev").addEventListener("click", ()=>{
+        if(state.pageStart <= 1) return;
+        state.pageStart = Math.max(1, state.pageStart - state.chunkSize);
+        state.pageEnd = Math.min(state.totalEps, state.pageStart + state.chunkSize - 1);
+        renderEpisodes();
+      });
+      $("btnPageNext").addEventListener("click", ()=>{
+        if(state.pageEnd >= state.totalEps) return;
+        state.pageStart = Math.min(state.totalEps, state.pageStart + state.chunkSize);
+        state.pageEnd = Math.min(state.totalEps, state.pageStart + state.chunkSize - 1);
+        renderEpisodes();
+      });
+
+      $("btnJump").addEventListener("click", ()=>{
+        const n = Number($("jumpEp").value || 0);
+        if(!n){ showToast("Nhập số tập hợp lệ.", "err"); return; }
+        // auto jump page
+        ensurePageForEp(n);
+        renderEpisodes();
+        // only set episode if exists
+        if(state.epMap.has(n)) setEpisode(n);
+        else showToast("Tập này chưa có link.", "err");
+      });
+
+      // Parse URL
+      const p = parseUrl();
+
+      // Determine mode
+      let driveId = p.driveId;
+      let title = p.title;
+      let season = p.season;
+      let ep = p.ep;
+
+      // If have drive => fetch row by drive (movie OR episodic)
+      let rowByDrive = null;
+      if(driveId){
+        rowByDrive = await dbFetchByDriveId(driveId);
+        if(!rowByDrive){
+          // fallback local by drive
+          const local = loadMoviesLocal().map(normalizeRow);
+          rowByDrive = local.find(x => x.driveId === driveId) || null;
+        }
       }
 
-      if (info?.kind === "movie") {
-        el.episodesSection.style.display = "none";
-        el.btnEpisodes.style.display = "none";
-        el.btnPrevEp.style.display = "none";
-        el.btnNextEp.style.display = "none";
-      } else {
-        el.episodesSection.style.display = "";
-        el.btnEpisodes.style.display = "";
-        el.btnPrevEp.style.display = "";
-        el.btnNextEp.style.display = "";
+      if(rowByDrive){
+        const it = normalizeRow(rowByDrive);
+        title = title || it.title || "";
+        // if episodic row (anime/series OR has ep/season)
+        const episodic = (it.kind === "anime" || it.kind === "series" || it.ep !== null || it.season !== null);
+        if(episodic && title){
+          state.mode = "episodic";
+          state.title = title;
+          state.season = Number(it.season || season || 1) || 1;
+          state.ep = Number(it.ep || ep || 1) || 1;
+        }else{
+          state.mode = "movie";
+          state.title = title || it.title || "";
+          state.driveId = it.driveId || driveId;
+          state.current = it;
+          setUrlMovie(state.driveId, state.title);
+          renderPlayer(state.current);
+          renderInfo(state.current);
+        }
+      }else{
+        // No row by drive => maybe episodic by title
+        if(title){
+          state.mode = "episodic";
+          state.title = title;
+          state.season = Number(season || 1) || 1;
+          state.ep = Number(ep || 1) || 1;
+        }else if(driveId){
+          // Only driveId, no DB info => still play
+          state.mode = "movie";
+          state.title = "Video";
+          state.driveId = driveId;
+          state.current = normalizeRow({ title: "Video", kind: "movie", driveid: driveId });
+          setUrlMovie(driveId, "Video");
+          renderPlayer(state.current);
+          renderInfo(state.current);
+          showToast("Không tìm thấy phim trong DB, nhưng vẫn phát video theo Drive ID.", "err");
+        }else{
+          // nothing
+          state.current = normalizeRow({ title:"Không có dữ liệu", kind:"movie", driveid:"" });
+          renderPlayer(state.current);
+          renderInfo(state.current);
+          showToast("Thiếu tham số. Mở từ index/list để vào đúng phim.", "err");
+        }
+      }
 
-        const eps = await fetchEpisodesByTitle(seriesTitle, info?.kind || null);
+      // Episodic mode: load episodes list
+      if(state.mode === "episodic" && state.title){
+        let epsAll = await dbFetchEpisodesByTitle(state.title);
 
-        // Nếu user có ?ep=.. thì ưu tiên drive của ep đó
-        if (epWanted && eps.length) {
-          const hit = eps.find(x => x._season === seasonWanted && x._ep === epWanted);
-          if (hit?.driveid && hit.driveid !== r.id) {
-            setCurrentDriveId(hit.driveid);
-            const rr = DriveTool.normalize(hit.driveid);
-            if (rr.ok) loadPlayer(rr.links.preview);
-          }
+        if(!epsAll.length){
+          // fallback local (nếu có lưu theo từng tập)
+          const local = loadMoviesLocal().map(normalizeRow);
+          epsAll = local.filter(x => x.title === state.title && (x.kind==="anime" || x.kind==="series"));
         }
 
-        const currentDid = getCurrentDriveId() || r.id;
-        renderEpisodes(eps, currentDid, seriesTitle, epWanted, seasonWanted);
-        setupPrevNext(eps, currentDid, seriesTitle, epWanted, seasonWanted);
+        state.episodesAll = epsAll.map(normalizeRow);
+
+        // seasons list
+        const seasonSet = new Set();
+        state.episodesAll.forEach(r => seasonSet.add(Number(r.season || 1) || 1));
+        state.seasons = [...seasonSet].sort((a,b)=>a-b);
+
+        // if season not exist => fallback first season
+        if(state.seasons.length && !seasonSet.has(state.season)){
+          state.season = state.seasons[0];
+        }
+
+        // filter current season
+        state.seasonRows = state.episodesAll
+          .filter(r => (Number(r.season || 1) || 1) === state.season)
+          .sort((a,b)=>(Number(a.ep||0)-Number(b.ep||0)));
+
+        computeEpStats();
+
+        // choose episode
+        if(!state.epMap.has(state.ep)){
+          // fallback to first available ep
+          const first = state.seasonRows.find(r=>Number(r.ep||0)>0)?.ep || 1;
+          state.ep = Number(first || 1) || 1;
+        }
+
+        const curRow = state.epMap.get(state.ep) || state.seasonRows[0];
+        if(curRow){
+          state.current = normalizeRow(curRow);
+          setUrlEpisodic(state.title, state.season, state.ep);
+          renderPlayer(state.current);
+          renderInfo(state.current);
+          renderEpisodes();
+        }else{
+          // no episodes found
+          state.current = normalizeRow({ title: state.title, kind:"anime", driveid:"" });
+          renderPlayer(state.current);
+          renderInfo(state.current);
+          $("episodeCard").hidden = true;
+          showToast("Không tìm thấy danh sách tập cho phim này.", "err");
+        }
       }
 
-      const sug = await fetchSuggestions(getCurrentDriveId() || r.id);
-      renderSuggestions(sug);
-    })();
+      // Suggestions
+      let rawSug = await dbFetchSuggestions();
+      if(!rawSug.length){
+        rawSug = loadMoviesLocal();
+      }
+
+      const collapsed = collapseEpisodicRows(rawSug);
+      const currentKey = (state.current?.title || "").trim().toLowerCase();
+      const filtered = collapsed.filter(x => (String(x.title||"").trim().toLowerCase() !== currentKey));
+
+      const newest = filtered.slice().sort((a,b)=>(Number(b.updatedAt||0)-Number(a.updatedAt||0))).slice(0,12);
+      const suggest = filtered.slice(0,12);
+
+      renderCards($("rowSuggest"), suggest, "HOT");
+      renderCards($("rowNew"), newest, "NEW");
+    }
+
+    init();
   </script>
 </body>
-
 </html>
