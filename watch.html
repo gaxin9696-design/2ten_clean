@@ -18,8 +18,6 @@
       --radius:22px;
       --shadow:0 18px 65px rgba(0,0,0,.55);
       --bn-h:72px;
-      --ok:#7CFFB2;
-      --err:#ff8c8c;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -66,13 +64,8 @@
     }
 
     /* ===== Topbar ===== */
-    .topbar{
-      display:flex;align-items:center;gap:14px;
-    }
-    .brand{
-      display:flex;align-items:center;gap:10px;min-width:170px;
-      cursor:pointer; user-select:none;
-    }
+    .topbar{display:flex;align-items:center;gap:14px}
+    .brand{display:flex;align-items:center;gap:10px;min-width:170px;cursor:pointer;user-select:none}
     .brand-logo{
       width:44px;height:34px;border-radius:10px;
       display:grid;place-items:center;
@@ -121,6 +114,7 @@
       backdrop-filter:blur(14px);
       box-shadow:0 10px 30px rgba(0,0,0,.24);
       user-select:none;
+      text-decoration:none;
     }
     .pill-btn:hover{border-color:var(--line2); background:rgba(255,255,255,.06)}
     .pill-btn svg{width:18px;height:18px;opacity:.95}
@@ -141,8 +135,8 @@
       .brand-sub{display:none}
     }
     @media (max-width:680px){
-      .pill-btn span{display:none}
       .search{display:none}
+      .pill-btn span{display:none}
     }
 
     /* ===== Layout ===== */
@@ -176,11 +170,14 @@
       .player-wrap{height:0; padding-top:56.25%;}
       .player-wrap > *{position:absolute; inset:0;}
     }
-    iframe#playerFrame{
+
+    /* ✅ Native video (mượt hơn iframe trên mobile) */
+    video#videoPlayer{
       position:absolute; inset:0;
       width:100%; height:100%;
       border:0;
       background:#000;
+      outline:none;
     }
 
     /* Skeleton */
@@ -191,6 +188,7 @@
       animation: shimmer 1.1s linear infinite;
       opacity:.55;
       z-index:2;
+      pointer-events:none;
     }
     @keyframes shimmer{
       0%{background-position: 0% 0%;}
@@ -198,17 +196,20 @@
     }
     .player-skeleton.hide{ display:none; }
 
-    /* Mask che khu vực top bar (tránh lộ nút mở/đường dẫn trong UI iframe) */
-    .iframe-mask{
-      position:absolute; left:0; top:0; right:0;
-      height:58px;
+    .player-error{
+      position:absolute; inset:0;
       z-index:3;
-      pointer-events:auto; /* chặn click */
-      background: linear-gradient(180deg, rgba(0,0,0,.68), rgba(0,0,0,0));
+      display:grid;
+      place-items:center;
+      padding:14px;
+      text-align:center;
+      background: rgba(0,0,0,.62);
+      backdrop-filter: blur(4px);
     }
-    @media (max-width:560px){
-      .iframe-mask{ height:64px; }
-    }
+    .player-error.hidden{ display:none; }
+    .player-error b{display:block; font-size:14px; margin-bottom:8px;}
+    .player-error small{display:block; color:rgba(231,237,249,.75); line-height:1.45; max-width:62ch;}
+    .player-error .row{margin-top:12px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;}
 
     .player-bottom{
       padding:12px 12px 14px;
@@ -227,16 +228,11 @@
       min-height:44px;
       display:inline-flex;align-items:center;gap:10px;
       user-select:none;
+      text-decoration:none;
     }
     .btn:hover{border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.06)}
-    .btn svg{width:18px;height:18px;opacity:.95}
-    .btn.primary{
-      background: rgba(242,198,79,.14);
-      border-color: rgba(242,198,79,.35);
-      color: rgba(242,198,79,.98);
-    }
-    .btn.primary:hover{ background: rgba(242,198,79,.18); }
     .btn:disabled{opacity:.5;cursor:not-allowed}
+    .btn svg{width:18px;height:18px;opacity:.95}
 
     .mini{
       margin-left:auto;
@@ -244,15 +240,19 @@
     }
 
     /* Theater mode */
-    body.theater .layout{
-      grid-template-columns: 1fr;
-    }
-    body.theater .right-col{
-      display:none;
-    }
+    body.theater .layout{ grid-template-columns: 1fr; }
+    body.theater .right-col{ display:none; }
 
-    /* ===== Episodes card ===== */
-    .episodes-card{
+    /* ===== Episodes bottom sheet (giống filter panel) ===== */
+    .sheet-backdrop{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.48);
+      z-index:90;
+      backdrop-filter: blur(2px);
+    }
+    body.sheet-open{ overflow:hidden; }
+
+    .episodes-panel{
       margin-top:14px;
       border-radius:18px;
       border:1px solid rgba(255,255,255,.10);
@@ -263,18 +263,22 @@
     }
     .eps-head{
       padding:12px 12px 10px;
-      display:flex; align-items:flex-end; justify-content:space-between; gap:10px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
       border-bottom:1px solid rgba(255,255,255,.08);
     }
-    .eps-head h2{
-      margin:0;
-      font-size:16px;
-      letter-spacing:.2px;
+    .eps-head b{font-size:14px; letter-spacing:.2px}
+    .eps-close{
+      width:42px;height:42px;border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(18,24,36,.45);
+      color:rgba(231,237,249,.92);
+      cursor:pointer;
     }
+    .eps-close:hover{background:rgba(255,255,255,.06)}
     .eps-meta{
+      padding:10px 12px 0;
       font-size:12px;
       color:rgba(231,237,249,.66);
-      white-space:nowrap;
     }
     .season-chips{
       padding:10px 12px 0;
@@ -314,7 +318,7 @@
       background:rgba(18,24,36,.38);
       color:rgba(231,237,249,.92);
       cursor:pointer;
-      font-weight:800;
+      font-weight:900;
       letter-spacing:.2px;
       user-select:none;
     }
@@ -327,6 +331,19 @@
     .ep.off{
       opacity:.45;
       cursor:not-allowed;
+    }
+
+    /* ✅ on mobile: panel thành bottom-sheet */
+    @media (max-width:760px){
+      .episodes-panel{
+        position:fixed;
+        left:12px; right:12px;
+        bottom: calc(var(--bn-h) + 12px + env(safe-area-inset-bottom));
+        margin:0;
+        z-index:100;
+        max-height: 62vh;
+        overflow:auto;
+      }
     }
 
     /* ===== Right column ===== */
@@ -344,12 +361,8 @@
       overflow:hidden;
     }
 
-    .info-card{
-      padding:12px;
-    }
-    .info-top{
-      display:flex; gap:12px; align-items:flex-start;
-    }
+    .info-card{ padding:12px; }
+    .info-top{ display:flex; gap:12px; align-items:flex-start; }
     .poster{
       width:120px;
       border-radius:14px;
@@ -359,9 +372,8 @@
       flex:0 0 auto;
       aspect-ratio: 2 / 3;
     }
-    .poster img{
-      width:100%; height:100%; object-fit:cover; display:block;
-    }
+    .poster img{ width:100%; height:100%; object-fit:cover; display:block; }
+
     .info-main{flex:1; min-width:0;}
     .title{
       margin:0;
@@ -376,7 +388,6 @@
       font-size:13px;
       color:rgba(231,237,249,.72);
     }
-
     .badges{
       margin-top:10px;
       display:flex;
@@ -562,6 +573,9 @@
 <body>
   <div id="toast" class="toast" aria-live="polite"></div>
 
+  <!-- backdrop cho episodes sheet -->
+  <div id="epsBackdrop" class="sheet-backdrop" hidden></div>
+
   <div class="container">
     <header class="topbar">
       <div class="brand" onclick="location.href='index.html'">
@@ -581,19 +595,12 @@
       </div>
 
       <div class="top-actions">
-        <button class="pill-btn" id="btnBack" type="button" title="Quay lại">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M15 6l-6 6 6 6" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span>Back</span>
-        </button>
-
-        <button class="pill-btn" id="btnGoList" type="button" title="Danh sách">
+        <a class="pill-btn" href="list.html" title="Danh sách">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M4 6h16M4 12h16M4 18h10" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round"/>
           </svg>
           <span>List</span>
-        </button>
+        </a>
       </div>
     </header>
 
@@ -603,14 +610,29 @@
         <div class="player-card" aria-label="Trình phát">
           <div id="playerWrap" class="player-wrap">
             <div id="playerSkeleton" class="player-skeleton"></div>
-            <iframe
-              id="playerFrame"
-              title="Player"
-              allow="autoplay; fullscreen; picture-in-picture"
-              allowfullscreen
-              referrerpolicy="no-referrer"
-            ></iframe>
-            <div class="iframe-mask" aria-hidden="true" title=""></div>
+
+            <!-- ✅ Native video -->
+            <video
+              id="videoPlayer"
+              controls
+              playsinline
+              preload="metadata"
+              controlslist="nodownload noplaybackrate"
+              disablepictureinpicture
+            ></video>
+
+            <div id="playerError" class="player-error hidden" role="status" aria-live="polite">
+              <div>
+                <b>Không phát được video</b>
+                <small>
+                  Hãy kiểm tra quyền truy cập video (đặt công khai) hoặc thử tập khác.
+                </small>
+                <div class="row">
+                  <button class="btn" id="btnRetry" type="button">Thử lại</button>
+                  <button class="btn" id="btnOpenEps" type="button">Chọn tập</button>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="player-bottom">
@@ -618,20 +640,20 @@
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M15 6l-6 6 6 6" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
-              <span>Tập trước</span>
+              <span>Trước</span>
             </button>
 
             <button class="btn" id="btnNext" type="button" disabled title="Tập tiếp">
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M9 6l6 6-6 6" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
-              <span>Tập tiếp</span>
+              <span>Sau</span>
             </button>
 
             <div class="mini">
               <button class="btn" id="btnEpisodes" type="button" title="Danh sách tập">
                 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M4 7h16M4 12h16M4 17h10" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M4 6h16M4 12h16M4 18h10" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round"/>
                 </svg>
                 <span>Tập</span>
               </button>
@@ -642,14 +664,6 @@
                   <path d="M8 20h8" stroke="rgba(231,237,249,.72)" stroke-width="2" stroke-linecap="round"/>
                 </svg>
                 <span>Rạp</span>
-              </button>
-
-              <button class="btn primary" id="btnCopy" type="button" title="Copy link xem">
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M9 9h10v10H9V9Z" stroke="rgba(242,198,79,.98)" stroke-width="2" stroke-linejoin="round"/>
-                  <path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1" stroke="rgba(242,198,79,.85)" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-                <span>Copy link</span>
               </button>
 
               <button class="btn" id="btnFull" type="button" title="Toàn màn hình">
@@ -665,12 +679,13 @@
           </div>
         </div>
 
-        <!-- Episodes -->
-        <section class="episodes-card" id="episodesCard" hidden aria-label="Danh sách tập">
+        <!-- Episodes panel (ẩn, mở bằng nút Tập) -->
+        <section class="episodes-panel" id="episodesPanel" hidden aria-label="Danh sách tập">
           <div class="eps-head">
-            <h2>Danh sách tập</h2>
-            <div class="eps-meta" id="epsMeta">—</div>
+            <b>Danh sách tập</b>
+            <button id="epsClose" class="eps-close" type="button" aria-label="Đóng">✕</button>
           </div>
+          <div class="eps-meta" id="epsMeta">—</div>
           <div class="season-chips" id="seasonChips" aria-label="Season"></div>
           <div class="eps-grid" id="epsGrid" aria-label="Episodes"></div>
         </section>
@@ -678,7 +693,6 @@
 
       <!-- RIGHT -->
       <aside class="right-col">
-        <!-- Info -->
         <section class="card info-card" id="infoCard" aria-label="Thông tin phim">
           <div class="info-top">
             <div class="poster">
@@ -702,21 +716,9 @@
               </svg>
               <span>Yêu thích</span>
             </button>
-
-            <button class="btn" id="btnShare" type="button" title="Chia sẻ (copy link)">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M16 8a3 3 0 1 0-2.8-4" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round"/>
-                <path d="M8 12l8-4" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round"/>
-                <path d="M8 12l8 4" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round"/>
-                <path d="M8 12a3 3 0 1 0 0 0Z" stroke="rgba(231,237,249,.92)" stroke-width="2"/>
-                <path d="M16 20a3 3 0 1 0 0 0Z" stroke="rgba(231,237,249,.92)" stroke-width="2"/>
-              </svg>
-              <span>Chia sẻ</span>
-            </button>
           </div>
         </section>
 
-        <!-- Suggest -->
         <section class="card" id="suggestCard" aria-label="Đề xuất phim">
           <div class="row-head">
             <h3>Đề xuất</h3>
@@ -747,13 +749,13 @@
 
     <button class="bn-item" id="bnEp" type="button" aria-label="Tập">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M4 7h16v10H4V7Z" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linejoin="round"/>
-        <path d="M10 10v4l4-2-4-2Z" fill="rgba(231,237,249,.92)"/>
+        <path d="M4 6h16v12H4V6Z" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M9 10v4l4-2-4-2Z" fill="rgba(231,237,249,.92)"/>
       </svg>
       <span>Tập</span>
     </button>
 
-    <button class="bn-item" id="bnSuggest" type="button" aria-label="Đề xuất">
+    <button class="bn-item" id="bnSuggest" type="button" aria-label="Gợi ý">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M12 2l3 7 7 .6-5.3 4.6 1.7 7L12 17.8 5.6 21.2l1.7-7L2 9.6 9 9l3-7Z"
               stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linejoin="round"/>
@@ -761,7 +763,7 @@
       <span>Gợi ý</span>
     </button>
 
-    <button class="bn-item" id="bnInfo" type="button" aria-label="Thông tin">
+    <button class="bn-item" id="bnInfo" type="button" aria-label="Info">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Z" stroke="rgba(231,237,249,.92)" stroke-width="2"/>
         <path d="M12 10v7" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round"/>
@@ -807,34 +809,35 @@
 
     const ui = {
       q: $("q"),
-      playerFrame: $("playerFrame"),
-      playerSkeleton: $("playerSkeleton"),
-      playerWrap: $("playerWrap"),
 
-      btnBack: $("btnBack"),
-      btnGoList: $("btnGoList"),
+      playerWrap: $("playerWrap"),
+      skeleton: $("playerSkeleton"),
+      video: $("videoPlayer"),
+
+      errBox: $("playerError"),
+      btnRetry: $("btnRetry"),
+      btnOpenEps: $("btnOpenEps"),
+
       btnPrev: $("btnPrev"),
       btnNext: $("btnNext"),
       btnEpisodes: $("btnEpisodes"),
       btnTheater: $("btnTheater"),
-      btnCopy: $("btnCopy"),
       btnFull: $("btnFull"),
 
-      infoCard: $("infoCard"),
+      epsBackdrop: $("epsBackdrop"),
+      epsPanel: $("episodesPanel"),
+      epsClose: $("epsClose"),
+      epsMeta: $("epsMeta"),
+      seasonChips: $("seasonChips"),
+      epsGrid: $("epsGrid"),
+
       posterImg: $("posterImg"),
       movieTitle: $("movieTitle"),
       movieSub: $("movieSub"),
       badges: $("badges"),
       genres: $("genres"),
       desc: $("desc"),
-
       btnFav: $("btnFav"),
-      btnShare: $("btnShare"),
-
-      episodesCard: $("episodesCard"),
-      epsMeta: $("epsMeta"),
-      seasonChips: $("seasonChips"),
-      epsGrid: $("epsGrid"),
 
       suggestCard: $("suggestCard"),
       suggestRow: $("suggestRow"),
@@ -842,12 +845,12 @@
 
       toast: $("toast"),
 
-      // bottom nav
       bnHome: $("bnHome"),
       bnList: $("bnList"),
       bnEp: $("bnEp"),
       bnSuggest: $("bnSuggest"),
       bnInfo: $("bnInfo"),
+      infoCard: $("infoCard"),
     };
 
     let toastTimer = null;
@@ -855,7 +858,7 @@
       ui.toast.textContent = String(msg || "");
       ui.toast.classList.add("on");
       if(toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(()=>ui.toast.classList.remove("on"), 2600);
+      toastTimer = setTimeout(()=>ui.toast.classList.remove("on"), 2400);
     }
 
     function escapeHtml(s){
@@ -895,17 +898,18 @@
       imgEl.src = url || fallbackUrl;
     }
 
-    function isEpisodicKind(kind){
-      return kind === "anime" || kind === "series";
+    function isEpisodicKind(kind){ return kind === "anime" || kind === "series"; }
+
+    function kindLabel(k){
+      return k === "movie" ? "Phim Lẻ" : (k === "series" ? "Phim Bộ" : "Anime");
     }
 
-    // Tạo url preview (không render ra UI)
-    function buildPreviewUrl(fileId){
-      const domain = ["https://","drive",".","google",".","com"].join("");
-      return domain + "/file/d/" + encodeURIComponent(fileId) + "/preview";
+    function fmtUpdated(ms){
+      const n = Number(ms);
+      if(!Number.isFinite(n) || n <= 0) return "";
+      try{ return new Date(n).toLocaleString("vi-VN"); }catch{ return ""; }
     }
 
-    // ================== Normalize rows ==================
     function normalizeRow(r){
       if(!r) return null;
 
@@ -997,7 +1001,7 @@
       return normalizeRow(data);
     }
 
-    async function dbFetchRecent(limit=220){
+    async function dbFetchRecent(limit=240){
       if(!sb) return null;
       const { data, error } = await sb
         .from("movies")
@@ -1009,7 +1013,7 @@
       return (data || []).map(normalizeRow).filter(Boolean);
     }
 
-    // ================== Collapse episodic rows for suggestion ==================
+    // ================== Collapse episodic rows for suggestions ==================
     function collapseEpisodicRows(rows){
       const out = [];
       const map = new Map();
@@ -1018,7 +1022,6 @@
         const kind = r.kind || "anime";
         const episodic = isEpisodicKind(kind);
 
-        // movie hoặc không có ep => giữ nguyên
         if (!episodic || r.ep === null || r.ep === undefined) {
           out.push({ ...r, openSeason: 1, openEp: 1 });
           continue;
@@ -1075,106 +1078,123 @@
         const ep = Number(item.openEp || 1) || 1;
         return `watch.html?title=${encodeURIComponent(item.title)}&season=${encodeURIComponent(season)}&ep=${encodeURIComponent(ep)}`;
       }
-      // movie: ưu tiên id (không dùng drive trên URL)
-      if (item.id) return `watch.html?id=${encodeURIComponent(item.id)}&title=${encodeURIComponent(item.title)}`;
-      return `watch.html?title=${encodeURIComponent(item.title)}`;
+      // movie: ưu tiên id (không đưa drive lên URL)
+      if (item.id) return `watch.html?id=${encodeURIComponent(item.id)}&title=${encodeURIComponent(item.title || "")}`;
+      return `watch.html?title=${encodeURIComponent(item.title || "")}`;
     }
 
-    // ================== Watch State ==================
-    const state = {
-      current: null,          // object row đang phát (movie hoặc episode)
-      baseInfo: null,         // info đại diện cho series (thường ep1)
-      episodic: false,
+    // ================== Episodes sheet open/close ==================
+    function isSheetMode(){ return window.matchMedia("(max-width:760px)").matches; }
 
+    function openEpsPanel(){
+      if(ui.epsPanel.hidden){
+        ui.epsPanel.hidden = false;
+      }
+      if(isSheetMode()){
+        ui.epsBackdrop.hidden = false;
+        document.body.classList.add("sheet-open");
+      }
+      ui.epsPanel.scrollIntoView({ behavior:"smooth", block:"start" });
+    }
+
+    function closeEpsPanel(){
+      ui.epsPanel.hidden = true;
+      ui.epsBackdrop.hidden = true;
+      document.body.classList.remove("sheet-open");
+    }
+
+    ui.epsBackdrop.addEventListener("click", closeEpsPanel);
+    ui.epsClose.addEventListener("click", closeEpsPanel);
+
+    // ================== Player (native video) ==================
+    const state = {
+      current: null,
+      baseInfo: null,
+      episodic: false,
       title: "",
       kind: "",
+
       seasons: [],
-      seasonMap: new Map(),   // season -> Map(ep->row)
+      seasonMap: new Map(),  // season -> Map(ep->row)
       activeSeason: 1,
       activeEp: 1,
       totalEps: null,
       latestEp: null,
-      prevTarget: null,       // {season, ep}
-      nextTarget: null,       // {season, ep}
+      prevTarget: null,
+      nextTarget: null,
 
-      cleanUrl: "",
-      suggestions: [],
+      // video source fallback
+      srcList: [],
+      srcIdx: 0
     };
 
-    function kindLabel(k){
-      return k === "movie" ? "Phim Lẻ" : (k === "series" ? "Phim Bộ" : "Anime");
+    function buildStreamUrls(fileId){
+      // tránh lộ raw domain trong source (obfuscate nhẹ)
+      const d = ["https://","drive",".","google",".","com"].join("");
+      const id = encodeURIComponent(fileId);
+
+      // ✅ Ưu tiên link "uc?export=download" để <video> chạy mượt hơn iframe trên mobile
+      return [
+        `${d}/uc?export=download&id=${id}`,
+        `${d}/uc?id=${id}`,
+      ];
     }
 
-    function fmtUpdated(ms){
-      const n = Number(ms);
-      if(!Number.isFinite(n) || n <= 0) return "";
-      try{ return new Date(n).toLocaleString("vi-VN"); }catch{ return ""; }
+    function hideSkeleton(){ ui.skeleton.classList.add("hide"); }
+    function showSkeleton(){ ui.skeleton.classList.remove("hide"); }
+
+    function showPlayerError(show){
+      ui.errBox.classList.toggle("hidden", !show);
     }
 
-    function computeTargets(){
-      state.prevTarget = null;
-      state.nextTarget = null;
+    function setVideoSource(url){
+      showPlayerError(false);
+      showSkeleton();
 
-      if(!state.episodic) return;
-
-      const s = Number(state.activeSeason||1) || 1;
-      const e = Number(state.activeEp||1) || 1;
-
-      const seasons = state.seasons.slice().sort((a,b)=>a-b);
-      const epsMap = state.seasonMap.get(s) || new Map();
-      const epsList = [...epsMap.keys()].sort((a,b)=>a-b);
-
-      const idx = epsList.indexOf(e);
-
-      // prev
-      if(idx > 0){
-        state.prevTarget = { season:s, ep: epsList[idx-1] };
-      }else{
-        // qua season trước (lấy tập lớn nhất)
-        const si = seasons.indexOf(s);
-        if(si > 0){
-          const ps = seasons[si-1];
-          const pm = state.seasonMap.get(ps) || new Map();
-          const pel = [...pm.keys()].sort((a,b)=>a-b);
-          if(pel.length) state.prevTarget = { season:ps, ep: pel[pel.length-1] };
-        }
-      }
-
-      // next
-      if(idx >= 0 && idx < epsList.length - 1){
-        state.nextTarget = { season:s, ep: epsList[idx+1] };
-      }else{
-        // qua season sau (lấy tập nhỏ nhất)
-        const si = seasons.indexOf(s);
-        if(si >= 0 && si < seasons.length - 1){
-          const ns = seasons[si+1];
-          const nm = state.seasonMap.get(ns) || new Map();
-          const nel = [...nm.keys()].sort((a,b)=>a-b);
-          if(nel.length) state.nextTarget = { season:ns, ep: nel[0] };
-        }
-      }
-    }
-
-    function saveContinue(){
+      // reset để tránh bug một số Android giữ frame cũ
       try{
-        if(!state.current) return;
-        const key = "khoii_continue_v1";
-        const raw = localStorage.getItem(key);
-        const obj = raw ? JSON.parse(raw) : {};
-        const t = state.title || state.current.title || "";
-        if(!t) return;
-
-        obj[t] = {
-          kind: state.kind,
-          season: state.activeSeason,
-          ep: state.activeEp,
-          at: Date.now(),
-          id: state.current.id || null
-        };
-        localStorage.setItem(key, JSON.stringify(obj));
+        ui.video.pause();
       }catch{}
+
+      ui.video.removeAttribute("src");
+      ui.video.load();
+
+      ui.video.src = url;
+      ui.video.load();
     }
 
+    function tryNextSource(){
+      state.srcIdx += 1;
+      if(state.srcIdx >= state.srcList.length){
+        hideSkeleton();
+        showPlayerError(true);
+        return;
+      }
+      setVideoSource(state.srcList[state.srcIdx]);
+    }
+
+    // event handlers (attach once)
+    ui.video.addEventListener("loadedmetadata", hideSkeleton);
+    ui.video.addEventListener("loadeddata", hideSkeleton);
+    ui.video.addEventListener("canplay", hideSkeleton);
+    ui.video.addEventListener("playing", hideSkeleton);
+
+    ui.video.addEventListener("error", ()=>{
+      // thử link dự phòng
+      tryNextSource();
+    });
+
+    // chặn context menu (hạn chế người dùng copy / download trực tiếp)
+    ui.video.addEventListener("contextmenu", (e)=>e.preventDefault());
+
+    ui.btnRetry.addEventListener("click", ()=>{
+      if(!state.srcList.length) return;
+      state.srcIdx = 0;
+      setVideoSource(state.srcList[0]);
+    });
+    ui.btnOpenEps.addEventListener("click", openEpsPanel);
+
+    // ================== Render Info / Episodes ==================
     function renderInfo(){
       const item = state.baseInfo || state.current;
       if(!item){
@@ -1188,12 +1208,10 @@
       }
 
       document.title = `${item.title} - Khoii`;
-
       ui.movieTitle.textContent = item.title || "Không tên";
       ui.movieSub.textContent = kindLabel(item.kind || "anime");
 
       const badges = [];
-
       if(item.imdb) badges.push(`<span class="badge imdb"><b>IMDb</b> ${escapeHtml(item.imdb)}</span>`);
       if(item.quality) badges.push(`<span class="badge">${escapeHtml(item.quality)}</span>`);
       if(item.year) badges.push(`<span class="badge">${escapeHtml(item.year)}</span>`);
@@ -1224,15 +1242,59 @@
       setImgWithFallback(ui.posterImg, poster, svgPlaceholder("Khoii • Poster", 500, 750));
     }
 
+    function computeTargets(){
+      state.prevTarget = null;
+      state.nextTarget = null;
+      if(!state.episodic) return;
+
+      const s = Number(state.activeSeason||1) || 1;
+      const e = Number(state.activeEp||1) || 1;
+
+      const seasons = state.seasons.slice().sort((a,b)=>a-b);
+      const epsMap = state.seasonMap.get(s) || new Map();
+      const epsList = [...epsMap.keys()].sort((a,b)=>a-b);
+
+      const idx = epsList.indexOf(e);
+
+      // prev
+      if(idx > 0){
+        state.prevTarget = { season:s, ep: epsList[idx-1] };
+      }else{
+        const si = seasons.indexOf(s);
+        if(si > 0){
+          const ps = seasons[si-1];
+          const pm = state.seasonMap.get(ps) || new Map();
+          const pel = [...pm.keys()].sort((a,b)=>a-b);
+          if(pel.length) state.prevTarget = { season:ps, ep: pel[pel.length-1] };
+        }
+      }
+
+      // next
+      if(idx >= 0 && idx < epsList.length - 1){
+        state.nextTarget = { season:s, ep: epsList[idx+1] };
+      }else{
+        const si = seasons.indexOf(s);
+        if(si >= 0 && si < seasons.length - 1){
+          const ns = seasons[si+1];
+          const nm = state.seasonMap.get(ns) || new Map();
+          const nel = [...nm.keys()].sort((a,b)=>a-b);
+          if(nel.length) state.nextTarget = { season:ns, ep: nel[0] };
+        }
+      }
+    }
+
     function renderEpisodes(){
       if(!state.episodic){
-        ui.episodesCard.hidden = true;
         ui.btnPrev.disabled = true;
         ui.btnNext.disabled = true;
+        ui.epsPanel.hidden = true;
+        ui.epsBackdrop.hidden = true;
+        document.body.classList.remove("sheet-open");
         return;
       }
 
-      ui.episodesCard.hidden = false;
+      // chuẩn bị UI trong panel (panel có thể đang hidden nhưng vẫn render được)
+      ui.epsMeta.textContent = `Season ${state.activeSeason} • ${(state.totalEps || state.latestEp || 0) ? ((state.totalEps || state.latestEp) + " tập") : "—"}`;
 
       // season chips
       ui.seasonChips.innerHTML = "";
@@ -1243,7 +1305,6 @@
         b.className = "chip" + (Number(s) === Number(state.activeSeason) ? " on" : "");
         b.textContent = "Season " + s;
         b.addEventListener("click", ()=>{
-          // chọn season -> mở tập 1 hoặc tập đầu tiên có dữ liệu
           const m = state.seasonMap.get(s) || new Map();
           const eps = [...m.keys()].sort((a,b)=>a-b);
           const first = eps.length ? eps[0] : 1;
@@ -1253,13 +1314,10 @@
       });
 
       const epsMap = state.seasonMap.get(Number(state.activeSeason)) || new Map();
-
-      // total eps hiển thị: ưu tiên eps (tổng tập) nếu có, nếu không dùng max ep hiện có
       const maxEpHave = [...epsMap.keys()].reduce((m, x)=>Math.max(m, Number(x)||0), 0) || 1;
       const total = (Number(state.totalEps) > 0) ? Number(state.totalEps) : maxEpHave;
 
-      ui.epsMeta.textContent = `Season ${state.activeSeason} • ${total ? (total + " tập") : "—"}`;
-
+      // episodes grid
       ui.epsGrid.innerHTML = "";
       for(let i=1;i<=total;i++){
         const row = epsMap.get(i);
@@ -1277,45 +1335,58 @@
       ui.btnNext.disabled = !state.nextTarget;
     }
 
-    function setPlayerByRow(row){
-      if(!row || !row.driveId){
-        ui.playerFrame.removeAttribute("src");
-        ui.playerSkeleton.classList.add("hide");
-        toast("Không có dữ liệu để phát.");
-        return;
-      }
-
-      ui.playerSkeleton.classList.remove("hide");
-
-      // set src (không render link ra UI)
-      const src = buildPreviewUrl(row.driveId);
-      ui.playerFrame.src = src;
-
-      // hide skeleton khi iframe load
-      ui.playerFrame.onload = ()=>{
-        setTimeout(()=>ui.playerSkeleton.classList.add("hide"), 350);
-      };
-    }
-
-    function buildCleanUrl(){
-      // Không dùng driveId trên URL
-      if(!state.current) return location.pathname;
-      if(state.episodic){
-        return `watch.html?title=${encodeURIComponent(state.title)}&season=${encodeURIComponent(state.activeSeason)}&ep=${encodeURIComponent(state.activeEp)}`;
-      }
-      // movie: ưu tiên uuid
-      if(state.current.id){
-        return `watch.html?id=${encodeURIComponent(state.current.id)}&title=${encodeURIComponent(state.current.title || state.title || "")}`;
-      }
-      return `watch.html?title=${encodeURIComponent(state.current.title || state.title || "")}`;
+    function buildSeasonMap(rows){
+      const map = new Map();
+      rows.forEach(r=>{
+        const season = Number(r.season || 1) || 1;
+        const ep = (r.ep === null || r.ep === undefined) ? 1 : (Number(r.ep) || 1);
+        let m = map.get(season);
+        if(!m){ m = new Map(); map.set(season, m); }
+        m.set(ep, r);
+      });
+      return map;
     }
 
     function replaceUrlClean(){
-      const clean = buildCleanUrl();
-      state.cleanUrl = clean;
+      // Không dùng drive trên URL
       try{
-        history.replaceState({}, "", clean);
+        if(!state.current) return;
+        if(state.episodic){
+          const clean = `watch.html?title=${encodeURIComponent(state.title)}&season=${encodeURIComponent(state.activeSeason)}&ep=${encodeURIComponent(state.activeEp)}`;
+          history.replaceState({}, "", clean);
+        }else{
+          if(state.current.id){
+            const clean = `watch.html?id=${encodeURIComponent(state.current.id)}&title=${encodeURIComponent(state.current.title || state.title || "")}`;
+            history.replaceState({}, "", clean);
+          }else{
+            const clean = `watch.html?title=${encodeURIComponent(state.current.title || state.title || "")}`;
+            history.replaceState({}, "", clean);
+          }
+        }
       }catch{}
+    }
+
+    function setPlayerByRow(row){
+      if(!row || !row.driveId){
+        showPlayerError(true);
+        return;
+      }
+
+      showPlayerError(false);
+      showSkeleton();
+
+      // set poster (giúp pause không bị đen ở đầu video)
+      const poster = row.heroUrl || row.posterUrl || "";
+      if(poster){
+        try{ ui.video.poster = poster; }catch{}
+      }
+
+      state.srcList = buildStreamUrls(row.driveId);
+      state.srcIdx = 0;
+
+      setVideoSource(state.srcList[0]);
+
+      // ✅ không autoplay: để user tự play -> tránh lỗi “pause xong tự phát lại”
     }
 
     function openEpisode(season, ep, userAction=false){
@@ -1334,30 +1405,51 @@
       state.activeEp = ep;
       state.current = row;
 
-      // total eps / latest ep: lấy theo season hiện tại
       const maxEp = [...epsMap.keys()].reduce((m,x)=>Math.max(m, Number(x)||0), 0) || ep;
-      const anyRow = row;
-      state.totalEps = (anyRow && Number(anyRow.eps) > 0) ? Number(anyRow.eps) : null;
+      state.totalEps = (row && Number(row.eps) > 0) ? Number(row.eps) : null;
       state.latestEp = maxEp;
 
       renderInfo();
       renderEpisodes();
       setPlayerByRow(row);
-
       replaceUrlClean();
-      saveContinue();
 
       if(userAction){
-        // scroll nhẹ cho mobile
-        if(window.matchMedia("(max-width:980px)").matches){
-          ui.playerWrap?.scrollIntoView({ behavior:"smooth", block:"start" });
-        }
+        toast(`Đã chuyển: Season ${season} • Tập ${ep}`);
+        if(isSheetMode()) closeEpsPanel();
+        ui.playerWrap?.scrollIntoView({ behavior:"smooth", block:"start" });
       }
+    }
+
+    // ================== Suggestions ==================
+    function scoreSuggest(candidate, cur){
+      let score = 0;
+      if(!candidate || !cur) return score;
+      if(candidate.title === cur.title) return -9999;
+
+      if(candidate.kind === cur.kind) score += 3;
+
+      if(candidate.country && cur.country && String(candidate.country).toLowerCase() === String(cur.country).toLowerCase()){
+        score += 1;
+      }
+
+      const a = new Set((candidate.genres || []).map(x=>String(x).toLowerCase()));
+      const b = new Set((cur.genres || []).map(x=>String(x).toLowerCase()));
+      let common = 0;
+      b.forEach(g=>{ if(a.has(g)) common++; });
+      score += Math.min(common, 4) * 2;
+
+      const upd = Number(candidate.updatedAt||0);
+      if(Number.isFinite(upd) && upd>0){
+        const days = Math.floor((Date.now()-upd)/86400000);
+        if(days < 14) score += 2;
+      }
+
+      return score;
     }
 
     function renderSuggestions(list){
       ui.suggestRow.innerHTML = "";
-
       if(!list || !list.length){
         ui.suggestRow.innerHTML = `<div style="padding:8px 4px;color:rgba(231,237,249,.65);font-size:13px">Chưa có gợi ý.</div>`;
         return;
@@ -1379,60 +1471,22 @@
         img.onerror = ()=>{ img.onerror=null; img.src = svgPlaceholder("Khoii • Poster", 500, 750); };
         img.src = poster;
 
-        c.addEventListener("click", ()=>{
-          location.href = makeWatchHref(item);
-        });
-
+        c.addEventListener("click", ()=>location.href = makeWatchHref(item));
         ui.suggestRow.appendChild(c);
       });
-    }
-
-    function scoreSuggest(candidate, cur){
-      let score = 0;
-      if(!candidate || !cur) return score;
-
-      if(candidate.title === cur.title) return -9999; // loại chính nó
-
-      // cùng loại
-      if(candidate.kind === cur.kind) score += 3;
-
-      // cùng quốc gia
-      if(candidate.country && cur.country && String(candidate.country).toLowerCase() === String(cur.country).toLowerCase()){
-        score += 1;
-      }
-
-      // cùng thể loại
-      const a = new Set((candidate.genres || []).map(x=>String(x).toLowerCase()));
-      const b = new Set((cur.genres || []).map(x=>String(x).toLowerCase()));
-      let common = 0;
-      b.forEach(g=>{ if(a.has(g)) common++; });
-      score += Math.min(common, 4) * 2;
-
-      // ưu tiên mới cập nhật
-      const upd = Number(candidate.updatedAt||0);
-      if(Number.isFinite(upd) && upd>0) score += Math.min(3, Math.floor((Date.now()-upd)/86400000) < 14 ? 2 : 0);
-
-      return score;
     }
 
     async function loadSuggestions(){
       const cur = state.baseInfo || state.current;
       if(!cur) return;
 
-      let pool = null;
-
-      // ưu tiên db
-      pool = await dbFetchRecent(260);
-
-      // fallback local
+      let pool = await dbFetchRecent(240);
       if(!pool || !pool.length){
         pool = loadLocalMoviesRaw().map(normalizeRow).filter(Boolean);
       }
 
-      // gộp episodic để tránh spam nhiều tập
       const collapsed = collapseEpisodicRows(pool);
 
-      // chấm điểm
       const ranked = collapsed
         .map(x=>({ item:x, score: scoreSuggest(x, cur) }))
         .filter(x=>x.score > -1000)
@@ -1441,73 +1495,53 @@
 
       const picks = ranked.filter(x=>x.title !== cur.title).slice(0, 12);
 
-      // link "xem tất cả" theo kind
       if(isEpisodicKind(cur.kind)) ui.seeAll.href = `list.html?kind=${encodeURIComponent(cur.kind)}`;
       else ui.seeAll.href = `list.html?kind=movie`;
 
       renderSuggestions(picks);
     }
 
-    // ================== Init logic ==================
+    // ================== Init ==================
     function getParams(){
       const u = new URL(location.href);
       const p = u.searchParams;
       const id = (p.get("id") || "").trim();
-      const drive = (p.get("drive") || "").trim(); // chỉ dùng để lookup, sau đó remove khỏi URL
+      const drive = (p.get("drive") || "").trim(); // chỉ dùng lookup, sau đó remove khỏi URL
       const title = (p.get("title") || "").trim();
       const season = Number(p.get("season") || 1) || 1;
       const ep = Number(p.get("ep") || 1) || 1;
       return { id, drive, title, season, ep };
     }
 
-    function buildSeasonMap(rows){
-      const map = new Map();
-      rows.forEach(r=>{
-        const season = Number(r.season || 1) || 1;
-        // ep null => coi như ep=1
-        const ep = (r.ep === null || r.ep === undefined) ? 1 : (Number(r.ep) || 1);
-        let m = map.get(season);
-        if(!m){ m = new Map(); map.set(season, m); }
-        m.set(ep, r);
-      });
-      return map;
-    }
-
     async function init(){
-      ui.playerSkeleton.classList.remove("hide");
+      showSkeleton();
+      showPlayerError(false);
 
       const { id, drive, title, season, ep } = getParams();
 
       let current = null;
       let titleRows = null;
 
-      // 1) ưu tiên: id (uuid)
-      if(id){
-        current = await dbGetByUuid(id);
-      }
+      // ưu tiên id
+      if(id) current = await dbGetByUuid(id);
 
-      // 2) nếu có drive param (từ index/list movie cũ) => lookup rồi sẽ xóa khỏi URL
-      if(!current && drive){
-        current = await dbGetByDriveId(drive);
-      }
+      // nếu có drive (link cũ từ index/list) -> lookup rồi clean URL
+      if(!current && drive) current = await dbGetByDriveId(drive);
 
-      // 3) nếu có title => load theo title
-      if(!current && title){
-        // lấy latest row của title (để biết kind)
-        current = await dbPickLatestByTitle(title);
-      }
+      // theo title
+      if(!current && title) current = await dbPickLatestByTitle(title);
 
-      // fallback local (khi không dùng db)
+      // fallback local
       if(!current){
         const local = loadLocalMoviesRaw().map(normalizeRow).filter(Boolean);
         if(id) current = local.find(x=>String(x.id||"") === String(id)) || null;
         if(!current && title) current = local.find(x=>String(x.title||"") === String(title)) || null;
-        // drive param local: vẫn match driveId
         if(!current && drive) current = local.find(x=>String(x.driveId||"") === String(drive)) || null;
       }
 
       if(!current){
-        ui.playerSkeleton.classList.add("hide");
+        hideSkeleton();
+        showPlayerError(true);
         state.current = null;
         state.baseInfo = null;
         state.episodic = false;
@@ -1522,11 +1556,10 @@
       state.kind = current.kind || "anime";
       state.episodic = isEpisodicKind(state.kind);
 
-      // Nếu là episodic => tải toàn bộ tập theo title
+      // episodic -> load all eps by title
       if(state.episodic){
         titleRows = await dbListByTitle(state.title);
 
-        // local fallback episodic
         if((!titleRows || !titleRows.length) && !sb){
           const local = loadLocalMoviesRaw().map(normalizeRow).filter(Boolean);
           titleRows = local.filter(x=>String(x.title||"") === String(state.title) && isEpisodicKind(x.kind));
@@ -1534,55 +1567,47 @@
 
         titleRows = (titleRows || []).filter(x=>isEpisodicKind(x.kind));
 
-        // Nếu vẫn không có tập => coi như movie lẻ (trường hợp dữ liệu thiếu ep)
-        if(!titleRows.length){
-          state.episodic = false;
-        }
+        // nếu dữ liệu episodic lỗi -> fallback movie
+        if(!titleRows.length) state.episodic = false;
       }
 
-      // Base info: lấy ep=1 của season 1 nếu có, không thì lấy current
+      // base info
       state.baseInfo = current;
+
       if(state.episodic && titleRows && titleRows.length){
-        // sort để chọn đại diện tốt
         const sorted = titleRows.slice().sort((a,b)=>
           (Number(a.season||1)-Number(b.season||1)) ||
           (Number(a.ep||1)-Number(b.ep||1)) ||
           (Number(b.updatedAt||0)-Number(a.updatedAt||0))
         );
+
         const rep = sorted.find(x=>Number(x.season||1)===1 && Number(x.ep||1)===1) || sorted[0];
         state.baseInfo = rep || current;
 
         state.seasonMap = buildSeasonMap(titleRows);
         state.seasons = [...state.seasonMap.keys()].sort((a,b)=>a-b);
 
-        // set active season/ep theo URL, nếu không có thì fallback
         let s = Number(season||1) || 1;
-        if(!state.seasonMap.has(s)){
-          s = state.seasons[0] || 1;
-        }
+        if(!state.seasonMap.has(s)) s = state.seasons[0] || 1;
 
         const epsMap = state.seasonMap.get(s) || new Map();
 
         let e = Number(ep||1) || 1;
         if(!epsMap.has(e)){
-          // nếu ep không có, lấy ep=1 hoặc ep nhỏ nhất đang có
           const epsList = [...epsMap.keys()].sort((a,b)=>a-b);
           e = (epsMap.has(1) ? 1 : (epsList[0] || 1));
         }
 
-        // set active và current theo tập
         state.activeSeason = s;
         state.activeEp = e;
 
         const row = epsMap.get(e) || state.baseInfo || current;
         state.current = row;
 
-        // total eps / latest
         state.totalEps = (row && Number(row.eps) > 0) ? Number(row.eps) : null;
         state.latestEp = [...epsMap.keys()].reduce((m,x)=>Math.max(m, Number(x)||0), 0) || e;
 
-      } else {
-        // movie lẻ
+      }else{
         state.current = current;
         state.activeSeason = 1;
         state.activeEp = 1;
@@ -1590,37 +1615,21 @@
         state.latestEp = null;
       }
 
-      // Render
       renderInfo();
       renderEpisodes();
       setPlayerByRow(state.current);
-
-      // Clean URL (remove drive param khỏi thanh địa chỉ)
       replaceUrlClean();
 
-      // Suggestions
       await loadSuggestions();
     }
 
-    // ================== Wire events ==================
-    ui.btnBack.addEventListener("click", ()=>{
-      // nếu có history thì back, không thì về home
-      try{
-        if(history.length > 1) history.back();
-        else location.href = "index.html";
-      }catch{
-        location.href = "index.html";
-      }
-    });
-
-    ui.btnGoList.addEventListener("click", ()=> location.href = "list.html");
-
+    // ================== UI events ==================
     ui.btnEpisodes.addEventListener("click", ()=>{
-      if(ui.episodesCard.hidden){
+      if(!state.episodic){
         toast("Phim này không có danh sách tập.");
         return;
       }
-      ui.episodesCard.scrollIntoView({ behavior:"smooth", block:"start" });
+      openEpsPanel();
     });
 
     ui.btnPrev.addEventListener("click", ()=>{
@@ -1652,29 +1661,14 @@
       }
     });
 
-    async function copyLink(){
-      const url = (state.cleanUrl ? (location.origin + "/" + state.cleanUrl) : location.href);
-      try{
-        await navigator.clipboard.writeText(url);
-        toast("Đã copy link xem.");
-      }catch{
-        // fallback
-        try{
-          const t = document.createElement("textarea");
-          t.value = url;
-          document.body.appendChild(t);
-          t.select();
-          document.execCommand("copy");
-          document.body.removeChild(t);
-          toast("Đã copy link xem.");
-        }catch{
-          toast("Copy thất bại. Hãy copy thủ công trên thanh địa chỉ.");
-        }
+    // search -> mở list.html?q=...
+    ui.q?.addEventListener("keydown", (ev)=>{
+      if(ev.key === "Enter"){
+        const q = (ui.q.value || "").trim();
+        if(!q) return;
+        location.href = `list.html?q=${encodeURIComponent(q)}`;
       }
-    }
-
-    ui.btnCopy.addEventListener("click", copyLink);
-    ui.btnShare.addEventListener("click", copyLink);
+    });
 
     ui.btnFav.addEventListener("click", ()=>{
       try{
@@ -1705,31 +1699,15 @@
       }
     });
 
-    // Search -> mở list.html?q=...
-    ui.q?.addEventListener("keydown", (ev)=>{
-      if(ev.key === "Enter"){
-        const q = (ui.q.value || "").trim();
-        if(!q) return;
-        location.href = `list.html?q=${encodeURIComponent(q)}`;
-      }
-    });
-
-    // Bottom nav
+    // bottom nav
     ui.bnHome?.addEventListener("click", ()=>location.href="index.html");
     ui.bnList?.addEventListener("click", ()=>location.href="list.html");
     ui.bnEp?.addEventListener("click", ()=>{
-      if(ui.episodesCard.hidden){
-        toast("Phim này không có danh sách tập.");
-        return;
-      }
-      ui.episodesCard.scrollIntoView({ behavior:"smooth", block:"start" });
+      if(!state.episodic) return toast("Phim này không có danh sách tập.");
+      openEpsPanel();
     });
-    ui.bnSuggest?.addEventListener("click", ()=>{
-      ui.suggestCard?.scrollIntoView({ behavior:"smooth", block:"start" });
-    });
-    ui.bnInfo?.addEventListener("click", ()=>{
-      ui.infoCard?.scrollIntoView({ behavior:"smooth", block:"start" });
-    });
+    ui.bnSuggest?.addEventListener("click", ()=>ui.suggestCard?.scrollIntoView({ behavior:"smooth", block:"start" }));
+    ui.bnInfo?.addEventListener("click", ()=>ui.infoCard?.scrollIntoView({ behavior:"smooth", block:"start" }));
 
     // Keyboard shortcuts (PC)
     document.addEventListener("keydown", (ev)=>{
@@ -1741,15 +1719,15 @@
       if(ev.key === "ArrowRight"){
         if(state.nextTarget) openEpisode(state.nextTarget.season, state.nextTarget.ep, true);
       }
-      if(ev.key.toLowerCase() === "l"){
-        copyLink();
-      }
       if(ev.key.toLowerCase() === "t"){
         document.body.classList.toggle("theater");
       }
+      if(ev.key === "Escape"){
+        closeEpsPanel();
+      }
     });
 
-    // Init
+    // init
     (async ()=>{ await init(); })();
   </script>
 </body>
