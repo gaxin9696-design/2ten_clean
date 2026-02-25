@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin - Khoii</title>
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <style>
+    .admin-wrap{padding:14px}
+    .panel{border:1px solid var(--line);background:rgba(255,255,255,.03);border-radius:18px;padding:14px}
+    .panel h2{margin:0 0 10px 0}
+    .row{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+    .row .input{min-width:auto;width:100%}
+    @media (max-width: 900px){ .row{grid-template-columns:repeat(2,1fr)} }
+    .table{width:100%;border-collapse:collapse;overflow:auto;display:block}
+    .table th,.table td{border-bottom:1px solid var(--line);padding:10px 8px;text-align:left;font-size:13px;vertical-align:top}
+    .table th{color:var(--muted);font-weight:700;position:sticky;top:0;background:rgba(10,14,25,.85);backdrop-filter: blur(8px)}
+    .small{font-size:12px;color:var(--muted)}
+    textarea.input{min-height:220px;font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px; line-height:1.4;}
+    .actions{display:flex;gap:10px;flex-wrap:wrap}
+    .danger{border-color: rgba(255,110,110,.55); background: rgba(255,110,110,.16);}
+    .danger:hover{border-color: rgba(255,110,110,.8); background: rgba(255,110,110,.22);}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">K</div>
+      <div>
+        <div class="brand-name">Admin</div>
+        <div class="brand-sub">Tạo/Sửa movies.json (export file để commit lên GitHub)</div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <a class="nav-btn nav-link" href="index.html">← Về trang xem</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="panel admin-wrap">
+      <h2>Thông tin chung</h2>
+      <div class="row">
+        <input id="titleInput" class="input" placeholder="title (vd: khoii)" />
+        <input id="defaultPosterInput" class="input" placeholder="poster mặc định (vd: assets/posters/ep.jpg)" />
+        <input id="cfHintInput" class="input" placeholder="Gợi ý domain HLS (vd: https://2ten-hls.pages.dev)" />
+        <div class="actions">
+          <button id="btnLoad" class="btn">Load movies.json</button>
+          <button id="btnSaveDraft" class="btn btn-ghost">Lưu nháp (local)</button>
+          <button id="btnRestoreDraft" class="btn btn-ghost">Khôi phục nháp</button>
+        </div>
+      </div>
+      <p class="small">
+        GitHub Pages là web tĩnh nên Admin chỉ giúp bạn tạo file JSON. Bạn bấm <b>Export</b> để tải <code>movies.json</code> về và commit lên repo.
+      </p>
+    </section>
+
+    <section class="panel">
+      <h2>Thêm / Sửa item</h2>
+
+      <div class="row">
+        <input id="idInput" class="input" placeholder="id (vd: khoii-e01)" />
+        <input id="nameInput" class="input" placeholder="name (vd: Tập 1)" />
+        <input id="posterInput" class="input" placeholder="poster (vd: assets/posters/ep.jpg)" />
+        <input id="hlsInput" class="input" placeholder="hls (vd: https://2ten-hls.pages.dev/hls/.../master.m3u8)" />
+        <input id="seriesInput" class="input" placeholder="series (vd: khoii / Yosuga no Sora)" />
+        <input id="seasonInput" class="input" placeholder="season (vd: 1)" />
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <input id="episodeInput" class="input" placeholder="episode (vd: 1)" />
+        <input id="typeInput" class="input" placeholder="type (vd: Phim Bộ / Phim Lẻ)" />
+        <input id="countryInput" class="input" placeholder="country (vd: Japan)" />
+        <input id="genresInput" class="input" placeholder="genres (vd: Anime, Romance, Drama)" />
+        <input id="updatedInput" class="input" placeholder="updated (YYYY-MM-DD)" />
+        <select id="featuredInput" class="input">
+          <option value="false">featured: false</option>
+          <option value="true">featured: true</option>
+        </select>
+      </div>
+
+      <div class="actions" style="margin-top:12px">
+        <button id="btnUpsert" class="btn">Thêm / Cập nhật</button>
+        <button id="btnClear" class="btn btn-ghost">Clear form</button>
+      </div>
+      <p class="small">Tip: Nếu <code>id</code> trùng thì sẽ update item, không tạo mới.</p>
+    </section>
+
+    <section class="panel">
+      <h2>Danh sách hiện tại</h2>
+      <div class="actions" style="margin-bottom:10px">
+        <button id="btnSort" class="btn btn-ghost">Sort theo series/season/episode</button>
+        <button id="btnExport" class="btn">Export movies.json</button>
+        <button id="btnDeleteAll" class="btn danger">Xóa hết (cẩn thận)</button>
+      </div>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th style="min-width:140px">id</th>
+            <th style="min-width:240px">name</th>
+            <th style="min-width:320px">hls</th>
+            <th style="min-width:220px">series / S / E</th>
+            <th style="min-width:160px">meta</th>
+            <th style="min-width:180px">actions</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </section>
+
+    <section class="panel">
+      <h2>JSON (copy/paste hoặc import)</h2>
+      <div class="actions" style="margin-bottom:10px">
+        <button id="btnApplyJson" class="btn btn-ghost">Apply JSON vào list</button>
+        <button id="btnDownloadJson" class="btn">Download movies.json</button>
+      </div>
+      <textarea id="jsonArea" class="input" spellcheck="false"></textarea>
+      <p class="small">Nếu JSON báo lỗi, hãy kiểm tra dấu phẩy, ngoặc, và đảm bảo là JSON hợp lệ.</p>
+    </section>
+  </main>
+
+  <script src="assets/js/admin.js"></script>
+</body>
+</html>

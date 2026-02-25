@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Khoii - Home</title>
+
+  <!-- Pin version for stability -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.6.15/dist/hls.min.js"></script>
+
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">K</div>
+      <div>
+        <div class="brand-name" id="siteTitle">Khoii</div>
+        <div class="brand-sub">Kho phim cập nhật nhanh</div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <button class="nav-btn" data-nav="all">Thể loại</button>
+      <button class="nav-btn" data-nav="movie">Phim Lẻ</button>
+      <button class="nav-btn" data-nav="series">Phim Bộ</button>
+      <button class="nav-btn" data-nav="country">Quốc gia</button>
+      <a class="nav-btn nav-link" href="admin.html">Admin</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <!-- PLAYER -->
+    <section class="player-card">
+      <div class="player-head">
+        <div class="nowplaying">
+          <div class="np-label">Đang phát</div>
+          <div class="np-title" id="nowTitle">—</div>
+          <div class="np-meta" id="nowMeta">—</div>
+        </div>
+
+        <div class="player-actions">
+          <div class="field">
+            <label for="qualitySelect">Chất lượng</label>
+            <select id="qualitySelect" disabled>
+              <option value="-2">—</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="speedSelect">Tốc độ</label>
+            <select id="speedSelect">
+              <option value="0.5">0.5x</option>
+              <option value="0.75">0.75x</option>
+              <option value="1" selected>1x</option>
+              <option value="1.25">1.25x</option>
+              <option value="1.5">1.5x</option>
+              <option value="2">2x</option>
+            </select>
+          </div>
+
+          <button class="btn" id="btnCopyLink" title="Copy link tập đang phát">Copy Link</button>
+        </div>
+      </div>
+
+      <div class="video-wrap">
+        <video id="video" controls playsinline preload="metadata" crossorigin="anonymous"></video>
+
+        <div class="player-overlay" id="playerOverlay">
+          <div class="overlay-title">Chưa chọn tập để phát</div>
+          <div class="overlay-sub">Hãy chọn 1 tập ở danh sách bên dưới.</div>
+        </div>
+      </div>
+
+      <div class="player-foot">
+        <button class="btn btn-ghost" id="btnPrev">◀ Tập trước</button>
+        <button class="btn btn-ghost" id="btnNext">Tập sau ▶</button>
+        <div class="hint" id="playerHint">Tip: Bạn có thể dán link m3u8 Cloudflare vào movies.json.</div>
+      </div>
+
+      <div class="episodes" id="episodesBlock">
+        <div class="episodes-head">
+          <div class="sec-title">Danh sách tập</div>
+          <div class="sec-sub" id="episodesSub">—</div>
+        </div>
+        <div class="episodes-list" id="episodesList"></div>
+      </div>
+    </section>
+
+    <!-- FILTERS + CATALOG -->
+    <section class="catalog-card">
+      <div class="catalog-head">
+        <div>
+          <div class="sec-title">Kho Tàng Anime Mới Nhất</div>
+          <div class="sec-sub" id="catalogSub">Đang tải movies.json...</div>
+        </div>
+
+        <div class="filters">
+          <input id="searchInput" class="input" placeholder="Tìm tên phim/tập..." />
+
+          <select id="typeSelect" class="input">
+            <option value="">Tất cả loại</option>
+          </select>
+
+          <select id="countrySelect" class="input">
+            <option value="">Tất cả quốc gia</option>
+          </select>
+
+          <select id="genreSelect" class="input">
+            <option value="">Tất cả thể loại</option>
+          </select>
+
+          <button class="btn" id="btnReset">Reset</button>
+        </div>
+      </div>
+
+      <div class="sections">
+        <div class="section-row">
+          <div class="section-head">
+            <div class="section-title">Đề xuất hôm nay</div>
+            <button class="link" data-action="show-all" data-target="recommend">Xem tất cả</button>
+          </div>
+          <div class="grid" id="gridRecommend"></div>
+        </div>
+
+        <div class="section-row">
+          <div class="section-head">
+            <div class="section-title">Phim mới cập nhật</div>
+            <button class="link" data-action="show-all" data-target="latest">Xem tất cả</button>
+          </div>
+          <div class="grid" id="gridLatest"></div>
+        </div>
+
+        <div class="section-row">
+          <div class="section-head">
+            <div class="section-title">Anime nổi bật</div>
+            <button class="link" data-action="show-all" data-target="featured">Xem tất cả</button>
+          </div>
+          <div class="grid" id="gridFeatured"></div>
+        </div>
+
+        <div class="section-row">
+          <div class="section-head">
+            <div class="section-title">Tất cả</div>
+            <div class="muted" id="countAll">—</div>
+          </div>
+          <div class="grid" id="gridAll"></div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div>
+        <div class="footer-title">Ghi chú quan trọng</div>
+        <ul class="footer-list">
+          <li>Nếu video không chạy: kiểm tra Cloudflare Pages có bật CORS cho <code>/hls/*</code> (repo HLS trong zip có sẵn <code>_headers</code>).</li>
+          <li>Safari/iOS có thể phát HLS native trực tiếp từ thẻ <code>&lt;video&gt;</code>.</li>
+          <li>Hãy đảm bảo bạn có quyền phát nội dung bạn upload/encode.</li>
+        </ul>
+      </div>
+    </footer>
+  </main>
+
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
