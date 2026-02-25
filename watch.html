@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="description" content="Khoii – Xem phim nhanh. Hỗ trợ phim bộ theo tập, đề xuất phim, thông tin phim." />
+  <meta name="description" content="Khoii – Xem phim nhanh, giao diện đẹp. Hỗ trợ phim bộ theo tập, đề xuất phim, thông tin phim." />
   <meta name="robots" content="index,follow" />
   <meta name="theme-color" content="#0b1224" />
   <title>Khoii - Watch</title>
@@ -12,12 +12,14 @@
     :root{
       --bg0:#0b0f17; --bg1:#0b1224;
       --text:#e7edf9; --muted:rgba(231,237,249,.72);
-      --line:rgba(255,255,255,.10); --line2:rgba(255,255,255,.16);
+      --line:rgba(255,255,255,.10); --line2:rgba(255,255,255,.18);
       --glass:rgba(18,24,36,.72); --glass2:rgba(18,24,36,.55);
       --accent:#f2c64f;
       --radius:22px;
       --shadow:0 18px 65px rgba(0,0,0,.55);
-      --bn-h:72px; /* bottom nav height */
+      --bn-h:72px;
+      --ok:#7CFFB2;
+      --err:#ff8c8c;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -33,10 +35,6 @@
       padding-bottom: env(safe-area-inset-bottom);
       -webkit-tap-highlight-color: transparent;
     }
-    a,button{ -webkit-tap-highlight-color: transparent; }
-    button{ touch-action: manipulation; }
-
-    /* ===== tiny dots overlay ===== */
     body::before{
       content:"";
       position:fixed; inset:0;
@@ -47,27 +45,34 @@
         radial-gradient(circle, rgba(255,255,255,.14) 1px, transparent 1.25px);
       background-size:6px 6px, 12px 12px;
       background-position:0 0, 3px 3px;
-      opacity:.14;
+      opacity:.12;
       mix-blend-mode:overlay;
       filter:blur(.15px);
     }
+    a,button{ -webkit-tap-highlight-color: transparent; }
+    button{ touch-action: manipulation; }
 
     .container{
       position:relative; z-index:1;
       max-width:1320px;
       margin:0 auto;
-      padding:18px 22px calc(40px + env(safe-area-inset-bottom));
+      padding:16px 18px calc(40px + env(safe-area-inset-bottom));
     }
     @media (max-width:980px){
       .container{ padding-bottom: calc(40px + var(--bn-h) + 10px + env(safe-area-inset-bottom)); }
     }
     @media (max-width:560px){
-      .container{ padding:14px 12px calc(28px + var(--bn-h) + 10px + env(safe-area-inset-bottom)); }
+      .container{ padding:14px 12px calc(26px + var(--bn-h) + 10px + env(safe-area-inset-bottom)); }
     }
 
-    /* ===== TOPBAR ===== */
-    .topbar{display:flex;align-items:center;gap:16px}
-    .brand{display:flex;align-items:center;gap:10px;min-width:170px;cursor:pointer}
+    /* ===== Topbar ===== */
+    .topbar{
+      display:flex;align-items:center;gap:14px;
+    }
+    .brand{
+      display:flex;align-items:center;gap:10px;min-width:170px;
+      cursor:pointer; user-select:none;
+    }
     .brand-logo{
       width:44px;height:34px;border-radius:10px;
       display:grid;place-items:center;
@@ -76,7 +81,7 @@
         radial-gradient(18px 18px at 30% 35%, rgba(255,255,255,.22), transparent 60%),
         linear-gradient(135deg,#f59e0b,#fb7185);
       box-shadow:0 10px 25px rgba(245,158,11,.22);
-      position:relative;overflow:hidden;user-select:none;
+      position:relative;overflow:hidden;
     }
     .brand-logo:before{
       content:"";position:absolute;inset:0;
@@ -88,7 +93,7 @@
     .brand-sub{font-size:11px;color:rgba(231,237,249,.55);margin-top:2px}
 
     .search{
-      flex:1;max-width:620px;
+      flex:1;max-width:560px;
       display:flex;align-items:center;gap:10px;
       padding:10px 14px;border-radius:12px;
       background:var(--glass);
@@ -103,35 +108,24 @@
     }
     .search input::placeholder{color:rgba(231,237,249,.50)}
 
-    .nav{display:flex;align-items:center;gap:14px;margin-left:6px}
-    .nav a{
-      color:rgba(231,237,249,.88);
-      text-decoration:none;font-size:14px;
-      display:inline-flex;align-items:center;gap:6px;
-      padding:10px 12px;border-radius:10px;
-      min-height:44px;
-    }
-    .nav a:hover{background:rgba(255,255,255,.06)}
-    .nav a.active{
-      border:1px solid rgba(242,198,79,.35);
-      background:rgba(242,198,79,.10);
-    }
-
-    .member-btn{
-      margin-left:auto;
-      display:inline-flex;align-items:center;gap:10px;
-      padding:10px 14px;border-radius:999px;
+    .top-actions{display:flex; gap:10px; align-items:center; margin-left:auto;}
+    .pill-btn{
+      display:inline-flex; align-items:center; gap:8px;
       border:1px solid rgba(255,255,255,.12);
       background:var(--glass2);
-      color:var(--text);cursor:pointer;
+      color:rgba(231,237,249,.92);
+      padding:10px 12px;
+      border-radius:999px;
+      cursor:pointer;
+      min-height:44px;
       backdrop-filter:blur(14px);
       box-shadow:0 10px 30px rgba(0,0,0,.24);
-      min-height:44px;
+      user-select:none;
     }
-    .member-btn:hover{border-color:var(--line2)}
-    .member-btn svg{opacity:.95}
+    .pill-btn:hover{border-color:var(--line2); background:rgba(255,255,255,.06)}
+    .pill-btn svg{width:18px;height:18px;opacity:.95}
 
-    /* Sticky topbar (mobile) */
+    /* sticky trên mobile */
     @media (max-width:980px){
       .topbar{
         position:sticky;
@@ -144,129 +138,84 @@
         backdrop-filter: blur(14px);
         box-shadow: 0 14px 35px rgba(0,0,0,.30);
       }
-      .nav{display:none}
       .brand-sub{display:none}
-      .member-btn span{display:none}
+    }
+    @media (max-width:680px){
+      .pill-btn span{display:none}
+      .search{display:none}
     }
 
-    /* ===== Tooltip ===== */
-    .tip{position:relative}
-    .tip::after{
-      content:attr(data-tip);
-      position:absolute;left:50%;
-      transform:translateX(-50%) translateY(6px);
-      bottom:100%;
-      background:rgba(10,14,22,.92);
-      border:1px solid rgba(255,255,255,.14);
-      box-shadow:0 12px 30px rgba(0,0,0,.35);
-      color:rgba(231,237,249,.92);
-      padding:8px 10px;border-radius:10px;
-      font-size:12px;white-space:nowrap;
-      opacity:0;pointer-events:none;
-      transition:opacity .15s ease, transform .15s ease;
-      backdrop-filter:blur(10px);
-      z-index:99;
-    }
-    .tip:hover::after{opacity:1;transform:translateX(-50%) translateY(0)}
-
-    /* ===== Watch layout ===== */
-    .watch-grid{
-      margin-top:16px;
+    /* ===== Layout ===== */
+    .layout{
+      margin-top:14px;
       display:grid;
-      grid-template-columns: 1.65fr 1fr;
+      grid-template-columns: 1.45fr .85fr;
       gap:16px;
       align-items:start;
     }
     @media (max-width:980px){
-      .watch-grid{grid-template-columns:1fr}
+      .layout{ grid-template-columns:1fr; }
     }
 
-    .card{
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(18,24,36,.40);
+    /* ===== Player card ===== */
+    .player-card{
+      border-radius:var(--radius);
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(10,14,22,.58);
+      backdrop-filter:blur(12px);
+      box-shadow:var(--shadow);
       overflow:hidden;
-      box-shadow:0 18px 50px rgba(0,0,0,.35);
+    }
+    .player-wrap{
       position:relative;
-    }
-    .card::after{
-      content:"";
-      position:absolute;inset:0;pointer-events:none;border-radius:inherit;
-      background-image:radial-gradient(circle, rgba(255,255,255,.10) 1px, transparent 1.35px);
-      background-size:8px 8px;
-      opacity:.14;mix-blend-mode:overlay;z-index:0;
-    }
-    .card > *{position:relative; z-index:1}
-
-    /* ===== Player ===== */
-    .player-wrap{padding:12px}
-    .player{
       width:100%;
-      border-radius:14px;
-      overflow:hidden;
-      border:1px solid rgba(255,255,255,.12);
       background:#000;
       aspect-ratio: 16 / 9;
-      position:relative;
     }
-    .player iframe{
-      position:absolute;inset:0;
-      width:100%;height:100%;
+    @supports not (aspect-ratio: 16 / 9){
+      .player-wrap{height:0; padding-top:56.25%;}
+      .player-wrap > *{position:absolute; inset:0;}
+    }
+    iframe#playerFrame{
+      position:absolute; inset:0;
+      width:100%; height:100%;
       border:0;
       background:#000;
     }
-    .player-loading{
-      position:absolute;inset:0;
-      display:grid;place-items:center;
-      color:rgba(231,237,249,.82);
-      background:linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.25));
-      font-size:13px;
-      letter-spacing:.2px;
-    }
-    .player-bar{
-      margin-top:12px;
-      display:flex;
-      gap:12px;
-      align-items:flex-start;
-      justify-content:space-between;
-      flex-wrap:wrap;
-    }
-    .title-block h1{
-      margin:0;
-      font-size:20px;
-      letter-spacing:.2px;
-      font-weight:900;
-      line-height:1.2;
-    }
-    .subline{
-      margin-top:6px;
-      color:rgba(231,237,249,.72);
-      font-size:13px;
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-    }
-    .badge{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:7px 10px;border-radius:10px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(18,24,36,.55);
-      color:rgba(231,237,249,.92);
-      font-size:13px;
-      backdrop-filter:blur(10px);
-      min-height:34px;
-    }
-    .badge.imdb{border-color:rgba(242,198,79,.75);background:rgba(242,198,79,.10)}
-    .badge b{font-size:11px;letter-spacing:.6px;opacity:.9}
-    .badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
 
-    .p-actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
+    /* Skeleton */
+    .player-skeleton{
+      position:absolute; inset:0;
+      background: linear-gradient(90deg, rgba(255,255,255,.06), rgba(255,255,255,.12), rgba(255,255,255,.06));
+      background-size: 220% 100%;
+      animation: shimmer 1.1s linear infinite;
+      opacity:.55;
+      z-index:2;
+    }
+    @keyframes shimmer{
+      0%{background-position: 0% 0%;}
+      100%{background-position: 200% 0%;}
+    }
+    .player-skeleton.hide{ display:none; }
+
+    /* Mask che khu vực top bar (tránh lộ nút mở/đường dẫn trong UI iframe) */
+    .iframe-mask{
+      position:absolute; left:0; top:0; right:0;
+      height:58px;
+      z-index:3;
+      pointer-events:auto; /* chặn click */
+      background: linear-gradient(180deg, rgba(0,0,0,.68), rgba(0,0,0,0));
+    }
+    @media (max-width:560px){
+      .iframe-mask{ height:64px; }
+    }
+
+    .player-bottom{
+      padding:12px 12px 14px;
+      display:flex; flex-wrap:wrap; gap:10px;
       align-items:center;
+      border-top:1px solid rgba(255,255,255,.08);
+      background:rgba(18,24,36,.28);
     }
     .btn{
       border:1px solid rgba(255,255,255,.12);
@@ -275,257 +224,292 @@
       padding:10px 12px;
       border-radius:12px;
       cursor:pointer;
-      min-height:42px;
+      min-height:44px;
       display:inline-flex;align-items:center;gap:10px;
-      backdrop-filter:blur(14px);
-      box-shadow:0 10px 30px rgba(0,0,0,.20);
-      text-decoration:none;
-      white-space:nowrap;
-      font-weight:700;
-      font-size:13px;
+      user-select:none;
     }
-    .btn:hover{border-color:rgba(255,255,255,.20); background:rgba(255,255,255,.06)}
+    .btn:hover{border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.06)}
+    .btn svg{width:18px;height:18px;opacity:.95}
     .btn.primary{
-      background:rgba(242,198,79,.14);
-      border-color:rgba(242,198,79,.35);
-      color:rgba(242,198,79,.98);
+      background: rgba(242,198,79,.14);
+      border-color: rgba(242,198,79,.35);
+      color: rgba(242,198,79,.98);
     }
-    .btn.primary:hover{background:rgba(242,198,79,.18)}
-    .btn:disabled{opacity:.55;cursor:not-allowed}
+    .btn.primary:hover{ background: rgba(242,198,79,.18); }
+    .btn:disabled{opacity:.5;cursor:not-allowed}
 
-    /* ===== Episodes ===== */
-    .ep-wrap{padding:12px}
-    .ep-head{
-      display:flex;align-items:center;justify-content:space-between;gap:10px;
-      margin-bottom:10px;
-      flex-wrap:wrap;
+    .mini{
+      margin-left:auto;
+      display:flex; gap:10px; flex-wrap:wrap;
     }
-    .ep-head h3{margin:0;font-size:15px;letter-spacing:.2px}
-    .ep-meta{color:rgba(231,237,249,.70);font-size:12px}
 
+    /* Theater mode */
+    body.theater .layout{
+      grid-template-columns: 1fr;
+    }
+    body.theater .right-col{
+      display:none;
+    }
+
+    /* ===== Episodes card ===== */
+    .episodes-card{
+      margin-top:14px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(10,14,22,.58);
+      backdrop-filter:blur(10px);
+      box-shadow:0 18px 50px rgba(0,0,0,.35);
+      overflow:hidden;
+    }
+    .eps-head{
+      padding:12px 12px 10px;
+      display:flex; align-items:flex-end; justify-content:space-between; gap:10px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .eps-head h2{
+      margin:0;
+      font-size:16px;
+      letter-spacing:.2px;
+    }
+    .eps-meta{
+      font-size:12px;
+      color:rgba(231,237,249,.66);
+      white-space:nowrap;
+    }
     .season-chips{
-      display:flex;
-      gap:10px;
+      padding:10px 12px 0;
+      display:flex; gap:10px;
       overflow:auto hidden;
-      padding:2px 2px 8px;
       scrollbar-width:none;
       -webkit-overflow-scrolling:touch;
     }
     .season-chips::-webkit-scrollbar{height:0}
     .chip{
-      padding:10px 12px;border-radius:999px;
+      padding:10px 12px;
+      border-radius:999px;
       border:1px solid rgba(255,255,255,.12);
       background:rgba(18,24,36,.45);
       color:rgba(231,237,249,.88);
       cursor:pointer;
-      font-size:13px;
       min-height:40px;
+      font-size:13px;
       white-space:nowrap;
       user-select:none;
     }
     .chip:hover{background:rgba(255,255,255,.06)}
-    .chip.on{border-color:rgba(242,198,79,.65);background:rgba(242,198,79,.12);color:rgba(242,198,79,.98)}
+    .chip.on{border-color:rgba(242,198,79,.65);background:rgba(242,198,79,.12); color:rgba(242,198,79,.98)}
 
-    .ep-pager{
-      display:flex;gap:10px;align-items:center;justify-content:space-between;
-      margin-top:6px;
-      flex-wrap:wrap;
-    }
-    .ep-range{
-      color:rgba(231,237,249,.72);
-      font-size:12px;
-    }
-    .jump{
-      display:flex;gap:8px;align-items:center;flex-wrap:wrap;
-    }
-    .jump input{
-      width:110px;
-      background:rgba(18,24,36,.45);
-      color:rgba(231,237,249,.90);
-      border:1px solid rgba(255,255,255,.12);
-      border-radius:12px;
-      padding:10px 12px;
-      outline:none;
-      min-height:42px;
-    }
-
-    .ep-list{
-      margin-top:12px;
+    .eps-grid{
+      padding:12px 12px 14px;
       display:flex;
       flex-wrap:wrap;
-      gap:10px;
+      gap:8px;
     }
-    .ep-btn{
-      min-width:52px;
-      padding:10px 12px;
+    .ep{
+      min-width:44px;
+      min-height:40px;
+      padding:8px 10px;
       border-radius:12px;
       border:1px solid rgba(255,255,255,.12);
-      background:rgba(18,24,36,.45);
+      background:rgba(18,24,36,.38);
       color:rgba(231,237,249,.92);
       cursor:pointer;
       font-weight:800;
-      font-size:13px;
-      min-height:42px;
+      letter-spacing:.2px;
       user-select:none;
     }
-    .ep-btn:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.20)}
-    .ep-btn.on{
-      border-color:rgba(242,198,79,.65);
+    .ep:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.20)}
+    .ep.on{
+      border-color:rgba(242,198,79,.75);
       background:rgba(242,198,79,.12);
       color:rgba(242,198,79,.98);
     }
-    .ep-btn.miss{
-      opacity:.50;
+    .ep.off{
+      opacity:.45;
       cursor:not-allowed;
     }
 
-    /* ===== Info ===== */
-    .info-wrap{padding:12px}
-    .poster{
+    /* ===== Right column ===== */
+    .right-col{
       display:grid;
-      grid-template-columns: 120px 1fr;
-      gap:12px;
-      align-items:start;
-    }
-    .poster img{
-      width:120px;height:170px;
-      border-radius:14px;
-      object-fit:cover;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.06);
-    }
-    @media (max-width:560px){
-      .poster{grid-template-columns: 96px 1fr;}
-      .poster img{width:96px;height:140px;border-radius:12px}
-    }
-    .info-title{
-      margin:0;
-      font-size:16px;
-      font-weight:900;
-      letter-spacing:.2px;
-      line-height:1.25;
-    }
-    .info-sub{
-      margin-top:6px;
-      color:rgba(231,237,249,.70);
-      font-size:12px;
-    }
-    .genres{
-      display:flex;flex-wrap:wrap;gap:10px;margin-top:10px
-    }
-    .genre{
-      padding:7px 10px;border-radius:999px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(18,24,36,.45);
-      color:rgba(231,237,249,.88);
-      font-size:13px;
-      min-height:34px;
-      backdrop-filter:blur(10px);
-    }
-    .desc{
-      margin-top:12px;
-      color:rgba(231,237,249,.82);
-      font-size:13px;
-      line-height:1.55;
-      white-space:pre-wrap;
-    }
-    .kv{
-      margin-top:10px;
-      display:grid;
-      grid-template-columns: 110px 1fr;
-      gap:8px 10px;
-      font-size:13px;
-      color:rgba(231,237,249,.84);
-    }
-    .kv div:nth-child(odd){
-      color:rgba(231,237,249,.62);
+      gap:14px;
     }
 
-    /* ===== Rows (suggestions) ===== */
-    .rows{margin-top:18px;display:grid;gap:16px}
-    .row-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
-    .row-head h3{margin:0;font-size:18px;letter-spacing:.2px}
-    .row-head a{
-      color:rgba(231,237,249,.8);text-decoration:none;font-size:13px;
-      padding:8px 12px;border-radius:999px;
+    .card{
+      border-radius:18px;
       border:1px solid rgba(255,255,255,.10);
-      background:rgba(18,24,36,.35);
+      background:rgba(10,14,22,.58);
+      backdrop-filter:blur(10px);
+      box-shadow:0 18px 50px rgba(0,0,0,.35);
+      overflow:hidden;
+    }
+
+    .info-card{
+      padding:12px;
+    }
+    .info-top{
+      display:flex; gap:12px; align-items:flex-start;
+    }
+    .poster{
+      width:120px;
+      border-radius:14px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      flex:0 0 auto;
+      aspect-ratio: 2 / 3;
+    }
+    .poster img{
+      width:100%; height:100%; object-fit:cover; display:block;
+    }
+    .info-main{flex:1; min-width:0;}
+    .title{
+      margin:0;
+      font-size:20px;
+      letter-spacing:.2px;
+      line-height:1.2;
+      font-weight:900;
+      word-break:break-word;
+    }
+    .subtitle{
+      margin:6px 0 0;
+      font-size:13px;
+      color:rgba(231,237,249,.72);
+    }
+
+    .badges{
+      margin-top:10px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+    .badge{
+      display:inline-flex;align-items:center;gap:7px;
+      padding:7px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(18,24,36,.45);
+      font-size:12px;
+      color:rgba(231,237,249,.90);
+      min-height:32px;
+    }
+    .badge.imdb{border-color:rgba(242,198,79,.70);background:rgba(242,198,79,.10)}
+    .badge b{font-size:10px;letter-spacing:.6px;opacity:.92}
+
+    .genres{
+      margin-top:10px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+    .genre{
+      padding:7px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(18,24,36,.40);
+      font-size:12px;
+      color:rgba(231,237,249,.86);
+      min-height:32px;
+    }
+
+    .desc{
+      margin:12px 0 0;
+      color:rgba(231,237,249,.80);
+      font-size:13.5px;
+      line-height:1.55;
+    }
+
+    .info-actions{
+      margin-top:12px;
+      display:flex; gap:10px; flex-wrap:wrap;
+    }
+
+    /* Suggest */
+    .row-head{
+      padding:12px 12px 10px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .row-head h3{margin:0;font-size:16px;letter-spacing:.2px}
+    .row-head a{
+      color:rgba(231,237,249,.82);
+      text-decoration:none;
+      font-size:13px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(18,24,36,.32);
       min-height:36px;
       display:inline-flex;align-items:center;
     }
     .row-head a:hover{border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.06)}
+
     .cards{
-      display:flex;gap:14px;
-      overflow-x:auto;
-      padding:6px 2px 10px;
-      scroll-snap-type:x mandatory;
-      -webkit-overflow-scrolling:touch;
+      padding:12px 12px 14px;
+      display:flex;
+      gap:12px;
+      overflow:auto hidden;
       scrollbar-width:none;
+      -webkit-overflow-scrolling:touch;
     }
     .cards::-webkit-scrollbar{height:0}
-    .m-card{
-      scroll-snap-align:start;
-      width:170px;flex:0 0 auto;
+    .mcard{
+      width:150px;
+      flex:0 0 auto;
       border-radius:16px;
       border:1px solid rgba(255,255,255,.12);
       background:rgba(18,24,36,.40);
       overflow:hidden;
-      box-shadow:0 18px 50px rgba(0,0,0,.35);
+      box-shadow:0 14px 40px rgba(0,0,0,.35);
       cursor:pointer;
       transition:transform .14s ease,border-color .14s ease;
       position:relative;
-      touch-action: manipulation;
+      user-select:none;
     }
-    .m-card:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.22)}
-    .m-card .img{
-      height:240px;
+    .mcard:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.22)}
+    .mcard .img{
+      height:210px;
       background:#000;
       border-bottom:1px solid rgba(255,255,255,.10);
     }
-    .m-card img{width:100%;height:100%;object-fit:cover;display:block}
-    .m-card .meta{padding:10px 10px 12px}
-    .m-card .meta b{display:block;font-size:13px;line-height:1.25}
-    .m-card .meta small{display:block;margin-top:6px;color:rgba(231,237,249,.65)}
-    .tag{
-      position:absolute;top:10px;left:10px;
-      padding:6px 8px;border-radius:999px;
-      font-size:11px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(10,14,22,.65);
-      backdrop-filter:blur(10px);
-      z-index:3;
-    }
-    .m-card::after{
-      content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
-      background-image:radial-gradient(circle, rgba(255,255,255,.10) 1px, transparent 1.35px);
-      background-size:8px 8px;
-      opacity:.18;mix-blend-mode:overlay;z-index:2;
+    .mcard img{width:100%;height:100%;object-fit:cover;display:block}
+    .mcard .meta{padding:10px 10px 12px}
+    .mcard .meta b{display:block;font-size:13px;line-height:1.25}
+    .mcard .meta small{display:block;margin-top:6px;color:rgba(231,237,249,.65);font-size:12px}
+
+    @media (max-width:560px){
+      .poster{width:96px}
+      .mcard{width:148px}
+      .mcard .img{height:200px}
     }
 
     /* ===== Toast ===== */
     .toast{
       position:fixed;
-      left:12px; right:12px;
-      bottom: calc(var(--bn-h) + 14px + env(safe-area-inset-bottom));
+      left:50%;
+      transform:translateX(-50%);
+      bottom: calc(16px + env(safe-area-inset-bottom));
       z-index:200;
-      display:none;
-      max-width: 720px;
-      margin: 0 auto;
-      padding:12px 12px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(10,14,22,.86);
+      background:rgba(10,14,22,.92);
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow:0 12px 30px rgba(0,0,0,.45);
       color:rgba(231,237,249,.92);
-      box-shadow:0 18px 55px rgba(0,0,0,.45);
-      backdrop-filter: blur(14px);
+      padding:10px 12px;
+      border-radius:14px;
       font-size:13px;
-      line-height:1.35;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .18s ease, transform .18s ease;
+      max-width:min(92vw, 520px);
+      text-align:center;
+      backdrop-filter:blur(10px);
     }
-    .toast.on{display:block}
-    .toast.ok{border-color:rgba(124,255,178,.35)}
-    .toast.err{border-color:rgba(255,124,124,.35)}
+    .toast.on{
+      opacity:1;
+      transform:translateX(-50%) translateY(-4px);
+    }
 
-    /* ===== Mobile bottom nav ===== */
+    /* ===== Bottom nav (mobile) ===== */
     .bottom-nav{
       position:fixed;
       left:10px; right:10px;
@@ -559,17 +543,15 @@
       font-size: 11px;
       letter-spacing: .2px;
       user-select:none;
-      text-decoration:none;
     }
     .bn-item svg{ width:18px; height:18px; opacity:.95; }
-    .bn-item.active{
-      border:1px solid rgba(242,198,79,.35);
-      background: rgba(242,198,79,.12);
-      color: rgba(242,198,79,.98);
-    }
     .bn-item:active{ transform: translateY(1px); }
-    @media (max-width:980px){ .bottom-nav{ display:grid; } }
 
+    @media (max-width:980px){
+      .bottom-nav{ display:grid; }
+    }
+
+    /* Reduced motion */
     @media (prefers-reduced-motion: reduce){
       *{ animation:none !important; transition:none !important; }
       html{ scroll-behavior:auto !important; }
@@ -578,7 +560,7 @@
 </head>
 
 <body>
-  <div class="toast" id="toast"></div>
+  <div id="toast" class="toast" aria-live="polite"></div>
 
   <div class="container">
     <header class="topbar">
@@ -590,175 +572,203 @@
         </div>
       </div>
 
-      <div class="search">
+      <div class="search" title="Gõ để tìm phim (Enter để mở danh sách)">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M10.5 19a8.5 8.5 0 1 1 0-17 8.5 8.5 0 0 1 0 17Z" stroke="rgba(231,237,249,.85)" stroke-width="2" />
           <path d="M16.8 16.8 21 21" stroke="rgba(231,237,249,.85)" stroke-width="2" stroke-linecap="round" />
         </svg>
-        <input id="q" placeholder="Tìm kiếm phim, diễn viên (Enter)" />
+        <input id="q" placeholder="Tìm nhanh (Enter để mở danh sách)" />
       </div>
 
-      <nav class="nav" aria-label="Main navigation">
-        <a href="index.html" class="nav-btn">Home</a>
-        <a href="list.html" class="nav-btn">Danh sách</a>
-        <a href="list.html?kind=anime" class="nav-btn">Anime</a>
-        <a href="list.html?kind=movie" class="nav-btn">Phim lẻ</a>
-        <a href="list.html?kind=series" class="nav-btn">Phim bộ</a>
-      </nav>
+      <div class="top-actions">
+        <button class="pill-btn" id="btnBack" type="button" title="Quay lại">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M15 6l-6 6 6 6" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Back</span>
+        </button>
 
-      <button class="member-btn" onclick="location.href='sql.html'">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M12 12a4.5 4.5 0 1 0-4.5-4.5A4.5 4.5 0 0 0 12 12Z" stroke="rgba(231,237,249,.9)" stroke-width="2" />
-          <path d="M20 21a8 8 0 1 0-16 0" stroke="rgba(231,237,249,.9)" stroke-width="2" stroke-linecap="round" />
-        </svg>
-        <span>Admin</span>
-      </button>
+        <button class="pill-btn" id="btnGoList" type="button" title="Danh sách">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M4 6h16M4 12h16M4 18h10" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span>List</span>
+        </button>
+      </div>
     </header>
 
-    <section class="watch-grid" aria-label="Watch layout">
-      <!-- LEFT: player + episodes -->
-      <div class="left">
-        <div class="card player-wrap" aria-label="Player">
-          <div class="player">
-            <iframe id="playerFrame" allow="autoplay; fullscreen" allowfullscreen referrerpolicy="no-referrer"></iframe>
-            <div id="playerLoading" class="player-loading">Đang tải video...</div>
+    <main class="layout">
+      <!-- LEFT -->
+      <section class="left-col">
+        <div class="player-card" aria-label="Trình phát">
+          <div id="playerWrap" class="player-wrap">
+            <div id="playerSkeleton" class="player-skeleton"></div>
+            <iframe
+              id="playerFrame"
+              title="Player"
+              allow="autoplay; fullscreen; picture-in-picture"
+              allowfullscreen
+              referrerpolicy="no-referrer"
+            ></iframe>
+            <div class="iframe-mask" aria-hidden="true" title=""></div>
           </div>
 
-          <div class="player-bar">
-            <div class="title-block">
-              <h1 id="movieTitle">Đang tải...</h1>
-              <div id="movieSubline" class="subline"></div>
-              <div id="movieBadges" class="badges"></div>
-            </div>
+          <div class="player-bottom">
+            <button class="btn" id="btnPrev" type="button" disabled title="Tập trước">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M15 6l-6 6 6 6" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span>Tập trước</span>
+            </button>
 
-            <div class="p-actions">
-              <button id="btnPrev" class="btn tip" data-tip="Tập trước" type="button" disabled>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M15 6l-6 6 6 6" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <button class="btn" id="btnNext" type="button" disabled title="Tập tiếp">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M9 6l6 6-6 6" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span>Tập tiếp</span>
+            </button>
+
+            <div class="mini">
+              <button class="btn" id="btnEpisodes" type="button" title="Danh sách tập">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M4 7h16M4 12h16M4 17h10" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round"/>
                 </svg>
-                Trước
+                <span>Tập</span>
               </button>
-              <button id="btnNext" class="btn tip" data-tip="Tập sau" type="button" disabled>
-                Sau
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M9 6l6 6-6 6" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+              <button class="btn" id="btnTheater" type="button" title="Chế độ rạp">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M4 7h16v10H4V7Z" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linejoin="round"/>
+                  <path d="M8 20h8" stroke="rgba(231,237,249,.72)" stroke-width="2" stroke-linecap="round"/>
                 </svg>
+                <span>Rạp</span>
               </button>
 
-              <a id="btnOpenDrive" class="btn" href="#" target="_blank" rel="noreferrer">
-                Mở Drive
-              </a>
-              <button id="btnCopy" class="btn primary" type="button">Copy link</button>
+              <button class="btn primary" id="btnCopy" type="button" title="Copy link xem">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M9 9h10v10H9V9Z" stroke="rgba(242,198,79,.98)" stroke-width="2" stroke-linejoin="round"/>
+                  <path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1" stroke="rgba(242,198,79,.85)" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <span>Copy link</span>
+              </button>
+
+              <button class="btn" id="btnFull" type="button" title="Toàn màn hình">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M8 3H5a2 2 0 0 0-2 2v3" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M16 3h3a2 2 0 0 1 2 2v3" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M8 21H5a2 2 0 0 1-2-2v-3" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M16 21h3a2 2 0 0 0 2-2v-3" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <span>Full</span>
+              </button>
             </div>
           </div>
         </div>
 
-        <div id="episodeCard" class="card ep-wrap" aria-label="Danh sách tập" hidden>
-          <div class="ep-head">
-            <h3>Danh sách tập</h3>
-            <div id="epMeta" class="ep-meta">—</div>
+        <!-- Episodes -->
+        <section class="episodes-card" id="episodesCard" hidden aria-label="Danh sách tập">
+          <div class="eps-head">
+            <h2>Danh sách tập</h2>
+            <div class="eps-meta" id="epsMeta">—</div>
           </div>
+          <div class="season-chips" id="seasonChips" aria-label="Season"></div>
+          <div class="eps-grid" id="epsGrid" aria-label="Episodes"></div>
+        </section>
+      </section>
 
-          <div id="seasonChips" class="season-chips" aria-label="Season chips"></div>
-
-          <div class="ep-pager">
-            <div class="jump">
-              <button id="btnPagePrev" class="btn" type="button">Trang trước</button>
-              <button id="btnPageNext" class="btn" type="button">Trang sau</button>
-              <div id="epRange" class="ep-range">—</div>
+      <!-- RIGHT -->
+      <aside class="right-col">
+        <!-- Info -->
+        <section class="card info-card" id="infoCard" aria-label="Thông tin phim">
+          <div class="info-top">
+            <div class="poster">
+              <img id="posterImg" alt="" />
             </div>
-
-            <div class="jump">
-              <input id="jumpEp" type="number" inputmode="numeric" placeholder="Nhập tập..." />
-              <button id="btnJump" class="btn" type="button">Đi</button>
-            </div>
-          </div>
-
-          <div id="epList" class="ep-list" aria-label="Episode list"></div>
-        </div>
-      </div>
-
-      <!-- RIGHT: info -->
-      <aside class="right">
-        <div class="card info-wrap" aria-label="Thông tin phim">
-          <div class="poster">
-            <img id="posterImg" alt="Poster" />
-            <div>
-              <div id="infoTitle" class="info-title">—</div>
-              <div id="infoSub" class="info-sub">—</div>
-              <div id="infoGenres" class="genres"></div>
+            <div class="info-main">
+              <h1 class="title" id="movieTitle">Đang tải...</h1>
+              <div class="subtitle" id="movieSub">—</div>
+              <div class="badges" id="badges"></div>
             </div>
           </div>
 
-          <div id="infoDesc" class="desc">—</div>
+          <div class="genres" id="genres"></div>
+          <p class="desc" id="desc"></p>
 
-          <div class="kv" style="margin-top:14px">
-            <div>Loại</div><div id="kvKind">—</div>
-            <div>Năm</div><div id="kvYear">—</div>
-            <div>Chất lượng</div><div id="kvQuality">—</div>
-            <div>Quốc gia</div><div id="kvCountry">—</div>
-            <div>IMDb</div><div id="kvImdb">—</div>
-            <div>Cập nhật</div><div id="kvUpdated">—</div>
+          <div class="info-actions">
+            <button class="btn" id="btnFav" type="button" title="Yêu thích (lưu local)">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M12 21s-7-4.6-9.4-8.7C.8 9 .9 6.5 2.7 4.9 4.5 3.3 7.2 3.6 9 5.4L12 8.4l3-3c1.8-1.8 4.5-2.1 6.3-.5 1.8 1.6 1.9 4.1.1 7.4C19 16.4 12 21 12 21Z"
+                  stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linejoin="round" />
+              </svg>
+              <span>Yêu thích</span>
+            </button>
+
+            <button class="btn" id="btnShare" type="button" title="Chia sẻ (copy link)">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M16 8a3 3 0 1 0-2.8-4" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round"/>
+                <path d="M8 12l8-4" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round"/>
+                <path d="M8 12l8 4" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round"/>
+                <path d="M8 12a3 3 0 1 0 0 0Z" stroke="rgba(231,237,249,.92)" stroke-width="2"/>
+                <path d="M16 20a3 3 0 1 0 0 0Z" stroke="rgba(231,237,249,.92)" stroke-width="2"/>
+              </svg>
+              <span>Chia sẻ</span>
+            </button>
           </div>
-        </div>
+        </section>
+
+        <!-- Suggest -->
+        <section class="card" id="suggestCard" aria-label="Đề xuất phim">
+          <div class="row-head">
+            <h3>Đề xuất</h3>
+            <a id="seeAll" href="list.html">Xem tất cả</a>
+          </div>
+          <div class="cards" id="suggestRow"></div>
+        </section>
       </aside>
-    </section>
-
-    <div class="rows" aria-label="Đề xuất">
-      <div class="row-head">
-        <h3>Đề xuất cho bạn</h3>
-        <a href="list.html?tab=suggest">Xem tất cả</a>
-      </div>
-      <div id="rowSuggest" class="cards"></div>
-
-      <div class="row-head">
-        <h3>Mới cập nhật</h3>
-        <a href="list.html?tab=new">Xem tất cả</a>
-      </div>
-      <div id="rowNew" class="cards"></div>
-    </div>
+    </main>
   </div>
 
-  <!-- Bottom nav mobile -->
+  <!-- Bottom nav (mobile) -->
   <nav class="bottom-nav" aria-label="Điều hướng nhanh">
-    <a class="bn-item" href="index.html" aria-label="Trang chủ">
+    <button class="bn-item" id="bnHome" type="button" aria-label="Trang chủ">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M3 10.5 12 3l9 7.5V21a1.5 1.5 0 0 1-1.5 1.5H4.5A1.5 1.5 0 0 1 3 21V10.5Z" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linejoin="round"/>
         <path d="M9.5 22V15.5A1.5 1.5 0 0 1 11 14h2a1.5 1.5 0 0 1 1.5 1.5V22" stroke="rgba(231,237,249,.72)" stroke-width="2" stroke-linecap="round"/>
       </svg>
       <span>Home</span>
-    </a>
+    </button>
 
-    <a class="bn-item" href="list.html" aria-label="Danh sách">
+    <button class="bn-item" id="bnList" type="button" aria-label="Danh sách">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M4 6h16M4 12h16M4 18h10" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round"/>
       </svg>
       <span>List</span>
-    </a>
+    </button>
 
-    <a class="bn-item" href="list.html?kind=anime" aria-label="Anime">
+    <button class="bn-item" id="bnEp" type="button" aria-label="Tập">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M4 6h16v12H4V6Z" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linejoin="round"/>
-        <path d="M9 10v4l4-2-4-2Z" fill="rgba(231,237,249,.92)"/>
+        <path d="M4 7h16v10H4V7Z" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M10 10v4l4-2-4-2Z" fill="rgba(231,237,249,.92)"/>
       </svg>
-      <span>Anime</span>
-    </a>
+      <span>Tập</span>
+    </button>
 
-    <a class="bn-item" href="list.html?kind=movie" aria-label="Phim lẻ">
+    <button class="bn-item" id="bnSuggest" type="button" aria-label="Đề xuất">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M4 7h16v14H4V7Z" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linejoin="round"/>
-        <path d="M4 7l2-4h3l-2 4M11 7l2-4h3l-2 4M18 7l2-4" stroke="rgba(231,237,249,.72)" stroke-width="2" stroke-linecap="round"/>
+        <path d="M12 2l3 7 7 .6-5.3 4.6 1.7 7L12 17.8 5.6 21.2l1.7-7L2 9.6 9 9l3-7Z"
+              stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linejoin="round"/>
       </svg>
-      <span>Lẻ</span>
-    </a>
+      <span>Gợi ý</span>
+    </button>
 
-    <a class="bn-item" href="list.html?kind=series" aria-label="Phim bộ">
+    <button class="bn-item" id="bnInfo" type="button" aria-label="Thông tin">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M4 6h16v6H4V6Z" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linejoin="round"/>
-        <path d="M4 12h16v6H4v-6Z" stroke="rgba(231,237,249,.72)" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Z" stroke="rgba(231,237,249,.92)" stroke-width="2"/>
+        <path d="M12 10v7" stroke="rgba(231,237,249,.92)" stroke-width="2" stroke-linecap="round"/>
+        <path d="M12 7h.01" stroke="rgba(231,237,249,.92)" stroke-width="3" stroke-linecap="round"/>
       </svg>
-      <span>Bộ</span>
-    </a>
+      <span>Info</span>
+    </button>
   </nav>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -771,11 +781,11 @@
       ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
       : null;
 
-    // ================== LOCAL FALLBACK ==================
+    // ================== Local fallback ==================
     const STORAGE_KEY = "khoii_drive_movies_v1";
     const LEGACY_KEY = "my_drive_movies_v2";
 
-    function loadMoviesLocal(){
+    function loadLocalMoviesRaw(){
       try{
         let raw = localStorage.getItem(STORAGE_KEY);
         if(!raw){
@@ -787,13 +797,67 @@
         }
         const arr = raw ? JSON.parse(raw) : [];
         return Array.isArray(arr) ? arr : [];
-      }catch{ return []; }
+      }catch{
+        return [];
+      }
     }
 
     // ================== Helpers ==================
-    const $ = (id) => document.getElementById(id);
+    const $ = (id)=>document.getElementById(id);
 
-    function safeText(s){ return String(s ?? ""); }
+    const ui = {
+      q: $("q"),
+      playerFrame: $("playerFrame"),
+      playerSkeleton: $("playerSkeleton"),
+      playerWrap: $("playerWrap"),
+
+      btnBack: $("btnBack"),
+      btnGoList: $("btnGoList"),
+      btnPrev: $("btnPrev"),
+      btnNext: $("btnNext"),
+      btnEpisodes: $("btnEpisodes"),
+      btnTheater: $("btnTheater"),
+      btnCopy: $("btnCopy"),
+      btnFull: $("btnFull"),
+
+      infoCard: $("infoCard"),
+      posterImg: $("posterImg"),
+      movieTitle: $("movieTitle"),
+      movieSub: $("movieSub"),
+      badges: $("badges"),
+      genres: $("genres"),
+      desc: $("desc"),
+
+      btnFav: $("btnFav"),
+      btnShare: $("btnShare"),
+
+      episodesCard: $("episodesCard"),
+      epsMeta: $("epsMeta"),
+      seasonChips: $("seasonChips"),
+      epsGrid: $("epsGrid"),
+
+      suggestCard: $("suggestCard"),
+      suggestRow: $("suggestRow"),
+      seeAll: $("seeAll"),
+
+      toast: $("toast"),
+
+      // bottom nav
+      bnHome: $("bnHome"),
+      bnList: $("bnList"),
+      bnEp: $("bnEp"),
+      bnSuggest: $("bnSuggest"),
+      bnInfo: $("bnInfo"),
+    };
+
+    let toastTimer = null;
+    function toast(msg){
+      ui.toast.textContent = String(msg || "");
+      ui.toast.classList.add("on");
+      if(toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(()=>ui.toast.classList.remove("on"), 2600);
+    }
+
     function escapeHtml(s){
       return String(s ?? "")
         .replaceAll("&","&amp;")
@@ -820,124 +884,169 @@
   <rect width="100%" height="100%" fill="url(#g)"/>
   <rect width="100%" height="100%" fill="url(#r)"/>
   <text x="6%" y="52%" fill="rgba(231,237,249,.92)" font-family="system-ui,Segoe UI,Roboto" font-size="56" font-weight="800">${safe}</text>
-  <text x="6%" y="64%" fill="rgba(231,237,249,.55)" font-family="system-ui,Segoe UI,Roboto" font-size="22">Khoii Watch</text>
+  <text x="6%" y="64%" fill="rgba(231,237,249,.55)" font-family="system-ui,Segoe UI,Roboto" font-size="22">Khoii</text>
 </svg>`;
       return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
     }
 
-    const DriveTool = (() => {
-      const patterns = [
-        /drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]{10,})/i,
-        /drive\.google\.com\/open\?id=([a-zA-Z0-9_-]{10,})/i,
-        /drive\.google\.com\/uc\?id=([a-zA-Z0-9_-]{10,})/i,
-        /drive\.google\.com\/uc\?export=download&id=([a-zA-Z0-9_-]{10,})/i,
-        /drive\.google\.com\/thumbnail\?id=([a-zA-Z0-9_-]{10,})/i,
-      ];
-      function extractId(input){
-        const s = String(input || "").trim();
-        if(!s) return null;
-        if (/^[a-zA-Z0-9_-]{10,}$/.test(s)) return s;
-        try{
-          const u = new URL(s);
-          const qid = u.searchParams.get("id");
-          if(qid && /^[a-zA-Z0-9_-]{10,}$/.test(qid)) return qid;
-        }catch{}
-        for(const re of patterns){
-          const m = s.match(re);
-          if(m && m[1]) return m[1];
-        }
-        return null;
-      }
-      function thumb(id, w=800){ return `https://drive.google.com/thumbnail?id=${id}&sz=w${w}`; }
-      function preview(id){ return `https://drive.google.com/file/d/${id}/preview`; }
-      function view(id){ return `https://drive.google.com/file/d/${id}/view`; }
-      return { extractId, thumb, preview, view };
-    })();
-
-    function kindLabel(kind){
-      return kind === "movie" ? "Phim Lẻ" : kind === "series" ? "Phim Bộ" : "Anime";
+    function setImgWithFallback(imgEl, url, fallbackUrl){
+      try{ imgEl.decoding = "async"; }catch{}
+      imgEl.onerror = ()=>{ imgEl.onerror=null; imgEl.src = fallbackUrl; };
+      imgEl.src = url || fallbackUrl;
     }
 
-    function fmtMs(ms){
-      const n = Number(ms);
-      if(!Number.isFinite(n) || n <= 0) return "—";
-      try{ return new Date(n).toLocaleString("vi-VN"); }catch{ return String(n); }
+    function isEpisodicKind(kind){
+      return kind === "anime" || kind === "series";
     }
 
-    function showToast(msg, type="ok"){
-      const t = $("toast");
-      t.className = "toast on " + (type === "err" ? "err" : "ok");
-      t.textContent = String(msg || "");
-      clearTimeout(showToast._tm);
-      showToast._tm = setTimeout(()=>{ t.className = "toast"; }, 2200);
+    // Tạo url preview (không render ra UI)
+    function buildPreviewUrl(fileId){
+      const domain = ["https://","drive",".","google",".","com"].join("");
+      return domain + "/file/d/" + encodeURIComponent(fileId) + "/preview";
     }
 
+    // ================== Normalize rows ==================
     function normalizeRow(r){
-      // Support both Supabase row & localStorage object
-      const driveId = r.driveid || r.driveId || DriveTool.extractId(r.drivelink || r.driveLink) || "";
-      const posterUrl = r.posterurl || r.posterUrl || (driveId ? DriveTool.thumb(driveId, 600) : "");
-      const heroUrl = r.herourl || r.heroUrl || posterUrl || (driveId ? DriveTool.thumb(driveId, 1400) : "");
+      if(!r) return null;
 
-      const genres = Array.isArray(r.genres) ? r.genres : (Array.isArray(r.genresArr) ? r.genresArr : []);
+      // Supabase row
+      if (typeof r === "object" && ("driveid" in r || "posterurl" in r || "updatedat" in r)) {
+        return {
+          id: r.id || null,
+          title: r.title || "Không tên",
+          kind: r.kind || "anime",
+          year: r.year || "",
+          quality: r.quality || "FHD",
+          imdb: r.imdb || "",
+          desc: r.desc || "",
+          driveId: r.driveid || "",
+          posterUrl: r.posterurl || "",
+          heroUrl: r.herourl || "",
+          genres: Array.isArray(r.genres) ? r.genres : [],
+          country: r.country || "",
+          updatedAt: Number(r.updatedat || 0),
+          ep: (r.ep === null || r.ep === undefined) ? null : Number(r.ep),
+          eps: (r.eps === null || r.eps === undefined) ? null : Number(r.eps),
+          season: (r.season === null || r.season === undefined) ? null : Number(r.season),
+        };
+      }
+
+      // Local row
       return {
-        id: r.id || r._id || "",
+        id: r.id || null,
         title: r.title || "Không tên",
         kind: r.kind || "anime",
         year: r.year || "",
         quality: r.quality || "FHD",
-        desc: r.desc || r["desc"] || "",
         imdb: r.imdb || "",
-        driveId,
-        driveLink: r.drivelink || r.driveLink || "",
-        posterUrl,
-        heroUrl,
-        genres,
+        desc: r.desc || "",
+        driveId: r.driveId || "",
+        posterUrl: r.posterUrl || r.poster || "",
+        heroUrl: r.heroUrl || r.hero || "",
+        genres: Array.isArray(r.genres) ? r.genres : [],
         country: r.country || "",
-        updatedAt: Number(r.updatedat || r.updatedAt || 0),
+        updatedAt: Number(r.updatedAt || 0),
         ep: (r.ep === null || r.ep === undefined) ? null : Number(r.ep),
         eps: (r.eps === null || r.eps === undefined) ? null : Number(r.eps),
         season: (r.season === null || r.season === undefined) ? null : Number(r.season),
       };
     }
 
-    // Gom phim bộ/anime theo tập -> 1 card đại diện (ep=1), updatedAt=max
+    // ================== DB fetch ==================
+    const SELECT_COLS = "id,title,kind,year,quality,desc,imdb,driveid,posterurl,herourl,updatedat,genres,country,ep,eps,season";
+
+    async function dbGetByUuid(id){
+      if(!sb || !id) return null;
+      const { data, error } = await sb.from("movies").select(SELECT_COLS).eq("id", id).maybeSingle();
+      if(error) return null;
+      return normalizeRow(data);
+    }
+
+    async function dbGetByDriveId(driveId){
+      if(!sb || !driveId) return null;
+      const { data, error } = await sb.from("movies").select(SELECT_COLS).eq("driveid", driveId).maybeSingle();
+      if(error) return null;
+      return normalizeRow(data);
+    }
+
+    async function dbListByTitle(title){
+      if(!sb || !title) return null;
+      const { data, error } = await sb
+        .from("movies")
+        .select(SELECT_COLS)
+        .eq("title", title)
+        .order("season", { ascending:true })
+        .order("ep", { ascending:true })
+        .limit(900);
+
+      if(error) return null;
+      return (data || []).map(normalizeRow).filter(Boolean);
+    }
+
+    async function dbPickLatestByTitle(title){
+      if(!sb || !title) return null;
+      const { data, error } = await sb
+        .from("movies")
+        .select(SELECT_COLS)
+        .eq("title", title)
+        .order("updatedat", { ascending:false })
+        .limit(1)
+        .maybeSingle();
+
+      if(error) return null;
+      return normalizeRow(data);
+    }
+
+    async function dbFetchRecent(limit=220){
+      if(!sb) return null;
+      const { data, error } = await sb
+        .from("movies")
+        .select(SELECT_COLS)
+        .order("updatedat", { ascending:false })
+        .limit(limit);
+
+      if(error) return null;
+      return (data || []).map(normalizeRow).filter(Boolean);
+    }
+
+    // ================== Collapse episodic rows for suggestion ==================
     function collapseEpisodicRows(rows){
       const out = [];
       const map = new Map();
 
-      for(const raw of (rows || [])){
-        const r = normalizeRow(raw);
+      for (const r of (rows || [])) {
         const kind = r.kind || "anime";
-        const episodic = (kind === "anime" || kind === "series");
+        const episodic = isEpisodicKind(kind);
 
-        if(!episodic){
+        // movie hoặc không có ep => giữ nguyên
+        if (!episodic || r.ep === null || r.ep === undefined) {
           out.push({ ...r, openSeason: 1, openEp: 1 });
           continue;
         }
 
-        const season = Number(r.season || 1) || 1; // null -> 1
+        const season = Number(r.season || 1) || 1;
         const title = String(r.title || "").trim();
         const key = `${kind}||${season}||${title}`.toLowerCase();
 
         let g = map.get(key);
-        if(!g){
+        if (!g) {
           g = { kind, season, title, rows: [] };
           map.set(key, g);
         }
         g.rows.push(r);
       }
 
-      for(const g of map.values()){
+      for (const g of map.values()) {
         const arr = g.rows.slice();
         arr.sort((a,b)=>(Number(a.ep||0)-Number(b.ep||0)) || (Number(a.updatedAt||0)-Number(b.updatedAt||0)));
 
-        const rep = arr.find(x=>Number(x.ep)===1) || arr[0];
-        const maxUpdated = Math.max(...arr.map(x=>Number(x.updatedAt||0)||0));
-        const maxEp = Math.max(...arr.map(x=>Number(x.ep||0)||0));
-        const totalEps = arr.reduce((m,x)=>Math.max(m, Number(x.eps||0)||0), 0) || (rep.eps || null);
+        const rep = arr.find(x => Number(x.ep) === 1) || arr[0];
+        const maxUpdated = Math.max(...arr.map(x => Number(x.updatedAt || 0) || 0));
+        const maxEp = Math.max(...arr.map(x => Number(x.ep || 0) || 0));
+        const totalEps = arr.reduce((m, x) => Math.max(m, Number(x.eps || 0) || 0), 0) || (rep.eps || null);
 
-        const posterUrl = arr.map(x=>x.posterUrl).find(Boolean) || rep.posterUrl || "";
-        const heroUrl = arr.map(x=>x.heroUrl).find(Boolean) || rep.heroUrl || posterUrl || "";
+        const posterUrl = arr.map(x => x.posterUrl).find(Boolean) || rep.posterUrl || "";
+        const heroUrl = arr.map(x => x.heroUrl).find(Boolean) || rep.heroUrl || posterUrl || "";
 
         out.push({
           ...rep,
@@ -946,7 +1055,8 @@
           season: g.season,
           ep: (rep.ep ?? 1),
           eps: totalEps,
-          posterUrl, heroUrl,
+          posterUrl,
+          heroUrl,
           updatedAt: maxUpdated,
           openSeason: g.season,
           openEp: 1,
@@ -958,585 +1068,689 @@
       return out;
     }
 
-    function makeWatchHref(item, overrides={}){
-      const it = { ...item, ...overrides };
-      const kind = it.kind || "anime";
-      const episodic = (kind === "anime" || kind === "series");
-      if(episodic){
-        const season = Number(it.openSeason || it.season || 1) || 1;
-        const ep = Number(it.openEp || 1) || 1;
-        return `watch.html?title=${encodeURIComponent(it.title)}&season=${encodeURIComponent(season)}&ep=${encodeURIComponent(ep)}`;
+    function makeWatchHref(item){
+      const kind = item.kind || "anime";
+      if (isEpisodicKind(kind)) {
+        const season = Number(item.openSeason || item.season || 1) || 1;
+        const ep = Number(item.openEp || 1) || 1;
+        return `watch.html?title=${encodeURIComponent(item.title)}&season=${encodeURIComponent(season)}&ep=${encodeURIComponent(ep)}`;
       }
-      return `watch.html?drive=${encodeURIComponent(it.driveId)}&title=${encodeURIComponent(it.title)}`;
+      // movie: ưu tiên id (không dùng drive trên URL)
+      if (item.id) return `watch.html?id=${encodeURIComponent(item.id)}&title=${encodeURIComponent(item.title)}`;
+      return `watch.html?title=${encodeURIComponent(item.title)}`;
     }
 
-    function badgeHTML(item, episodeText){
-      const imdbPart = item.imdb ? `<span class="badge imdb"><b>IMDb</b> ${escapeHtml(item.imdb)}</span>` : "";
-      const countryPart = item.country ? `<span class="badge">${escapeHtml(item.country)}</span>` : "";
-      const year = item.year || "—";
-      const quality = item.quality || "FHD";
-      const kind = kindLabel(item.kind);
+    // ================== Watch State ==================
+    const state = {
+      current: null,          // object row đang phát (movie hoặc episode)
+      baseInfo: null,         // info đại diện cho series (thường ep1)
+      episodic: false,
 
-      const epPart = episodeText ? `<span class="badge">${escapeHtml(episodeText)}</span>` : "";
+      title: "",
+      kind: "",
+      seasons: [],
+      seasonMap: new Map(),   // season -> Map(ep->row)
+      activeSeason: 1,
+      activeEp: 1,
+      totalEps: null,
+      latestEp: null,
+      prevTarget: null,       // {season, ep}
+      nextTarget: null,       // {season, ep}
 
-      return `
-        ${imdbPart}
-        <span class="badge">${escapeHtml(quality)}</span>
-        <span class="badge">${escapeHtml(year)}</span>
-        ${countryPart}
-        <span class="badge">${escapeHtml(kind)}</span>
-        ${epPart}
-      `;
+      cleanUrl: "",
+      suggestions: [],
+    };
+
+    function kindLabel(k){
+      return k === "movie" ? "Phim Lẻ" : (k === "series" ? "Phim Bộ" : "Anime");
     }
 
-    function genresHTML(item){
-      const arr = Array.isArray(item.genres) ? item.genres : [];
-      return arr.slice(0,10).map(g => `<span class="genre">${escapeHtml(g)}</span>`).join("");
+    function fmtUpdated(ms){
+      const n = Number(ms);
+      if(!Number.isFinite(n) || n <= 0) return "";
+      try{ return new Date(n).toLocaleString("vi-VN"); }catch{ return ""; }
     }
 
-    function renderCards(container, list, tagText){
-      container.innerHTML = "";
-      list.forEach((raw)=>{
-        const item = normalizeRow(raw);
+    function computeTargets(){
+      state.prevTarget = null;
+      state.nextTarget = null;
+
+      if(!state.episodic) return;
+
+      const s = Number(state.activeSeason||1) || 1;
+      const e = Number(state.activeEp||1) || 1;
+
+      const seasons = state.seasons.slice().sort((a,b)=>a-b);
+      const epsMap = state.seasonMap.get(s) || new Map();
+      const epsList = [...epsMap.keys()].sort((a,b)=>a-b);
+
+      const idx = epsList.indexOf(e);
+
+      // prev
+      if(idx > 0){
+        state.prevTarget = { season:s, ep: epsList[idx-1] };
+      }else{
+        // qua season trước (lấy tập lớn nhất)
+        const si = seasons.indexOf(s);
+        if(si > 0){
+          const ps = seasons[si-1];
+          const pm = state.seasonMap.get(ps) || new Map();
+          const pel = [...pm.keys()].sort((a,b)=>a-b);
+          if(pel.length) state.prevTarget = { season:ps, ep: pel[pel.length-1] };
+        }
+      }
+
+      // next
+      if(idx >= 0 && idx < epsList.length - 1){
+        state.nextTarget = { season:s, ep: epsList[idx+1] };
+      }else{
+        // qua season sau (lấy tập nhỏ nhất)
+        const si = seasons.indexOf(s);
+        if(si >= 0 && si < seasons.length - 1){
+          const ns = seasons[si+1];
+          const nm = state.seasonMap.get(ns) || new Map();
+          const nel = [...nm.keys()].sort((a,b)=>a-b);
+          if(nel.length) state.nextTarget = { season:ns, ep: nel[0] };
+        }
+      }
+    }
+
+    function saveContinue(){
+      try{
+        if(!state.current) return;
+        const key = "khoii_continue_v1";
+        const raw = localStorage.getItem(key);
+        const obj = raw ? JSON.parse(raw) : {};
+        const t = state.title || state.current.title || "";
+        if(!t) return;
+
+        obj[t] = {
+          kind: state.kind,
+          season: state.activeSeason,
+          ep: state.activeEp,
+          at: Date.now(),
+          id: state.current.id || null
+        };
+        localStorage.setItem(key, JSON.stringify(obj));
+      }catch{}
+    }
+
+    function renderInfo(){
+      const item = state.baseInfo || state.current;
+      if(!item){
+        ui.movieTitle.textContent = "Không tìm thấy phim";
+        ui.movieSub.textContent = "";
+        ui.badges.innerHTML = "";
+        ui.genres.innerHTML = "";
+        ui.desc.textContent = "Hãy quay lại danh sách hoặc thử tìm kiếm.";
+        setImgWithFallback(ui.posterImg, svgPlaceholder("Khoii • Poster", 500, 750), svgPlaceholder("Khoii • Poster", 500, 750));
+        return;
+      }
+
+      document.title = `${item.title} - Khoii`;
+
+      ui.movieTitle.textContent = item.title || "Không tên";
+      ui.movieSub.textContent = kindLabel(item.kind || "anime");
+
+      const badges = [];
+
+      if(item.imdb) badges.push(`<span class="badge imdb"><b>IMDb</b> ${escapeHtml(item.imdb)}</span>`);
+      if(item.quality) badges.push(`<span class="badge">${escapeHtml(item.quality)}</span>`);
+      if(item.year) badges.push(`<span class="badge">${escapeHtml(item.year)}</span>`);
+      if(item.country) badges.push(`<span class="badge">${escapeHtml(item.country)}</span>`);
+
+      if(state.episodic){
+        badges.push(`<span class="badge">S${escapeHtml(String(state.activeSeason))}</span>`);
+        const epsText = state.totalEps ? `${state.activeEp}/${state.totalEps}` : `${state.activeEp}`;
+        badges.push(`<span class="badge">Tập ${escapeHtml(epsText)}</span>`);
+        if(Number.isFinite(state.latestEp) && state.latestEp > 0){
+          badges.push(`<span class="badge">Mới nhất: ${escapeHtml(String(state.latestEp))}</span>`);
+        }
+      }else{
+        badges.push(`<span class="badge">Full</span>`);
+      }
+
+      const updated = fmtUpdated(item.updatedAt);
+      if(updated) badges.push(`<span class="badge">Cập nhật: ${escapeHtml(updated)}</span>`);
+
+      ui.badges.innerHTML = badges.join("");
+
+      const gs = Array.isArray(item.genres) ? item.genres : [];
+      ui.genres.innerHTML = gs.slice(0,10).map(g=>`<span class="genre">${escapeHtml(g)}</span>`).join("");
+
+      ui.desc.textContent = item.desc || "—";
+
+      const poster = item.posterUrl || item.heroUrl || svgPlaceholder("Khoii • Poster", 500, 750);
+      setImgWithFallback(ui.posterImg, poster, svgPlaceholder("Khoii • Poster", 500, 750));
+    }
+
+    function renderEpisodes(){
+      if(!state.episodic){
+        ui.episodesCard.hidden = true;
+        ui.btnPrev.disabled = true;
+        ui.btnNext.disabled = true;
+        return;
+      }
+
+      ui.episodesCard.hidden = false;
+
+      // season chips
+      ui.seasonChips.innerHTML = "";
+      const seasons = state.seasons.slice().sort((a,b)=>a-b);
+      seasons.forEach(s=>{
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "chip" + (Number(s) === Number(state.activeSeason) ? " on" : "");
+        b.textContent = "Season " + s;
+        b.addEventListener("click", ()=>{
+          // chọn season -> mở tập 1 hoặc tập đầu tiên có dữ liệu
+          const m = state.seasonMap.get(s) || new Map();
+          const eps = [...m.keys()].sort((a,b)=>a-b);
+          const first = eps.length ? eps[0] : 1;
+          openEpisode(Number(s), Number(first), true);
+        });
+        ui.seasonChips.appendChild(b);
+      });
+
+      const epsMap = state.seasonMap.get(Number(state.activeSeason)) || new Map();
+
+      // total eps hiển thị: ưu tiên eps (tổng tập) nếu có, nếu không dùng max ep hiện có
+      const maxEpHave = [...epsMap.keys()].reduce((m, x)=>Math.max(m, Number(x)||0), 0) || 1;
+      const total = (Number(state.totalEps) > 0) ? Number(state.totalEps) : maxEpHave;
+
+      ui.epsMeta.textContent = `Season ${state.activeSeason} • ${total ? (total + " tập") : "—"}`;
+
+      ui.epsGrid.innerHTML = "";
+      for(let i=1;i<=total;i++){
+        const row = epsMap.get(i);
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "ep" + (i === Number(state.activeEp) ? " on" : "") + (row ? "" : " off");
+        btn.textContent = String(i);
+        btn.disabled = !row;
+        btn.addEventListener("click", ()=>openEpisode(Number(state.activeSeason), i, true));
+        ui.epsGrid.appendChild(btn);
+      }
+
+      computeTargets();
+      ui.btnPrev.disabled = !state.prevTarget;
+      ui.btnNext.disabled = !state.nextTarget;
+    }
+
+    function setPlayerByRow(row){
+      if(!row || !row.driveId){
+        ui.playerFrame.removeAttribute("src");
+        ui.playerSkeleton.classList.add("hide");
+        toast("Không có dữ liệu để phát.");
+        return;
+      }
+
+      ui.playerSkeleton.classList.remove("hide");
+
+      // set src (không render link ra UI)
+      const src = buildPreviewUrl(row.driveId);
+      ui.playerFrame.src = src;
+
+      // hide skeleton khi iframe load
+      ui.playerFrame.onload = ()=>{
+        setTimeout(()=>ui.playerSkeleton.classList.add("hide"), 350);
+      };
+    }
+
+    function buildCleanUrl(){
+      // Không dùng driveId trên URL
+      if(!state.current) return location.pathname;
+      if(state.episodic){
+        return `watch.html?title=${encodeURIComponent(state.title)}&season=${encodeURIComponent(state.activeSeason)}&ep=${encodeURIComponent(state.activeEp)}`;
+      }
+      // movie: ưu tiên uuid
+      if(state.current.id){
+        return `watch.html?id=${encodeURIComponent(state.current.id)}&title=${encodeURIComponent(state.current.title || state.title || "")}`;
+      }
+      return `watch.html?title=${encodeURIComponent(state.current.title || state.title || "")}`;
+    }
+
+    function replaceUrlClean(){
+      const clean = buildCleanUrl();
+      state.cleanUrl = clean;
+      try{
+        history.replaceState({}, "", clean);
+      }catch{}
+    }
+
+    function openEpisode(season, ep, userAction=false){
+      season = Number(season || 1) || 1;
+      ep = Number(ep || 1) || 1;
+
+      const epsMap = state.seasonMap.get(season) || new Map();
+      const row = epsMap.get(ep);
+
+      if(!row){
+        toast("Tập này chưa có.");
+        return;
+      }
+
+      state.activeSeason = season;
+      state.activeEp = ep;
+      state.current = row;
+
+      // total eps / latest ep: lấy theo season hiện tại
+      const maxEp = [...epsMap.keys()].reduce((m,x)=>Math.max(m, Number(x)||0), 0) || ep;
+      const anyRow = row;
+      state.totalEps = (anyRow && Number(anyRow.eps) > 0) ? Number(anyRow.eps) : null;
+      state.latestEp = maxEp;
+
+      renderInfo();
+      renderEpisodes();
+      setPlayerByRow(row);
+
+      replaceUrlClean();
+      saveContinue();
+
+      if(userAction){
+        // scroll nhẹ cho mobile
+        if(window.matchMedia("(max-width:980px)").matches){
+          ui.playerWrap?.scrollIntoView({ behavior:"smooth", block:"start" });
+        }
+      }
+    }
+
+    function renderSuggestions(list){
+      ui.suggestRow.innerHTML = "";
+
+      if(!list || !list.length){
+        ui.suggestRow.innerHTML = `<div style="padding:8px 4px;color:rgba(231,237,249,.65);font-size:13px">Chưa có gợi ý.</div>`;
+        return;
+      }
+
+      list.slice(0,12).forEach(item=>{
         const c = document.createElement("div");
-        c.className = "m-card tip";
-        c.dataset.tip = item.title;
+        c.className = "mcard";
+        const poster = item.posterUrl || item.heroUrl || svgPlaceholder("Khoii • Poster", 500, 750);
         c.innerHTML = `
-          <div class="tag">${escapeHtml(tagText)}</div>
           <div class="img"><img alt="" loading="lazy"></div>
           <div class="meta">
-            <b>${escapeHtml(item.title)}</b>
+            <b>${escapeHtml(item.title || "Không tên")}</b>
             <small>${escapeHtml(kindLabel(item.kind))} • ${escapeHtml(item.year || "—")} • ${escapeHtml(item.quality || "FHD")}</small>
           </div>
         `;
         const img = c.querySelector("img");
         img.decoding = "async";
-        img.onerror = () => { img.onerror = null; img.src = svgPlaceholder("Khoii • Poster", 500, 750); };
-        img.src = item.posterUrl || svgPlaceholder("Khoii • Poster", 500, 750);
+        img.onerror = ()=>{ img.onerror=null; img.src = svgPlaceholder("Khoii • Poster", 500, 750); };
+        img.src = poster;
 
         c.addEventListener("click", ()=>{
-          if(!item.driveId){
-            showToast("Phim này chưa có Drive ID.", "err");
-            return;
-          }
           location.href = makeWatchHref(item);
         });
 
-        container.appendChild(c);
+        ui.suggestRow.appendChild(c);
       });
     }
 
-    // ================== Load data from Supabase ==================
-    async function dbFetchByDriveId(driveId){
-      if(!sb || !driveId) return null;
-      const { data, error } = await sb
-        .from("movies")
-        .select("id,title,kind,year,quality,desc,driveid,drivelink,posterurl,herourl,updatedat,genres,country,imdb,ep,eps,season")
-        .eq("driveid", driveId)
-        .maybeSingle();
-      if(error) return null;
-      return data || null;
-    }
+    function scoreSuggest(candidate, cur){
+      let score = 0;
+      if(!candidate || !cur) return score;
 
-    async function dbFetchEpisodesByTitle(title){
-      if(!sb || !title) return [];
-      const { data, error } = await sb
-        .from("movies")
-        .select("id,title,kind,year,quality,desc,driveid,drivelink,posterurl,herourl,updatedat,genres,country,imdb,ep,eps,season")
-        .eq("title", title)
-        .in("kind", ["anime","series"])
-        .order("season", { ascending:true })
-        .order("ep", { ascending:true });
+      if(candidate.title === cur.title) return -9999; // loại chính nó
 
-      if(error) return [];
-      return Array.isArray(data) ? data : [];
-    }
+      // cùng loại
+      if(candidate.kind === cur.kind) score += 3;
 
-    async function dbFetchSuggestions(){
-      if(!sb) return [];
-      const { data, error } = await sb
-        .from("movies")
-        .select("id,title,kind,year,quality,desc,driveid,drivelink,posterurl,herourl,updatedat,genres,country,imdb,ep,eps,season")
-        .order("updatedat", { ascending:false })
-        .limit(250);
-      if(error) return [];
-      return Array.isArray(data) ? data : [];
-    }
-
-    // ================== State ==================
-    const state = {
-      mode: "movie", // movie | episodic
-      current: null, // normalized item being played (episode row or movie row)
-      title: "",
-      driveId: "",
-      season: 1,
-      ep: 1,
-
-      episodesAll: [],
-      seasons: [],
-      seasonRows: [],
-      epMap: new Map(),
-      totalEps: 0,
-
-      chunkSize: 50,
-      pageStart: 1,
-      pageEnd: 1,
-    };
-
-    // ================== URL / Navigation ==================
-    function parseUrl(){
-      const u = new URL(location.href);
-      const driveRaw = u.searchParams.get("drive") || "";
-      const title = u.searchParams.get("title") || "";
-      const season = Number(u.searchParams.get("season") || 1) || 1;
-      const ep = Number(u.searchParams.get("ep") || 1) || 1;
-      const driveId = DriveTool.extractId(driveRaw) || "";
-      return { title, season, ep, driveId };
-    }
-
-    function setUrlEpisodic(title, season, ep){
-      const u = new URL(location.href);
-      u.searchParams.set("title", title);
-      u.searchParams.set("season", String(season));
-      u.searchParams.set("ep", String(ep));
-      u.searchParams.delete("drive"); // episodic: drive thay đổi theo từng tập
-      history.replaceState(null, "", u.toString());
-    }
-
-    function setUrlMovie(driveId, title){
-      const u = new URL(location.href);
-      u.searchParams.set("drive", driveId);
-      if(title) u.searchParams.set("title", title);
-      u.searchParams.delete("season");
-      u.searchParams.delete("ep");
-      history.replaceState(null, "", u.toString());
-    }
-
-    // ================== Render ==================
-    function setImgWithFallback(imgEl, url, fallbackUrl){
-      try{ imgEl.decoding = "async"; }catch{}
-      imgEl.onerror = () => { imgEl.onerror = null; imgEl.src = fallbackUrl; };
-      imgEl.src = url || fallbackUrl;
-    }
-
-    function renderPlayer(item){
-      const title = item?.title || "Không có tiêu đề";
-      document.title = title + " - Khoii";
-
-      const isEpisodic = (state.mode === "episodic");
-      const episodeText = isEpisodic ? `S${state.season} • Tập ${state.ep}` : "";
-
-      $("movieTitle").textContent = title;
-      $("movieSubline").innerHTML = `
-        <span>${escapeHtml(kindLabel(item.kind))}</span>
-        ${isEpisodic ? `<span>• Season ${escapeHtml(state.season)}</span><span>• Tập ${escapeHtml(state.ep)}</span>` : ""}
-      `;
-
-      $("movieBadges").innerHTML = badgeHTML(item, episodeText);
-
-      // Drive links
-      const open = $("btnOpenDrive");
-      open.href = item.driveId ? DriveTool.view(item.driveId) : "#";
-
-      // Player iframe
-      const frame = $("playerFrame");
-      const loading = $("playerLoading");
-      loading.style.display = "grid";
-
-      frame.onload = () => { loading.style.display = "none"; };
-      frame.src = item.driveId ? DriveTool.preview(item.driveId) : "about:blank";
-
-      // Prev/Next enable (episodic)
-      $("btnPrev").disabled = !(state.mode === "episodic" && canGoPrev());
-      $("btnNext").disabled = !(state.mode === "episodic" && canGoNext());
-    }
-
-    function renderInfo(item){
-      const title = item?.title || "—";
-      const episodic = (item.kind === "anime" || item.kind === "series");
-      const sub = episodic
-        ? `${kindLabel(item.kind)} • Season ${state.season} • Tập ${state.ep}`
-        : `${kindLabel(item.kind)} • ${item.year || "—"} • ${item.quality || "FHD"}`;
-
-      $("infoTitle").textContent = title;
-      $("infoSub").textContent = sub;
-
-      setImgWithFallback($("posterImg"), item.posterUrl, svgPlaceholder("Khoii • Poster", 500, 750));
-      $("infoGenres").innerHTML = genresHTML(item);
-      $("infoDesc").textContent = item.desc || "—";
-
-      $("kvKind").textContent = kindLabel(item.kind);
-      $("kvYear").textContent = item.year || "—";
-      $("kvQuality").textContent = item.quality || "FHD";
-      $("kvCountry").textContent = item.country || "—";
-      $("kvImdb").textContent = item.imdb || "—";
-      $("kvUpdated").textContent = fmtMs(item.updatedAt);
-    }
-
-    function renderSeasons(){
-      const wrap = $("seasonChips");
-      wrap.innerHTML = "";
-      if(state.seasons.length <= 1){
-        wrap.style.display = "none";
-        return;
+      // cùng quốc gia
+      if(candidate.country && cur.country && String(candidate.country).toLowerCase() === String(cur.country).toLowerCase()){
+        score += 1;
       }
-      wrap.style.display = "flex";
-      state.seasons.forEach(s=>{
-        const b = document.createElement("button");
-        b.type="button";
-        b.className = "chip" + (s === state.season ? " on" : "");
-        b.textContent = "Season " + s;
-        b.addEventListener("click", ()=> setSeason(s));
-        wrap.appendChild(b);
-      });
+
+      // cùng thể loại
+      const a = new Set((candidate.genres || []).map(x=>String(x).toLowerCase()));
+      const b = new Set((cur.genres || []).map(x=>String(x).toLowerCase()));
+      let common = 0;
+      b.forEach(g=>{ if(a.has(g)) common++; });
+      score += Math.min(common, 4) * 2;
+
+      // ưu tiên mới cập nhật
+      const upd = Number(candidate.updatedAt||0);
+      if(Number.isFinite(upd) && upd>0) score += Math.min(3, Math.floor((Date.now()-upd)/86400000) < 14 ? 2 : 0);
+
+      return score;
     }
 
-    function computeEpStats(){
-      const rows = state.seasonRows || [];
-      const maxEp = rows.reduce((m,r)=>Math.max(m, Number(r.ep||0)||0), 0);
-      const maxEpsField = rows.reduce((m,r)=>Math.max(m, Number(r.eps||0)||0), 0);
-      state.totalEps = maxEpsField || maxEp || 1;
+    async function loadSuggestions(){
+      const cur = state.baseInfo || state.current;
+      if(!cur) return;
 
-      state.epMap = new Map();
+      let pool = null;
+
+      // ưu tiên db
+      pool = await dbFetchRecent(260);
+
+      // fallback local
+      if(!pool || !pool.length){
+        pool = loadLocalMoviesRaw().map(normalizeRow).filter(Boolean);
+      }
+
+      // gộp episodic để tránh spam nhiều tập
+      const collapsed = collapseEpisodicRows(pool);
+
+      // chấm điểm
+      const ranked = collapsed
+        .map(x=>({ item:x, score: scoreSuggest(x, cur) }))
+        .filter(x=>x.score > -1000)
+        .sort((a,b)=> (b.score - a.score) || (Number(b.item.updatedAt||0) - Number(a.item.updatedAt||0)))
+        .map(x=>x.item);
+
+      const picks = ranked.filter(x=>x.title !== cur.title).slice(0, 12);
+
+      // link "xem tất cả" theo kind
+      if(isEpisodicKind(cur.kind)) ui.seeAll.href = `list.html?kind=${encodeURIComponent(cur.kind)}`;
+      else ui.seeAll.href = `list.html?kind=movie`;
+
+      renderSuggestions(picks);
+    }
+
+    // ================== Init logic ==================
+    function getParams(){
+      const u = new URL(location.href);
+      const p = u.searchParams;
+      const id = (p.get("id") || "").trim();
+      const drive = (p.get("drive") || "").trim(); // chỉ dùng để lookup, sau đó remove khỏi URL
+      const title = (p.get("title") || "").trim();
+      const season = Number(p.get("season") || 1) || 1;
+      const ep = Number(p.get("ep") || 1) || 1;
+      return { id, drive, title, season, ep };
+    }
+
+    function buildSeasonMap(rows){
+      const map = new Map();
       rows.forEach(r=>{
-        const n = Number(r.ep||0);
-        if(Number.isFinite(n) && n > 0) state.epMap.set(n, r);
+        const season = Number(r.season || 1) || 1;
+        // ep null => coi như ep=1
+        const ep = (r.ep === null || r.ep === undefined) ? 1 : (Number(r.ep) || 1);
+        let m = map.get(season);
+        if(!m){ m = new Map(); map.set(season, m); }
+        m.set(ep, r);
       });
+      return map;
     }
 
-    function ensurePageForEp(ep){
-      const total = state.totalEps || 1;
-      const size = state.chunkSize;
-      const safeEp = Math.min(Math.max(1, ep), total);
-      const pageIdx = Math.floor((safeEp - 1) / size);
-      state.pageStart = pageIdx * size + 1;
-      state.pageEnd = Math.min(total, state.pageStart + size - 1);
-    }
-
-    function renderEpisodes(){
-      const card = $("episodeCard");
-
-      if(state.mode !== "episodic" || !state.episodesAll.length){
-        card.hidden = true;
-        return;
-      }
-
-      card.hidden = false;
-
-      $("epMeta").textContent = `Season ${state.season} • Tổng ${state.totalEps} tập • Có dữ liệu ${state.seasonRows.length} tập`;
-
-      renderSeasons();
-      ensurePageForEp(state.ep);
-
-      $("epRange").textContent = `Hiện: ${state.pageStart}-${state.pageEnd} / ${state.totalEps}`;
-
-      const list = $("epList");
-      list.innerHTML = "";
-
-      for(let n=state.pageStart; n<=state.pageEnd; n++){
-        const row = state.epMap.get(n);
-        const b = document.createElement("button");
-        b.type="button";
-        b.className = "ep-btn" + (n === state.ep ? " on" : "") + (!row ? " miss" : "");
-        b.textContent = String(n);
-
-        if(row){
-          b.addEventListener("click", ()=> setEpisode(n));
-        }else{
-          b.disabled = true;
-          b.title = "Chưa có link tập này";
-        }
-
-        list.appendChild(b);
-      }
-
-      // update prev/next
-      $("btnPrev").disabled = !canGoPrev();
-      $("btnNext").disabled = !canGoNext();
-    }
-
-    // ================== Episode Navigation ==================
-    function canGoPrev(){
-      if(state.mode !== "episodic") return false;
-      for(let n=state.ep-1; n>=1; n--){
-        if(state.epMap.has(n)) return true;
-      }
-      return false;
-    }
-    function canGoNext(){
-      if(state.mode !== "episodic") return false;
-      for(let n=state.ep+1; n<=state.totalEps; n++){
-        if(state.epMap.has(n)) return true;
-      }
-      return false;
-    }
-    function findPrevEp(){
-      for(let n=state.ep-1; n>=1; n--){
-        if(state.epMap.has(n)) return n;
-      }
-      return null;
-    }
-    function findNextEp(){
-      for(let n=state.ep+1; n<=state.totalEps; n++){
-        if(state.epMap.has(n)) return n;
-      }
-      return null;
-    }
-
-    function setSeason(season){
-      const s = Number(season || 1) || 1;
-      state.season = s;
-
-      // filter season rows (null -> 1)
-      state.seasonRows = state.episodesAll
-        .map(normalizeRow)
-        .filter(r => (Number(r.season || 1) || 1) === s)
-        .sort((a,b)=>(Number(a.ep||0)-Number(b.ep||0)));
-
-      computeEpStats();
-
-      // choose ep: keep current if exists, else fallback to first available
-      if(!state.epMap.has(state.ep)){
-        const first = state.seasonRows.find(r=>Number(r.ep||0)>0)?.ep || 1;
-        state.ep = Number(first || 1) || 1;
-      }
-
-      // update current item row
-      const row = state.epMap.get(state.ep) || state.seasonRows[0];
-      if(row){
-        state.current = normalizeRow(row);
-        state.current.kind = state.current.kind || "anime";
-        state.current.openSeason = state.season;
-        state.current.openEp = state.ep;
-        state.current.driveId = state.current.driveId || row.driveid || "";
-      }
-
-      setUrlEpisodic(state.title, state.season, state.ep);
-      renderPlayer(state.current);
-      renderInfo(state.current);
-      renderEpisodes();
-      scrollEpIntoView();
-    }
-
-    function setEpisode(ep){
-      const n = Number(ep || 1) || 1;
-      const row = state.epMap.get(n);
-      if(!row){
-        showToast("Tập này chưa có link.", "err");
-        return;
-      }
-
-      state.ep = n;
-      state.current = normalizeRow(row);
-      state.current.openSeason = state.season;
-      state.current.openEp = state.ep;
-
-      setUrlEpisodic(state.title, state.season, state.ep);
-      renderPlayer(state.current);
-      renderInfo(state.current);
-      renderEpisodes();
-      scrollEpIntoView();
-    }
-
-    function scrollEpIntoView(){
-      const btn = $("epList")?.querySelector(".ep-btn.on");
-      if(btn?.scrollIntoView){
-        btn.scrollIntoView({ behavior:"smooth", block:"nearest", inline:"nearest" });
-      }
-    }
-
-    // ================== Main init ==================
     async function init(){
-      // Search (Enter -> list.html?q=...)
-      $("q").addEventListener("keydown", (ev)=>{
-        if(ev.key === "Enter"){
-          const q = ($("q").value || "").trim();
-          if(!q) return;
-          location.href = `list.html?q=${encodeURIComponent(q)}`;
+      ui.playerSkeleton.classList.remove("hide");
+
+      const { id, drive, title, season, ep } = getParams();
+
+      let current = null;
+      let titleRows = null;
+
+      // 1) ưu tiên: id (uuid)
+      if(id){
+        current = await dbGetByUuid(id);
+      }
+
+      // 2) nếu có drive param (từ index/list movie cũ) => lookup rồi sẽ xóa khỏi URL
+      if(!current && drive){
+        current = await dbGetByDriveId(drive);
+      }
+
+      // 3) nếu có title => load theo title
+      if(!current && title){
+        // lấy latest row của title (để biết kind)
+        current = await dbPickLatestByTitle(title);
+      }
+
+      // fallback local (khi không dùng db)
+      if(!current){
+        const local = loadLocalMoviesRaw().map(normalizeRow).filter(Boolean);
+        if(id) current = local.find(x=>String(x.id||"") === String(id)) || null;
+        if(!current && title) current = local.find(x=>String(x.title||"") === String(title)) || null;
+        // drive param local: vẫn match driveId
+        if(!current && drive) current = local.find(x=>String(x.driveId||"") === String(drive)) || null;
+      }
+
+      if(!current){
+        ui.playerSkeleton.classList.add("hide");
+        state.current = null;
+        state.baseInfo = null;
+        state.episodic = false;
+        renderInfo();
+        renderEpisodes();
+        renderSuggestions([]);
+        toast("Không tìm thấy phim.");
+        return;
+      }
+
+      state.title = current.title || title || "";
+      state.kind = current.kind || "anime";
+      state.episodic = isEpisodicKind(state.kind);
+
+      // Nếu là episodic => tải toàn bộ tập theo title
+      if(state.episodic){
+        titleRows = await dbListByTitle(state.title);
+
+        // local fallback episodic
+        if((!titleRows || !titleRows.length) && !sb){
+          const local = loadLocalMoviesRaw().map(normalizeRow).filter(Boolean);
+          titleRows = local.filter(x=>String(x.title||"") === String(state.title) && isEpisodicKind(x.kind));
         }
-      });
 
-      // Copy link
-      $("btnCopy").addEventListener("click", async ()=>{
-        try{
-          await navigator.clipboard.writeText(location.href);
-          showToast("Đã copy link trang xem.", "ok");
-        }catch{
-          showToast("Không copy được (trình duyệt chặn).", "err");
-        }
-      });
+        titleRows = (titleRows || []).filter(x=>isEpisodicKind(x.kind));
 
-      // Prev / Next
-      $("btnPrev").addEventListener("click", ()=>{
-        const p = findPrevEp();
-        if(p) setEpisode(p);
-      });
-      $("btnNext").addEventListener("click", ()=>{
-        const n = findNextEp();
-        if(n) setEpisode(n);
-      });
-
-      // Episode pager
-      $("btnPagePrev").addEventListener("click", ()=>{
-        if(state.pageStart <= 1) return;
-        state.pageStart = Math.max(1, state.pageStart - state.chunkSize);
-        state.pageEnd = Math.min(state.totalEps, state.pageStart + state.chunkSize - 1);
-        renderEpisodes();
-      });
-      $("btnPageNext").addEventListener("click", ()=>{
-        if(state.pageEnd >= state.totalEps) return;
-        state.pageStart = Math.min(state.totalEps, state.pageStart + state.chunkSize);
-        state.pageEnd = Math.min(state.totalEps, state.pageStart + state.chunkSize - 1);
-        renderEpisodes();
-      });
-
-      $("btnJump").addEventListener("click", ()=>{
-        const n = Number($("jumpEp").value || 0);
-        if(!n){ showToast("Nhập số tập hợp lệ.", "err"); return; }
-        // auto jump page
-        ensurePageForEp(n);
-        renderEpisodes();
-        // only set episode if exists
-        if(state.epMap.has(n)) setEpisode(n);
-        else showToast("Tập này chưa có link.", "err");
-      });
-
-      // Parse URL
-      const p = parseUrl();
-
-      // Determine mode
-      let driveId = p.driveId;
-      let title = p.title;
-      let season = p.season;
-      let ep = p.ep;
-
-      // If have drive => fetch row by drive (movie OR episodic)
-      let rowByDrive = null;
-      if(driveId){
-        rowByDrive = await dbFetchByDriveId(driveId);
-        if(!rowByDrive){
-          // fallback local by drive
-          const local = loadMoviesLocal().map(normalizeRow);
-          rowByDrive = local.find(x => x.driveId === driveId) || null;
+        // Nếu vẫn không có tập => coi như movie lẻ (trường hợp dữ liệu thiếu ep)
+        if(!titleRows.length){
+          state.episodic = false;
         }
       }
 
-      if(rowByDrive){
-        const it = normalizeRow(rowByDrive);
-        title = title || it.title || "";
-        // if episodic row (anime/series OR has ep/season)
-        const episodic = (it.kind === "anime" || it.kind === "series" || it.ep !== null || it.season !== null);
-        if(episodic && title){
-          state.mode = "episodic";
-          state.title = title;
-          state.season = Number(it.season || season || 1) || 1;
-          state.ep = Number(it.ep || ep || 1) || 1;
-        }else{
-          state.mode = "movie";
-          state.title = title || it.title || "";
-          state.driveId = it.driveId || driveId;
-          state.current = it;
-          setUrlMovie(state.driveId, state.title);
-          renderPlayer(state.current);
-          renderInfo(state.current);
+      // Base info: lấy ep=1 của season 1 nếu có, không thì lấy current
+      state.baseInfo = current;
+      if(state.episodic && titleRows && titleRows.length){
+        // sort để chọn đại diện tốt
+        const sorted = titleRows.slice().sort((a,b)=>
+          (Number(a.season||1)-Number(b.season||1)) ||
+          (Number(a.ep||1)-Number(b.ep||1)) ||
+          (Number(b.updatedAt||0)-Number(a.updatedAt||0))
+        );
+        const rep = sorted.find(x=>Number(x.season||1)===1 && Number(x.ep||1)===1) || sorted[0];
+        state.baseInfo = rep || current;
+
+        state.seasonMap = buildSeasonMap(titleRows);
+        state.seasons = [...state.seasonMap.keys()].sort((a,b)=>a-b);
+
+        // set active season/ep theo URL, nếu không có thì fallback
+        let s = Number(season||1) || 1;
+        if(!state.seasonMap.has(s)){
+          s = state.seasons[0] || 1;
         }
-      }else{
-        // No row by drive => maybe episodic by title
-        if(title){
-          state.mode = "episodic";
-          state.title = title;
-          state.season = Number(season || 1) || 1;
-          state.ep = Number(ep || 1) || 1;
-        }else if(driveId){
-          // Only driveId, no DB info => still play
-          state.mode = "movie";
-          state.title = "Video";
-          state.driveId = driveId;
-          state.current = normalizeRow({ title: "Video", kind: "movie", driveid: driveId });
-          setUrlMovie(driveId, "Video");
-          renderPlayer(state.current);
-          renderInfo(state.current);
-          showToast("Không tìm thấy phim trong DB, nhưng vẫn phát video theo Drive ID.", "err");
-        }else{
-          // nothing
-          state.current = normalizeRow({ title:"Không có dữ liệu", kind:"movie", driveid:"" });
-          renderPlayer(state.current);
-          renderInfo(state.current);
-          showToast("Thiếu tham số. Mở từ index/list để vào đúng phim.", "err");
+
+        const epsMap = state.seasonMap.get(s) || new Map();
+
+        let e = Number(ep||1) || 1;
+        if(!epsMap.has(e)){
+          // nếu ep không có, lấy ep=1 hoặc ep nhỏ nhất đang có
+          const epsList = [...epsMap.keys()].sort((a,b)=>a-b);
+          e = (epsMap.has(1) ? 1 : (epsList[0] || 1));
         }
+
+        // set active và current theo tập
+        state.activeSeason = s;
+        state.activeEp = e;
+
+        const row = epsMap.get(e) || state.baseInfo || current;
+        state.current = row;
+
+        // total eps / latest
+        state.totalEps = (row && Number(row.eps) > 0) ? Number(row.eps) : null;
+        state.latestEp = [...epsMap.keys()].reduce((m,x)=>Math.max(m, Number(x)||0), 0) || e;
+
+      } else {
+        // movie lẻ
+        state.current = current;
+        state.activeSeason = 1;
+        state.activeEp = 1;
+        state.totalEps = null;
+        state.latestEp = null;
       }
 
-      // Episodic mode: load episodes list
-      if(state.mode === "episodic" && state.title){
-        let epsAll = await dbFetchEpisodesByTitle(state.title);
+      // Render
+      renderInfo();
+      renderEpisodes();
+      setPlayerByRow(state.current);
 
-        if(!epsAll.length){
-          // fallback local (nếu có lưu theo từng tập)
-          const local = loadMoviesLocal().map(normalizeRow);
-          epsAll = local.filter(x => x.title === state.title && (x.kind==="anime" || x.kind==="series"));
-        }
-
-        state.episodesAll = epsAll.map(normalizeRow);
-
-        // seasons list
-        const seasonSet = new Set();
-        state.episodesAll.forEach(r => seasonSet.add(Number(r.season || 1) || 1));
-        state.seasons = [...seasonSet].sort((a,b)=>a-b);
-
-        // if season not exist => fallback first season
-        if(state.seasons.length && !seasonSet.has(state.season)){
-          state.season = state.seasons[0];
-        }
-
-        // filter current season
-        state.seasonRows = state.episodesAll
-          .filter(r => (Number(r.season || 1) || 1) === state.season)
-          .sort((a,b)=>(Number(a.ep||0)-Number(b.ep||0)));
-
-        computeEpStats();
-
-        // choose episode
-        if(!state.epMap.has(state.ep)){
-          // fallback to first available ep
-          const first = state.seasonRows.find(r=>Number(r.ep||0)>0)?.ep || 1;
-          state.ep = Number(first || 1) || 1;
-        }
-
-        const curRow = state.epMap.get(state.ep) || state.seasonRows[0];
-        if(curRow){
-          state.current = normalizeRow(curRow);
-          setUrlEpisodic(state.title, state.season, state.ep);
-          renderPlayer(state.current);
-          renderInfo(state.current);
-          renderEpisodes();
-        }else{
-          // no episodes found
-          state.current = normalizeRow({ title: state.title, kind:"anime", driveid:"" });
-          renderPlayer(state.current);
-          renderInfo(state.current);
-          $("episodeCard").hidden = true;
-          showToast("Không tìm thấy danh sách tập cho phim này.", "err");
-        }
-      }
+      // Clean URL (remove drive param khỏi thanh địa chỉ)
+      replaceUrlClean();
 
       // Suggestions
-      let rawSug = await dbFetchSuggestions();
-      if(!rawSug.length){
-        rawSug = loadMoviesLocal();
-      }
-
-      const collapsed = collapseEpisodicRows(rawSug);
-      const currentKey = (state.current?.title || "").trim().toLowerCase();
-      const filtered = collapsed.filter(x => (String(x.title||"").trim().toLowerCase() !== currentKey));
-
-      const newest = filtered.slice().sort((a,b)=>(Number(b.updatedAt||0)-Number(a.updatedAt||0))).slice(0,12);
-      const suggest = filtered.slice(0,12);
-
-      renderCards($("rowSuggest"), suggest, "HOT");
-      renderCards($("rowNew"), newest, "NEW");
+      await loadSuggestions();
     }
 
-    init();
+    // ================== Wire events ==================
+    ui.btnBack.addEventListener("click", ()=>{
+      // nếu có history thì back, không thì về home
+      try{
+        if(history.length > 1) history.back();
+        else location.href = "index.html";
+      }catch{
+        location.href = "index.html";
+      }
+    });
+
+    ui.btnGoList.addEventListener("click", ()=> location.href = "list.html");
+
+    ui.btnEpisodes.addEventListener("click", ()=>{
+      if(ui.episodesCard.hidden){
+        toast("Phim này không có danh sách tập.");
+        return;
+      }
+      ui.episodesCard.scrollIntoView({ behavior:"smooth", block:"start" });
+    });
+
+    ui.btnPrev.addEventListener("click", ()=>{
+      if(!state.prevTarget) return toast("Không có tập trước.");
+      openEpisode(state.prevTarget.season, state.prevTarget.ep, true);
+    });
+
+    ui.btnNext.addEventListener("click", ()=>{
+      if(!state.nextTarget) return toast("Không có tập tiếp.");
+      openEpisode(state.nextTarget.season, state.nextTarget.ep, true);
+    });
+
+    ui.btnTheater.addEventListener("click", ()=>{
+      document.body.classList.toggle("theater");
+      toast(document.body.classList.contains("theater") ? "Đã bật chế độ rạp." : "Đã tắt chế độ rạp.");
+    });
+
+    ui.btnFull.addEventListener("click", async ()=>{
+      const el = ui.playerWrap;
+      if(!el) return;
+      try{
+        if(document.fullscreenElement){
+          await document.exitFullscreen();
+        }else{
+          await el.requestFullscreen();
+        }
+      }catch{
+        toast("Thiết bị không hỗ trợ full screen.");
+      }
+    });
+
+    async function copyLink(){
+      const url = (state.cleanUrl ? (location.origin + "/" + state.cleanUrl) : location.href);
+      try{
+        await navigator.clipboard.writeText(url);
+        toast("Đã copy link xem.");
+      }catch{
+        // fallback
+        try{
+          const t = document.createElement("textarea");
+          t.value = url;
+          document.body.appendChild(t);
+          t.select();
+          document.execCommand("copy");
+          document.body.removeChild(t);
+          toast("Đã copy link xem.");
+        }catch{
+          toast("Copy thất bại. Hãy copy thủ công trên thanh địa chỉ.");
+        }
+      }
+    }
+
+    ui.btnCopy.addEventListener("click", copyLink);
+    ui.btnShare.addEventListener("click", copyLink);
+
+    ui.btnFav.addEventListener("click", ()=>{
+      try{
+        const key = "khoii_fav_v1";
+        const raw = localStorage.getItem(key);
+        const arr = raw ? JSON.parse(raw) : [];
+        const title = state.title || (state.current?.title || "");
+        if(!title) return;
+
+        const idx = arr.findIndex(x => x && x.title === title);
+        if(idx >= 0){
+          arr.splice(idx,1);
+          toast("Đã bỏ khỏi yêu thích.");
+        }else{
+          arr.push({
+            title,
+            kind: state.kind,
+            id: state.current?.id || null,
+            season: state.activeSeason,
+            ep: state.activeEp,
+            at: Date.now(),
+          });
+          toast("Đã thêm vào yêu thích.");
+        }
+        localStorage.setItem(key, JSON.stringify(arr));
+      }catch{
+        toast("Không lưu được yêu thích.");
+      }
+    });
+
+    // Search -> mở list.html?q=...
+    ui.q?.addEventListener("keydown", (ev)=>{
+      if(ev.key === "Enter"){
+        const q = (ui.q.value || "").trim();
+        if(!q) return;
+        location.href = `list.html?q=${encodeURIComponent(q)}`;
+      }
+    });
+
+    // Bottom nav
+    ui.bnHome?.addEventListener("click", ()=>location.href="index.html");
+    ui.bnList?.addEventListener("click", ()=>location.href="list.html");
+    ui.bnEp?.addEventListener("click", ()=>{
+      if(ui.episodesCard.hidden){
+        toast("Phim này không có danh sách tập.");
+        return;
+      }
+      ui.episodesCard.scrollIntoView({ behavior:"smooth", block:"start" });
+    });
+    ui.bnSuggest?.addEventListener("click", ()=>{
+      ui.suggestCard?.scrollIntoView({ behavior:"smooth", block:"start" });
+    });
+    ui.bnInfo?.addEventListener("click", ()=>{
+      ui.infoCard?.scrollIntoView({ behavior:"smooth", block:"start" });
+    });
+
+    // Keyboard shortcuts (PC)
+    document.addEventListener("keydown", (ev)=>{
+      if(ev.target && (ev.target.tagName === "INPUT" || ev.target.tagName === "TEXTAREA")) return;
+
+      if(ev.key === "ArrowLeft"){
+        if(state.prevTarget) openEpisode(state.prevTarget.season, state.prevTarget.ep, true);
+      }
+      if(ev.key === "ArrowRight"){
+        if(state.nextTarget) openEpisode(state.nextTarget.season, state.nextTarget.ep, true);
+      }
+      if(ev.key.toLowerCase() === "l"){
+        copyLink();
+      }
+      if(ev.key.toLowerCase() === "t"){
+        document.body.classList.toggle("theater");
+      }
+    });
+
+    // Init
+    (async ()=>{ await init(); })();
   </script>
 </body>
 </html>
